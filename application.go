@@ -45,7 +45,7 @@ func (a *Application) EnableWeb(listen string, components ...server.Component) *
 	return a
 }
 
-func (a *Application) EnableDatabase(config persistence.BaseConfig, models []interface{}) *Application {
+func (a *Application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) *Application {
 
 	a.dbEnable = true
 	a.dbConfig = config
