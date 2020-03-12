@@ -7,29 +7,50 @@ import (
 	server "github.com/lishimeng/go-libs/web"
 )
 
-func Server(ctx context.Context, listen string, components ...server.Component) (err error) {
+func Server(listen string) (srv *server.Server, err error) {
 	if len(listen) == 0 {
 		return
 	}
+
+	srv = server.New(server.ServerConfig{
+		Listen: listen,
+	})
+	return
+}
+
+func EnableComponents(srv *server.Server, components ...server.Component) (err error) {
+
 	if len(components) == 0 {
 		return
 	}
+	srv.RegisterComponents(components...)
+	return
+}
 
+func EnableStatic(srv *server.Server, home string, asset func(string) ([]byte, error), assetNames func()[]string) (err error) {
+
+	bs, err := asset(home)
+	indexHtml := ""
+	if err != nil {
+		return
+	}
+	indexHtml = string(bs)
+	srv.SetHomePage(indexHtml)
+	srv.AdvancedConfig(func(app *iris.Application) {
+		app.StaticEmbedded("/", "", asset, assetNames)
+	})
+	return
+}
+
+func Start(ctx context.Context, srv *server.Server) (err error) {
 	go func() {
 		log.Info("start web server")
-		s := server.New(server.ServerConfig{
-			Listen: listen,
-		})
-		s.OnErrorCode(404, func(ctx iris.Context) {
 
-			_, _ = ctx.Text("not found")
-		})
-		s.RegisterComponents(components...)
-		err = s.Start(ctx)
-		if err != nil {
-			log.Info(err)
+		e := srv.Start(ctx)
+		if e != nil {
+			log.Info(e)
 		}
 		log.Info("stop web server")
 	}()
-	return
+	return nil
 }

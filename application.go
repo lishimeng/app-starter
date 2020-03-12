@@ -16,6 +16,11 @@ type Application struct {
 	webListen string
 	webComponents []server.Component
 
+	webStaticEnable bool
+	webStaticAsset func(string) ([]byte, error)
+	webStaticAssetNames func()[]string
+	webStaticHome string
+
 	dbEnable bool
 	dbConfig persistence.BaseConfig
 	dbModels []interface{}
@@ -45,6 +50,14 @@ func (a *Application) EnableWeb(listen string, components ...server.Component) *
 	return a
 }
 
+func (a *Application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) *Application {
+	a.webStaticEnable = true
+	a.webStaticAsset = asset
+	a.webStaticAssetNames = assetNames
+	// TODO check
+	return a
+}
+
 func (a *Application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) *Application {
 
 	a.dbEnable = true
@@ -61,7 +74,22 @@ func (a *Application) Start() (err error) {
 	}
 
 	if a.webEnable {
-		err = api.Server(a._ctx, a.webListen, a.webComponents...)
+		var srv *server.Server
+		srv, err = api.Server(a.webListen)
+		if a.webStaticEnable {
+			err = api.EnableStatic(srv, a.webStaticHome, a.webStaticAsset, a.webStaticAssetNames)
+			if err != nil {
+				return
+			}
+		}
+		err = api.EnableComponents(srv, a.webComponents...)
+		if err != nil {
+			return
+		}
+		err = api.Start(a._ctx, srv)
+		if err != nil {
+			return
+		}
 	}
 	if err != nil {
 		return
