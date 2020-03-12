@@ -52,6 +52,7 @@ func (a *Application) EnableWeb(listen string, components ...server.Component) *
 
 func (a *Application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) *Application {
 	a.webStaticEnable = true
+	a.webStaticHome = home
 	a.webStaticAsset = asset
 	a.webStaticAssetNames = assetNames
 	// TODO check
