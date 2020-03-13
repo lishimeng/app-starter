@@ -1,6 +1,6 @@
 package repo
 
-import "github.com/lishimeng/go-libs/persistence"
+import "github.com/lishimeng/go-orm"
 
 func Database(config persistence.BaseConfig, models ...interface{}) (ormContext *persistence.OrmContext, err error) {
 

@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 	"github.com/kataras/iris"
-	"github.com/lishimeng/go-libs/log"
+	"github.com/lishimeng/go-log"
 	server "github.com/lishimeng/go-web-server"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
-	"github.com/lishimeng/go-libs/etc"
-	"github.com/lishimeng/go-libs/persistence"
+	"github.com/lishimeng/go-etc"
+	"github.com/lishimeng/go-orm"
 	server "github.com/lishimeng/go-web-server"
 )
 
