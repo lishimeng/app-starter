@@ -6,7 +6,7 @@ import (
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/go-libs/etc"
 	"github.com/lishimeng/go-libs/persistence"
-	server "github.com/lishimeng/go-libs/web"
+	server "github.com/lishimeng/go-web-server"
 )
 
 type Application struct {

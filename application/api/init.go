@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/kataras/iris"
 	"github.com/lishimeng/go-libs/log"
-	server "github.com/lishimeng/go-libs/web"
+	server "github.com/lishimeng/go-web-server"
 )
 
 func Server(listen string) (srv *server.Server, err error) {
