@@ -1,4 +1,4 @@
-package web
+package app
 
 type Response struct {
 	Code *int `json:"code,omitempty"`
