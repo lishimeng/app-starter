@@ -1,8 +1,8 @@
 package app
 
 type Response struct {
-	Code *int `json:"code,omitempty"`
-	Success *bool `json:"success,omitempty"`
+	Code interface{} `json:"code,omitempty"`
+	Success interface{} `json:"success,omitempty"`
 	Message string `json:"message,omitempty"`
 }
 
