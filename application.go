@@ -24,6 +24,10 @@ type Application struct {
 	dbEnable bool
 	dbConfig persistence.BaseConfig
 	dbModels []interface{}
+
+	// other components
+	componentsBeforeWebServer []func(ctx context.Context) (err error)
+	componentsAfterWebServer []func(ctx context.Context) (err error)
 }
 
 var orm *persistence.OrmContext
@@ -37,63 +41,76 @@ func GetOrm() *persistence.OrmContext {
 	return orm
 }
 
-func (a *Application) LoadConfig(config interface{}, name string, path ...string) error {
+func GetServer() {
+
+}
+
+func (h *Application) LoadConfig(config interface{}, name string, path ...string) error {
 	_, err := etc.LoadEnvs(name, path, config)
 	return err
 }
 
-func (a *Application) EnableWeb(listen string, components ...server.Component) *Application {
-	a.webEnable = true
-	a.webListen = listen
-	a.webComponents = components
+func (h *Application) EnableWeb(listen string, components ...server.Component) *Application {
+	h.webEnable = true
+	h.webListen = listen
+	h.webComponents = components
 	// TODO check
-	return a
+	return h
 }
 
-func (a *Application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) *Application {
-	a.webStaticEnable = true
-	a.webStaticHome = home
-	a.webStaticAsset = asset
-	a.webStaticAssetNames = assetNames
+func (h *Application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) *Application {
+	h.webStaticEnable = true
+	h.webStaticHome = home
+	h.webStaticAsset = asset
+	h.webStaticAssetNames = assetNames
 	// TODO check
-	return a
+	return h
 }
 
-func (a *Application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) *Application {
+func (h *Application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) *Application {
 
-	a.dbEnable = true
-	a.dbConfig = config
-	a.dbModels = models
+	h.dbEnable = true
+	h.dbConfig = config
+	h.dbModels = models
 	// TODO check
-	return a
+	return h
 }
 
-func (a *Application) Start() (err error) {
+func (h *Application) Start() (err error) {
 
-	if a.dbEnable {
-		orm, err =repo.Database(a.dbConfig, a.dbModels...)
+	if h.dbEnable {
+		orm, err =repo.Database(h.dbConfig, h.dbModels...)
+		if err != nil {
+			return err
+		}
+	}
+	err = h.applyComponents(h.componentsBeforeWebServer)
+	if err != nil {
+		return err
 	}
 
-	if a.webEnable {
+	if h.webEnable {
 		var srv *server.Server
-		srv, err = api.Server(a.webListen)
-		if a.webStaticEnable {
-			err = api.EnableStatic(srv, a.webStaticHome, a.webStaticAsset, a.webStaticAssetNames)
+		srv, err = api.Server(h.webListen)
+		if h.webStaticEnable {
+			err = api.EnableStatic(srv, h.webStaticHome, h.webStaticAsset, h.webStaticAssetNames)
 			if err != nil {
 				return
 			}
 		}
-		err = api.EnableComponents(srv, a.webComponents...)
+		err = api.EnableComponents(srv, h.webComponents...)
 		if err != nil {
 			return
 		}
-		err = api.Start(a._ctx, srv)
+		err = api.Start(h._ctx, srv)
 		if err != nil {
 			return
 		}
 	}
+
+	err = h.applyComponents(h.componentsAfterWebServer)
 	if err != nil {
-		return
+		return err
 	}
 
 	return
