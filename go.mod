@@ -13,7 +13,7 @@ require (
 	github.com/lishimeng/go-etc v1.0.0
 	github.com/lishimeng/go-log v1.0.0
 	github.com/lishimeng/go-orm v1.0.2
-	github.com/lishimeng/go-web-server v1.0.0
+	github.com/lishimeng/go-web-server v1.0.1
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect

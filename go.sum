@@ -104,6 +104,8 @@ github.com/lishimeng/go-orm v1.0.2 h1:7ymp9eCQNXYph46GRm0psDnVMmiFGVB6ykdBXoTjyx
 github.com/lishimeng/go-orm v1.0.2/go.mod h1:D7bGJ/2nkRzaMWJ/hliF7nTVDIK9Uwu87ysa28qZNd8=
 github.com/lishimeng/go-web-server v1.0.0 h1:cA5SmWMpmdItnylhQoMXQG4rs5VuUkXpIF224Hr7wGM=
 github.com/lishimeng/go-web-server v1.0.0/go.mod h1:MujauaWLWUisW/Lj6QAogAhyTid8SjDuuIz+k/p3RUM=
+github.com/lishimeng/go-web-server v1.0.1 h1:Toj3Iavv7yH7Fu+ej6/ITB459CLFA5Yvwey74ndHtMc=
+github.com/lishimeng/go-web-server v1.0.1/go.mod h1:U/VYKA17anHACk4LiLBjW2eQgwPrPWfj+UV0NXZ2VwE=
 github.com/lishimeng/log4go v1.0.0 h1:oQMcyx/jby6jVCZ4ywnMP+tvZoRL4L3sKYktxTX0DFQ=
 github.com/lishimeng/log4go v1.0.0/go.mod h1:7CZh60epG3cgLa4RpxzFRzYVbQzp7lXmBMlMho1cRbE=
 github.com/mattn/go-colorable v0.1.6 h1:6Su7aK7lXmJ/U79bYtBjLNaha4Fs1Rg9plHpcH+vvnE=
