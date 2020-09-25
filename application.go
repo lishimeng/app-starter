@@ -2,38 +2,25 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
-	"github.com/lishimeng/go-etc"
+	shutdown "github.com/lishimeng/go-app-shutdown"
 	"github.com/lishimeng/go-orm"
 	server "github.com/lishimeng/go-web-server"
 )
 
 type Application struct {
 	_ctx context.Context
-
-	webEnable bool
-	webListen string
-	webComponents []server.Component
-
-	webStaticEnable bool
-	webStaticAsset func(string) ([]byte, error)
-	webStaticAssetNames func()[]string
-	webStaticHome string
-
-	dbEnable bool
-	dbConfig persistence.BaseConfig
-	dbModels []interface{}
-
-	// other components
-	componentsBeforeWebServer []func(ctx context.Context) (err error)
-	componentsAfterWebServer []func(ctx context.Context) (err error)
+	builder *ApplicationBuilder
 }
 
 var orm *persistence.OrmContext
 
-func New(ctx context.Context) (instance *Application) {
-	instance = &Application{_ctx:ctx}
+func New() (instance *Application) {
+	ctx := shutdown.Context()
+	builder := &ApplicationBuilder{}
+	instance = &Application{_ctx:ctx, builder: builder}
 	return
 }
 
@@ -45,60 +32,56 @@ func GetServer() {
 
 }
 
-func (h *Application) LoadConfig(config interface{}, name string, path ...string) error {
-	_, err := etc.LoadEnvs(name, path, config)
-	return err
+func (h *Application) Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate func(string)) (err error) {
+
+	err = h._start(buildHandler)
+
+	if err == nil {
+		shutdown.WaitExit(&shutdown.Configuration{
+			BeforeExit: func(s string) {
+				if onTerminate != nil {
+					onTerminate(s)
+				}
+			},
+		})
+	}
+	return
 }
 
-func (h *Application) EnableWeb(listen string, components ...server.Component) *Application {
-	h.webEnable = true
-	h.webListen = listen
-	h.webComponents = components
-	// TODO check
-	return h
-}
+func (h *Application) _start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error) (err error) {
 
-func (h *Application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) *Application {
-	h.webStaticEnable = true
-	h.webStaticHome = home
-	h.webStaticAsset = asset
-	h.webStaticAssetNames = assetNames
-	// TODO check
-	return h
-}
-
-func (h *Application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) *Application {
-
-	h.dbEnable = true
-	h.dbConfig = config
-	h.dbModels = models
-	// TODO check
-	return h
-}
-
-func (h *Application) Start() (err error) {
-
-	if h.dbEnable {
-		orm, err =repo.Database(h.dbConfig, h.dbModels...)
+	if buildHandler == nil {
+		err = fmt.Errorf("application builder function nil")
+		return
+	}
+	err = buildHandler(h._ctx, h.builder)
+	if err != nil {
+		return
+	}
+	if h.builder.dbEnable {
+		orm, err =repo.Database(h.builder.dbConfig, h.builder.dbModels...)
 		if err != nil {
-			return err
+			return
 		}
 	}
-	err = h.applyComponents(h.componentsBeforeWebServer)
+	err = h.applyComponents(h.builder.componentsBeforeWebServer)
 	if err != nil {
 		return err
 	}
 
-	if h.webEnable {
+	if h.builder.webEnable {
 		var srv *server.Server
-		srv, err = api.Server(h.webListen)
-		if h.webStaticEnable {
-			err = api.EnableStatic(srv, h.webStaticHome, h.webStaticAsset, h.webStaticAssetNames)
+		srv, err = api.Server(h.builder.webListen)
+		if h.builder.webStaticEnable {
+			err = api.EnableStatic(srv,
+				h.builder.webStaticHome,
+				h.builder.webStaticAsset,
+				h.builder.webStaticAssetNames)
 			if err != nil {
 				return
 			}
 		}
-		err = api.EnableComponents(srv, h.webComponents...)
+		err = api.EnableComponents(srv, h.builder.webComponents...)
 		if err != nil {
 			return
 		}
@@ -108,7 +91,7 @@ func (h *Application) Start() (err error) {
 		}
 	}
 
-	err = h.applyComponents(h.componentsAfterWebServer)
+	err = h.applyComponents(h.builder.componentsAfterWebServer)
 	if err != nil {
 		return err
 	}
