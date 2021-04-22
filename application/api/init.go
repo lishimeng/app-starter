@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 	"github.com/kataras/iris"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
-	server "github.com/lishimeng/go-web-server"
 )
 
 func Server(listen string) (srv *server.Server, err error) {
@@ -44,13 +44,13 @@ func EnableStatic(srv *server.Server, home string, asset func(string) ([]byte, e
 
 func Start(ctx context.Context, srv *server.Server) (err error) {
 	go func() {
-		log.Info("start web server")
+		log.Info("start server server")
 
 		e := srv.Start(ctx)
 		if e != nil {
 			log.Info(e)
 		}
-		log.Info("stop web server")
+		log.Info("stop server server")
 	}()
 	return nil
 }

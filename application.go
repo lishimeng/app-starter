@@ -4,12 +4,24 @@ import (
 	"context"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
-	"github.com/lishimeng/go-etc"
+	"github.com/lishimeng/app-starter/etc"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-orm"
-	server "github.com/lishimeng/go-web-server"
 )
 
-type Application struct {
+type Application interface {
+	Etc(config interface{}, callback func(etc.Loader)) error
+	EnableWeb(listen string, components ...server.Component) Application
+	EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) Application
+	EnableDatabase(config persistence.BaseConfig, models ...interface{}) Application
+
+	ComponentBefore(component func(context.Context)(err error)) Application
+	ComponentAfter(component func(context.Context)(err error)) Application
+
+	Start() (err error)
+}
+
+type application struct {
 	_ctx context.Context
 
 	webEnable bool
@@ -32,8 +44,9 @@ type Application struct {
 
 var orm *persistence.OrmContext
 
-func New(ctx context.Context) (instance *Application) {
-	instance = &Application{_ctx:ctx}
+func New(ctx context.Context) (instance Application) {
+	ins := &application{_ctx:ctx}
+	instance = ins
 	return
 }
 
@@ -41,16 +54,21 @@ func GetOrm() *persistence.OrmContext {
 	return orm
 }
 
-func GetServer() {
-
-}
-
-func (h *Application) LoadConfig(config interface{}, name string, path ...string) error {
-	_, err := etc.LoadEnvs(name, path, config)
+func (h *application) Etc(config interface{}, callback func(etc.Loader)) error {
+	var err error
+	loader := etc.New()
+	if callback != nil {
+		callback(loader)
+	} else {
+		callback = func(ld etc.Loader) {
+			ld.SetFileSearcher("config").SetEnvPrefix("").SetEnvSearcher()
+		}
+	}
+	err = loader.Load(config)
 	return err
 }
 
-func (h *Application) EnableWeb(listen string, components ...server.Component) *Application {
+func (h *application) EnableWeb(listen string, components ...server.Component) Application {
 	h.webEnable = true
 	h.webListen = listen
 	h.webComponents = components
@@ -58,7 +76,7 @@ func (h *Application) EnableWeb(listen string, components ...server.Component) *
 	return h
 }
 
-func (h *Application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) *Application {
+func (h *application) EnableStaticWeb(home string, asset func(string) ([]byte, error), assetNames func()[]string) Application {
 	h.webStaticEnable = true
 	h.webStaticHome = home
 	h.webStaticAsset = asset
@@ -67,7 +85,7 @@ func (h *Application) EnableStaticWeb(home string, asset func(string) ([]byte, e
 	return h
 }
 
-func (h *Application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) *Application {
+func (h *application) EnableDatabase(config persistence.BaseConfig, models ...interface{}) Application {
 
 	h.dbEnable = true
 	h.dbConfig = config
@@ -76,7 +94,7 @@ func (h *Application) EnableDatabase(config persistence.BaseConfig, models ...in
 	return h
 }
 
-func (h *Application) Start() (err error) {
+func (h *application) Start() (err error) {
 
 	if h.dbEnable {
 		orm, err =repo.Database(h.dbConfig, h.dbModels...)

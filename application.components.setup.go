@@ -2,7 +2,7 @@ package app
 
 import "context"
 
-func (h *Application) applyComponents(components []func(ctx context.Context) (err error)) (err error) {
+func (h *application) applyComponents(components []func(ctx context.Context) (err error)) (err error) {
 
 	for _, c := range components {
 		err = c(h._ctx)
@@ -13,7 +13,7 @@ func (h *Application) applyComponents(components []func(ctx context.Context) (er
 	return
 }
 
-func (h *Application) ComponentBefore(component func(context.Context)(err error)) *Application {
+func (h *application) ComponentBefore(component func(context.Context)(err error)) Application {
 
 	if component != nil {
 		h.componentsBeforeWebServer = append(h.componentsBeforeWebServer, component)
@@ -21,7 +21,7 @@ func (h *Application) ComponentBefore(component func(context.Context)(err error)
 	return h
 }
 
-func (h *Application) ComponentAfter(component func(context.Context)(err error)) *Application {
+func (h *application) ComponentAfter(component func(context.Context)(err error)) Application {
 
 	if component != nil {
 		h.componentsAfterWebServer = append(h.componentsAfterWebServer, component)
