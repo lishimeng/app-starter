@@ -76,8 +76,9 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		if h.builder.webStaticEnable {
 			err = api.EnableStatic(srv,
 				h.builder.webStaticHome,
-				h.builder.webStaticAsset,
-				h.builder.webStaticAssetNames)
+				h.builder.assetInfo,
+				h.builder.asset,
+				h.builder.assetNames)
 			if err != nil {
 				return
 			}

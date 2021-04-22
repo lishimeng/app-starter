@@ -5,6 +5,7 @@ import (
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/server"
 	persistence "github.com/lishimeng/go-orm"
+	"os"
 )
 
 type ApplicationBuilder struct {
@@ -14,8 +15,9 @@ type ApplicationBuilder struct {
 	webComponents []server.Component
 
 	webStaticEnable bool
-	webStaticAsset func(string) ([]byte, error)
-	webStaticAssetNames func()[]string
+	assetInfo  func(name string) (os.FileInfo, error)
+	asset func(string) ([]byte, error)
+	assetNames func()[]string
 	webStaticHome string
 
 	dbEnable bool
@@ -49,13 +51,14 @@ func (h *ApplicationBuilder) EnableWeb(listen string, components ...server.Compo
 }
 
 func (h *ApplicationBuilder) EnableStaticWeb(home string,
+	assetInfo  func(name string) (os.FileInfo, error),
 	asset func(string) ([]byte, error),
 	assetNames func()[]string) *ApplicationBuilder {
 	h.webStaticEnable = true
 	h.webStaticHome = home
-	h.webStaticAsset = asset
-	h.webStaticAssetNames = assetNames
-	// TODO check
+	h.assetInfo = assetInfo
+	h.asset = asset
+	h.assetNames = assetNames
 	return h
 }
 

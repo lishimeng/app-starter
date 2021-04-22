@@ -5,6 +5,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
+	"os"
 )
 
 func Server(listen string) (srv *server.Server, err error) {
@@ -27,7 +28,10 @@ func EnableComponents(srv *server.Server, components ...server.Component) (err e
 	return
 }
 
-func EnableStatic(srv *server.Server, home string, asset func(string) ([]byte, error), assetNames func()[]string) (err error) {
+func EnableStatic(srv *server.Server, home string,
+	assetInfo func(name string) (os.FileInfo, error),
+	asset func(string) ([]byte, error),
+	assetNames func() []string) (err error) {
 
 	bs, err := asset(home)
 	indexHtml := ""
@@ -37,8 +41,9 @@ func EnableStatic(srv *server.Server, home string, asset func(string) ([]byte, e
 	indexHtml = string(bs)
 	srv.SetHomePage(indexHtml)
 	srv.AdvancedConfig(func(app *iris.Application) {
-		app.HandleDir("/", "", iris.DirOptions{
-			Asset: asset,
+		app.HandleDir("/", "./", iris.DirOptions{
+			AssetInfo:  assetInfo,
+			Asset:      asset,
 			AssetNames: assetNames,
 		})
 	})
