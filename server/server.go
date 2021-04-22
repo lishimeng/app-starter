@@ -24,10 +24,11 @@ func New(config Config) (handler *Server) {
 		config: config,
 		proxy:  iris.New(),
 	}
+	s.setLogLvl(config.LogLvl)
 	return &s
 }
 
-func (s *Server) SetLogLvl(lvl string) *Server {
+func (s *Server) setLogLvl(lvl string) *Server {
 	s.proxy.Logger().SetLevel(lvl)
 	return s
 }
