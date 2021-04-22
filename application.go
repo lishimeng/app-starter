@@ -5,22 +5,27 @@ import (
 	"fmt"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
+	"github.com/lishimeng/app-starter/server"
 	shutdown "github.com/lishimeng/go-app-shutdown"
 	"github.com/lishimeng/go-orm"
-	server "github.com/lishimeng/go-web-server"
 )
 
-type Application struct {
+type Application interface {
+	Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate func(string)) error
+}
+
+type application struct {
 	_ctx context.Context
 	builder *ApplicationBuilder
 }
 
 var orm *persistence.OrmContext
 
-func New() (instance *Application) {
+func New() (instance Application) {
 	ctx := shutdown.Context()
 	builder := &ApplicationBuilder{}
-	instance = &Application{_ctx:ctx, builder: builder}
+	ins := &application{_ctx:ctx, builder: builder}
+	instance = ins
 	return
 }
 
@@ -28,11 +33,7 @@ func GetOrm() *persistence.OrmContext {
 	return orm
 }
 
-func GetServer() {
-
-}
-
-func (h *Application) Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate func(string)) (err error) {
+func (h *application) Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate func(string)) (err error) {
 
 	err = h._start(buildHandler)
 
@@ -48,7 +49,7 @@ func (h *Application) Start(buildHandler func(ctx context.Context, builder *Appl
 	return
 }
 
-func (h *Application) _start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error) (err error) {
+func (h *application) _start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error) (err error) {
 
 	if buildHandler == nil {
 		err = fmt.Errorf("application builder function nil")

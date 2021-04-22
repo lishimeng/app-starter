@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"github.com/lishimeng/go-etc"
+	"github.com/lishimeng/app-starter/etc"
+	"github.com/lishimeng/app-starter/server"
 	persistence "github.com/lishimeng/go-orm"
-	server "github.com/lishimeng/go-web-server"
 )
 
 type ApplicationBuilder struct {
@@ -27,9 +27,17 @@ type ApplicationBuilder struct {
 	componentsAfterWebServer []func(ctx context.Context) (err error)
 }
 
-func (h *ApplicationBuilder) LoadConfig(config interface{}, name string, path ...string) error {
-	_, err := etc.LoadEnvs(name, path, config)
-	return err
+func (h *ApplicationBuilder) LoadConfig(config interface{}, callback func(etc.Loader)) (err error) {
+	var cb = callback
+	loader := etc.New()
+	if cb == nil {
+		cb = func(ld etc.Loader) {
+			ld.SetFileSearcher("config")
+		}
+	}
+	cb(loader)
+	err = loader.Load(config)
+	return
 }
 
 func (h *ApplicationBuilder) EnableWeb(listen string, components ...server.Component) *ApplicationBuilder {

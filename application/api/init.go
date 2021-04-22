@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
-	server "github.com/lishimeng/go-web-server"
 )
 
 func Server(listen string) (srv *server.Server, err error) {
@@ -12,7 +12,7 @@ func Server(listen string) (srv *server.Server, err error) {
 		return
 	}
 
-	srv = server.New(server.ServerConfig{
+	srv = server.New(server.Config{
 		Listen: listen,
 	})
 	return
@@ -37,7 +37,10 @@ func EnableStatic(srv *server.Server, home string, asset func(string) ([]byte, e
 	indexHtml = string(bs)
 	srv.SetHomePage(indexHtml)
 	srv.AdvancedConfig(func(app *iris.Application) {
-		app.StaticEmbedded("/", "", asset, assetNames)
+		app.HandleDir("/", "", iris.DirOptions{
+			Asset: asset,
+			AssetNames: assetNames,
+		})
 	})
 	return
 }
