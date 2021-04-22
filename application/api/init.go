@@ -28,12 +28,12 @@ func EnableComponents(srv *server.Server, components ...server.Component) (err e
 	return
 }
 
-func EnableStatic(srv *server.Server, home string,
+func EnableStatic(srv *server.Server, vdir string, home string,
 	assetInfo func(name string) (os.FileInfo, error),
 	asset func(string) ([]byte, error),
 	assetNames func() []string) (err error) {
 
-	bs, err := asset(home)
+	bs, err := asset(vdir + "/" + home)
 	indexHtml := ""
 	if err != nil {
 		return
@@ -41,7 +41,7 @@ func EnableStatic(srv *server.Server, home string,
 	indexHtml = string(bs)
 	srv.SetHomePage(indexHtml)
 	srv.AdvancedConfig(func(app *iris.Application) {
-		app.HandleDir("/", "./", iris.DirOptions{
+		app.HandleDir("/", vdir, iris.DirOptions{
 			AssetInfo:  assetInfo,
 			Asset:      asset,
 			AssetNames: assetNames,

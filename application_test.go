@@ -1,14 +1,12 @@
 package app
 
 import (
-	"context"
 	"testing"
 )
 
 func TestNew(t *testing.T) {
 	var a Application
-	ctx := context.Background()
-	target  := New(ctx)
+	target  := New()
 	a = target.(Application)
 	t.Logf("application:%T", a)
 }

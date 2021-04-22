@@ -75,6 +75,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		srv, err = api.Server(h.builder.webListen)
 		if h.builder.webStaticEnable {
 			err = api.EnableStatic(srv,
+				h.builder.vdir,
 				h.builder.webStaticHome,
 				h.builder.assetInfo,
 				h.builder.asset,

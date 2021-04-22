@@ -15,6 +15,7 @@ type ApplicationBuilder struct {
 	webComponents []server.Component
 
 	webStaticEnable bool
+	vdir string
 	assetInfo  func(name string) (os.FileInfo, error)
 	asset func(string) ([]byte, error)
 	assetNames func()[]string
@@ -50,11 +51,12 @@ func (h *ApplicationBuilder) EnableWeb(listen string, components ...server.Compo
 	return h
 }
 
-func (h *ApplicationBuilder) EnableStaticWeb(home string,
+func (h *ApplicationBuilder) EnableStaticWeb(vdir, home string,
 	assetInfo  func(name string) (os.FileInfo, error),
 	asset func(string) ([]byte, error),
 	assetNames func()[]string) *ApplicationBuilder {
 	h.webStaticEnable = true
+	h.vdir = vdir
 	h.webStaticHome = home
 	h.assetInfo = assetInfo
 	h.asset = asset
