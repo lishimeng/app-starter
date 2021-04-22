@@ -10,6 +10,7 @@ import (
 type Component func(app *iris.Application)
 type Config struct {
 	Listen string
+	LogLvl string
 }
 
 type Server struct {
@@ -24,6 +25,11 @@ func New(config Config) (handler *Server) {
 		proxy:  iris.New(),
 	}
 	return &s
+}
+
+func (s *Server) SetLogLvl(lvl string) *Server {
+	s.proxy.Logger().SetLevel(lvl)
+	return s
 }
 
 func (s *Server) RegisterComponent(component Component) *Server {

@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+const (
+	defaultWebLogLevel = "error"
+)
+
 type ApplicationBuilder struct {
 
 	webEnable bool
@@ -20,6 +24,8 @@ type ApplicationBuilder struct {
 	asset func(string) ([]byte, error)
 	assetNames func()[]string
 	webStaticHome string
+
+	webLogLevel string
 
 	dbEnable bool
 	dbConfig persistence.BaseConfig
@@ -48,6 +54,11 @@ func (h *ApplicationBuilder) EnableWeb(listen string, components ...server.Compo
 	h.webListen = listen
 	h.webComponents = components
 	// TODO check
+	return h
+}
+
+func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
+	h.webLogLevel = lvl
 	return h
 }
 

@@ -72,7 +72,13 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	if h.builder.webEnable {
 		var srv *server.Server
-		srv, err = api.Server(h.builder.webListen)
+		conf := server.Config{
+			Listen: h.builder.webListen,
+		}
+		if len(h.builder.webLogLevel) > 0 {
+			conf.LogLvl = h.builder.webLogLevel
+		}
+		srv, err = api.Server(conf)
 		if h.builder.webStaticEnable {
 			err = api.EnableStatic(srv,
 				h.builder.vdir,

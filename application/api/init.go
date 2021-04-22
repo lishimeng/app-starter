@@ -8,14 +8,9 @@ import (
 	"os"
 )
 
-func Server(listen string) (srv *server.Server, err error) {
-	if len(listen) == 0 {
-		return
-	}
+func Server(conf server.Config) (srv *server.Server, err error) {
 
-	srv = server.New(server.Config{
-		Listen: listen,
-	})
+	srv = server.New(conf)
 	return
 }
 
