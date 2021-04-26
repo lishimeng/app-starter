@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
+	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/server"
 	shutdown "github.com/lishimeng/go-app-shutdown"
 	"github.com/lishimeng/go-orm"
@@ -15,22 +16,27 @@ type Application interface {
 }
 
 type application struct {
-	_ctx context.Context
 	builder *ApplicationBuilder
 }
-
+var ctx context.Context
 var orm *persistence.OrmContext
+var appCache cache.C
 
 func New() (instance Application) {
-	ctx := shutdown.Context()
+	ctx = shutdown.Context()
 	builder := &ApplicationBuilder{}
-	ins := &application{_ctx:ctx, builder: builder}
+	ins := &application{builder: builder}
 	instance = ins
 	return
 }
 
 func GetOrm() *persistence.OrmContext {
 	return orm
+}
+
+func GetCache() (c cache.C) {
+	c = appCache
+	return
 }
 
 func (h *application) Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate func(string)) (err error) {
@@ -55,7 +61,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		err = fmt.Errorf("application builder function nil")
 		return
 	}
-	err = buildHandler(h._ctx, h.builder)
+	err = buildHandler(ctx, h.builder)
 	if err != nil {
 		return
 	}
@@ -65,6 +71,11 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 			return
 		}
 	}
+
+	if h.builder.cacheEnable {
+		appCache = cache.New(ctx, h.builder.redisOpts, h.builder.cacheOpts)
+	}
+
 	err = h.applyComponents(h.builder.componentsBeforeWebServer)
 	if err != nil {
 		return err
@@ -94,7 +105,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		if err != nil {
 			return
 		}
-		err = api.Start(h._ctx, srv)
+		err = api.Start(ctx, srv)
 		if err != nil {
 			return
 		}

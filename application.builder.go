@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/server"
 	persistence "github.com/lishimeng/go-orm"
@@ -30,6 +31,10 @@ type ApplicationBuilder struct {
 	dbEnable bool
 	dbConfig persistence.BaseConfig
 	dbModels []interface{}
+
+	cacheEnable bool
+	redisOpts cache.RedisOptions
+	cacheOpts cache.Options
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
@@ -82,5 +87,13 @@ func (h *ApplicationBuilder) EnableDatabase(config persistence.BaseConfig,
 	h.dbConfig = config
 	h.dbModels = models
 	// TODO check
+	return h
+}
+
+func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts cache.Options) *ApplicationBuilder {
+
+	h.cacheEnable = true
+	h.redisOpts = redisOpts
+	h.cacheOpts = cacheOpts
 	return h
 }

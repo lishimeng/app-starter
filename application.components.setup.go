@@ -5,7 +5,7 @@ import "context"
 func (h *application) applyComponents(components []func(ctx context.Context) (err error)) (err error) {
 
 	for _, c := range components {
-		err = c(h._ctx)
+		err = c(ctx)
 		if err != nil {
 			break
 		}
