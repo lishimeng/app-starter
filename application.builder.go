@@ -46,7 +46,7 @@ func (h *ApplicationBuilder) LoadConfig(config interface{}, callback func(etc.Lo
 	loader := etc.New()
 	if cb == nil {
 		cb = func(ld etc.Loader) {
-			ld.SetFileSearcher("config")
+			ld.SetFileSearcher("config", ".").SetEnvPrefix("").SetEnvSearcher()
 		}
 	}
 	cb(loader)
