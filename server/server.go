@@ -14,8 +14,8 @@ type Config struct {
 }
 
 type Server struct {
-	config        Config
-	proxy         *iris.Application
+	config Config
+	proxy  *iris.Application
 }
 
 func New(config Config) (handler *Server) {
@@ -95,7 +95,7 @@ func (s *Server) shutdownFuture(srv *http.Server, ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			c, cancel = context.WithTimeout(context.Background(), 3*time.Second)
+			c = context.TODO()
 			if err := srv.Shutdown(c); nil != err {
 			}
 			return

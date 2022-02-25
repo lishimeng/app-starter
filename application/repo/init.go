@@ -2,13 +2,12 @@ package repo
 
 import "github.com/lishimeng/go-orm"
 
-func Database(config persistence.BaseConfig, models ...interface{}) (ormContext *persistence.OrmContext, err error) {
+func Database(config persistence.BaseConfig, models ...interface{}) (err error) {
 
 	config.RegisterModel(models...)
-	orm, err := persistence.InitOrm(config)
+	err = persistence.InitOrm(config)
 	if err != nil {
 		return
 	}
-	ormContext = &orm
 	return
 }

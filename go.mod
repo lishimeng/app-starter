@@ -15,11 +15,10 @@ require (
 	github.com/kataras/iris/v12 v12.1.8
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
-	github.com/lishimeng/go-orm v1.0.4
+	github.com/lishimeng/go-orm v1.1.1
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/valyala/fasthttp v1.23.0 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect

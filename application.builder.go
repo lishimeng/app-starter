@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/server"
@@ -14,17 +15,16 @@ const (
 )
 
 type ApplicationBuilder struct {
-
-	webEnable bool
-	webListen string
+	webEnable     bool
+	webListen     string
 	webComponents []server.Component
 
 	webStaticEnable bool
-	vdir string
-	assetInfo  func(name string) (os.FileInfo, error)
-	asset func(string) ([]byte, error)
-	assetNames func()[]string
-	webStaticHome string
+	vdir            string
+	assetInfo       func(name string) (os.FileInfo, error)
+	asset           func(string) ([]byte, error)
+	assetNames      func() []string
+	webStaticHome   string
 
 	webLogLevel string
 
@@ -33,12 +33,12 @@ type ApplicationBuilder struct {
 	dbModels []interface{}
 
 	cacheEnable bool
-	redisOpts cache.RedisOptions
-	cacheOpts cache.Options
+	redisOpts   cache.RedisOptions
+	cacheOpts   cache.Options
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
-	componentsAfterWebServer []func(ctx context.Context) (err error)
+	componentsAfterWebServer  []func(ctx context.Context) (err error)
 }
 
 func (h *ApplicationBuilder) LoadConfig(config interface{}, callback func(etc.Loader)) (err error) {
@@ -57,8 +57,30 @@ func (h *ApplicationBuilder) LoadConfig(config interface{}, callback func(etc.Lo
 func (h *ApplicationBuilder) EnableWeb(listen string, components ...server.Component) *ApplicationBuilder {
 	h.webEnable = true
 	h.webListen = listen
-	h.webComponents = components
+	h.webComponents = append(h.webComponents, api.Router)
+	if len(components) > 0 {
+		h.webComponents = append(h.webComponents, components...)
+	}
 	// TODO check
+	return h
+}
+
+func (h *ApplicationBuilder) SetMonitorPrefix(prefix string) *ApplicationBuilder {
+	api.MonitorPrefix = prefix
+	return h
+}
+
+func (h *ApplicationBuilder) HealthyHandler(handler func() int) *ApplicationBuilder {
+	if handler != nil {
+		api.LivenessHandler = handler
+	}
+	return h
+}
+
+func (h *ApplicationBuilder) ReadyHandler(handler func() int) *ApplicationBuilder {
+	if handler != nil {
+		api.ReadinessHandler = handler
+	}
 	return h
 }
 
@@ -68,9 +90,9 @@ func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 }
 
 func (h *ApplicationBuilder) EnableStaticWeb(vdir, home string,
-	assetInfo  func(name string) (os.FileInfo, error),
+	assetInfo func(name string) (os.FileInfo, error),
 	asset func(string) ([]byte, error),
-	assetNames func()[]string) *ApplicationBuilder {
+	assetNames func() []string) *ApplicationBuilder {
 	h.webStaticEnable = true
 	h.vdir = vdir
 	h.webStaticHome = home

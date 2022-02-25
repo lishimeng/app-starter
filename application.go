@@ -18,8 +18,8 @@ type Application interface {
 type application struct {
 	builder *ApplicationBuilder
 }
+
 var ctx context.Context
-var orm *persistence.OrmContext
 var appCache cache.C
 
 func New() (instance Application) {
@@ -31,7 +31,7 @@ func New() (instance Application) {
 }
 
 func GetOrm() *persistence.OrmContext {
-	return orm
+	return persistence.New()
 }
 
 func GetCache() (c cache.C) {
@@ -66,7 +66,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		return
 	}
 	if h.builder.dbEnable {
-		orm, err =repo.Database(h.builder.dbConfig, h.builder.dbModels...)
+		err = repo.Database(h.builder.dbConfig, h.builder.dbModels...)
 		if err != nil {
 			return
 		}
