@@ -29,7 +29,7 @@ func EnableStatic(srv *server.Server, assetFile func() http.FileSystem) (err err
 		return
 	}
 	srv.AdvancedConfig(func(app *iris.Application) {
-		app.HandleDir("/", assetFile)
+		app.HandleDir("/", assetFile())
 	})
 	return
 }
