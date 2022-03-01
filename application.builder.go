@@ -7,6 +7,7 @@ import (
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/server"
 	persistence "github.com/lishimeng/go-orm"
+	"net/http"
 	"os"
 )
 
@@ -25,6 +26,7 @@ type ApplicationBuilder struct {
 	asset           func(string) ([]byte, error)
 	assetNames      func() []string
 	webStaticHome   string
+	assetFile       func() http.FileSystem
 
 	webLogLevel string
 
@@ -89,16 +91,9 @@ func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 	return h
 }
 
-func (h *ApplicationBuilder) EnableStaticWeb(vdir, home string,
-	assetInfo func(name string) (os.FileInfo, error),
-	asset func(string) ([]byte, error),
-	assetNames func() []string) *ApplicationBuilder {
+func (h *ApplicationBuilder) EnableStaticWeb(assetFile func() http.FileSystem) *ApplicationBuilder {
 	h.webStaticEnable = true
-	h.vdir = vdir
-	h.webStaticHome = home
-	h.assetInfo = assetInfo
-	h.asset = asset
-	h.assetNames = assetNames
+	h.assetFile = assetFile
 	return h
 }
 
