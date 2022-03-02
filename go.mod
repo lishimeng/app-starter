@@ -24,10 +24,9 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	go.opentelemetry.io/otel v0.19.0 // indirect
-
 )
 replace (
 	github.com/dgrijalva/jwt-go => github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
-	github.com/go-yaml/yaml => github.com/go-yaml/yaml/v2 v2.2.8
+	github.com/go-yaml/yaml/v2 => github.com/go-yaml/yaml/v2 v2.2.8
 	gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.2.8
 )
