@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	defaultMonitorAddr = ":8080"
+)
+
 type Component func(app *iris.Application)
 type Config struct {
 	Listen string
@@ -14,22 +18,29 @@ type Config struct {
 }
 
 type Server struct {
-	config Config
-	proxy  *iris.Application
+	config  Config
+	proxy   *iris.Application
+	monitor *iris.Application
 }
 
 func New(config Config) (handler *Server) {
 
 	s := Server{
-		config: config,
-		proxy:  iris.New(),
+		config:  config,
+		proxy:   iris.New(),
+		monitor: iris.New(),
 	}
 	s.setLogLvl(config.LogLvl)
 	return &s
 }
 
+func (s *Server) GetMonitor() *iris.Application {
+	return s.monitor
+}
+
 func (s *Server) setLogLvl(lvl string) *Server {
 	s.proxy.Logger().SetLevel(lvl)
+	// Monitor不设置log
 	return s
 }
 
@@ -76,7 +87,13 @@ func (s *Server) Start(ctx context.Context) error {
 		Addr:    s.config.Listen,
 		Handler: s.proxy,
 	}
+	monitorServer := http.Server{Addr: defaultMonitorAddr, Handler: s.monitor}
 	go s.shutdownFuture(&srv, ctx)
+	go s.shutdownFuture(&monitorServer, ctx)
+
+	go func() {
+		_ = monitorServer.ListenAndServe()
+	}()
 
 	return srv.ListenAndServe()
 }

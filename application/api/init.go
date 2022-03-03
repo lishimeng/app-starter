@@ -23,6 +23,11 @@ func EnableComponents(srv *server.Server, components ...server.Component) (err e
 	return
 }
 
+func EnableMonitors(srv *server.Server) (err error) {
+	Router(srv.GetMonitor())
+	return
+}
+
 func EnableStatic(srv *server.Server, assetFile func() http.FileSystem) (err error) {
 
 	if err != nil {

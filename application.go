@@ -101,6 +101,10 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		if err != nil {
 			return
 		}
+		err = api.EnableMonitors(srv)
+		if err != nil {
+			return
+		}
 		err = api.Start(ctx, srv)
 		if err != nil {
 			return
