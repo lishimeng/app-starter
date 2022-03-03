@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultMonitorAddr = ":8080"
+	defaultMonitorAddr = ":8888"
 )
 
 type Component func(app *iris.Application)
@@ -86,6 +86,9 @@ func (s *Server) Start(ctx context.Context) error {
 	srv := http.Server{
 		Addr:    s.config.Listen,
 		Handler: s.proxy,
+	}
+	if err := s.monitor.Configure(iris.WithCharset("UTF-8")).Build(); err != nil {
+		return err
 	}
 	monitorServer := http.Server{Addr: defaultMonitorAddr, Handler: s.monitor}
 	go s.shutdownFuture(&srv, ctx)
