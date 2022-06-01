@@ -33,6 +33,9 @@ func New() (instance Application) {
 func GetOrm() *persistence.OrmContext {
 	return persistence.New()
 }
+func GetNamedOrm(aliaName string) *persistence.OrmContext {
+	return persistence.NewOrm(aliaName)
+}
 
 func GetCache() (c cache.C) {
 	c = appCache
