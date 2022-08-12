@@ -5,6 +5,7 @@ import "github.com/kataras/iris/v12"
 const (
 	RespCodeSuccess  = 200
 	RespCodeNotFound = 404
+	RespCodeError    = 500
 )
 
 const (
