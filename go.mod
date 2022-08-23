@@ -11,7 +11,6 @@ require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/jeremywohl/flatten v1.0.1
 	github.com/kataras/iris/v12 v12.2.0-beta4
-	github.com/lishimeng/emq-auth-http v0.1.5
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
 	github.com/lishimeng/go-orm v1.2.1
