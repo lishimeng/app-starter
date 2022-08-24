@@ -1,5 +1,10 @@
 package version
 
+import (
+	"fmt"
+	"runtime"
+)
+
 /**
 
 VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
@@ -13,3 +18,14 @@ const (
 	Commit  = ""
 	Build   = ""
 )
+
+func Print() {
+	fmt.Println("***********************************")
+	fmt.Println(AppName)
+	fmt.Println(Version)
+	fmt.Println(Commit)
+	fmt.Println(Build)
+	fmt.Println(runtime.GOOS)
+	fmt.Println(runtime.GOARCH)
+	fmt.Println("***********************************")
+}

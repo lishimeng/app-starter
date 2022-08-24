@@ -2,10 +2,12 @@ package app
 
 import (
 	"context"
+	"github.com/beego/beego/v2/client/orm"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/server"
+	"github.com/lishimeng/app-starter/version"
 	persistence "github.com/lishimeng/go-orm"
 	"net/http"
 	"os"
@@ -112,5 +114,15 @@ func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts
 	h.cacheEnable = true
 	h.redisOpts = redisOpts
 	h.cacheOpts = cacheOpts
+	return h
+}
+
+func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
+	orm.Debug = true
+	return h
+}
+
+func (h *ApplicationBuilder) PrintVersion() *ApplicationBuilder {
+	version.Print()
 	return h
 }
