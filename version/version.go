@@ -12,20 +12,21 @@ COMMIT=$(git log --pretty=format:"%h" -1)
 BUILD_TIME=$(date +%FT%T%z)
 */
 
-const (
-	AppName = ""
-	Version = ""
-	Commit  = ""
-	Build   = ""
+var (
+	AppName  = ""
+	Version  = ""
+	Commit   = ""
+	Build    = ""
+	Compiler = ""
 )
 
 func Print() {
 	fmt.Println("***********************************")
-	fmt.Println(AppName)
-	fmt.Println(Version)
-	fmt.Println(Commit)
-	fmt.Println(Build)
-	fmt.Println(runtime.GOOS)
-	fmt.Println(runtime.GOARCH)
+	fmt.Printf("Name     :%s\n", AppName)
+	fmt.Printf("Version  :%s\n", Version)
+	fmt.Printf("Commit   :%s\n", Commit)
+	fmt.Printf("Build    :%s\n", Build)
+	fmt.Printf("Compiler :%s\n", Compiler)
+	fmt.Printf("OS/Arch  :%s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Println("***********************************")
 }

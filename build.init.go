@@ -13,7 +13,9 @@ const (
 )
 
 const (
-	buildTpl = `
+	compilerCmd = "`go version`"
+	dateCmd     = "`date +%FT%T%z`"
+	buildTpl    = `
 #!/bin/bash
 NAME="{{ .name }}"
 MAIN_PATH="{{ .mainPath }}"
@@ -23,7 +25,6 @@ ORG="{{ .dockerOrganization }}"
 VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
 # shellcheck disable=SC2154
 COMMIT=$(git log --pretty=format:"%h" -1)
-BUILD_TIME=$(date +%FT%T%z)
 
 build_application(){
   git checkout "${VERSION}"
@@ -31,7 +32,6 @@ build_application(){
   --build-arg NAME="${NAME}" \
   --build-arg VERSION="${VERSION}" \
   --build-arg COMMIT="${COMMIT}" \
-  --build-arg BUILD_TIME="${BUILD_TIME}" \
   --build-arg MAIN_PATH="${MAIN_PATH}" .
 }
 
@@ -40,7 +40,6 @@ print_app_info(){
   echo "App:${NAME}"
   echo "Version:${VERSION}"
   echo "Commit:${COMMIT}"
-  echo "BuildTime:${BUILD_TIME}"
   echo "Main_Path:${MAIN_PATH}"
   echo "****************************************"
   echo ""
@@ -61,15 +60,20 @@ FROM golang:1.18 as build
 ARG NAME
 ARG VERSION
 ARG COMMIT
-ARG TAG
-ARG BUILD_TIME
 ARG MAIN_PATH
 ENV GOPROXY=https://goproxy.cn,direct
 WORKDIR /release
 ADD . .
 COPY --from=ui /ui_build/dist/ static/
 RUN go mod download && go mod verify
-RUN go build -v --ldflags "-X github.com/lishimeng/app-starter/version.AppName=${NAME} -X github.com/lishimeng/app-starter/version.Version=${VERSION} -X github.com/lishimeng/app-starter/version.Commit=${COMMIT} -X github.com/lishimeng/app-starter/version.Build=${BUILD_TIME}" -o ${NAME} ${MAIN_PATH}
+ENV LDFLAGS=" \
+    -X github.com/lishimeng/app-starter/version.AppName=${NAME} \
+    -X github.com/lishimeng/app-starter/version.Version=${VERSION} \
+    -X github.com/lishimeng/app-starter/version.Commit=${COMMIT} \
+    -X github.com/lishimeng/app-starter/version.Build={{ .dateCmd }} \
+    -X github.com/lishimeng/app-starter/version.Compiler={{ .compilerCmd }} \
+    "
+RUN go build -v --ldflags "${LDFLAGS}" -o ${NAME} ${MAIN_PATH}
 
 FROM ubuntu:22.04 as prod
 ARG NAME
@@ -85,10 +89,14 @@ type ApplicationConfig struct {
 	Name               string `json:"name,omitempty"`
 	MainPath           string `json:"mainPath,omitempty"`
 	DockerOrganization string `json:"dockerOrganization,omitempty"`
+	DateCmd            string `json:"dateCmd"`
+	CompilerCmd        string `json:"compilerCmd"`
 }
 
 func GenerateDockerfile(config ApplicationConfig) (err error) {
 
+	config.DateCmd = dateCmd
+	config.CompilerCmd = compilerCmd
 	bs, err := json.Marshal(config)
 	if err != nil {
 		fmt.Println(err)
