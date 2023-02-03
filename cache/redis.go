@@ -2,7 +2,7 @@ package cache
 
 import (
 	"context"
-	"github.com/go-redis/cache/v8"
+	"github.com/go-redis/cache/v9"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func (c *redisCache) GetProxy() *cache.Cache {
 // Get
 /**
 err = c.Get(key, &obj)
- */
+*/
 func (c *redisCache) Get(key string, value interface{}) (err error) {
 	err = c.proxy.Get(c.ctx, key, value)
 	return
@@ -38,7 +38,7 @@ err = c.Set(key, &Demo{
 		B: 24,
 		C: time.Now(),
 	})
- */
+*/
 func (c *redisCache) Set(key string, value interface{}) (err error) {
 	err = c.proxy.Set(&cache.Item{
 		Ctx:   nil,

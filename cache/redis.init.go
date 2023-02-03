@@ -2,8 +2,8 @@ package cache
 
 import (
 	"context"
-	"github.com/go-redis/cache/v8"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/cache/v9"
+	"github.com/redis/go-redis/v9"
 	"time"
 )
 
@@ -27,7 +27,7 @@ c := New(ctx, RedisOptions{
 		MaxSize: 10,
 		Ttl:     time.Second*20,
 	})
- */
+*/
 func New(ctx context.Context, redisOpts RedisOptions, cacheOpts Options) (c C) {
 	var options = redis.Options(redisOpts)
 	r := redis.NewClient(&options)
@@ -36,7 +36,7 @@ func New(ctx context.Context, redisOpts RedisOptions, cacheOpts Options) (c C) {
 		cacheOpts.MaxSize = defaultMaxSize
 	}
 	ca := cache.New(&cache.Options{
-		Redis: r,
+		Redis:      r,
 		LocalCache: cache.NewTinyLFU(cacheOpts.MaxSize, cacheOpts.Ttl),
 	})
 	rc := redisCache{
