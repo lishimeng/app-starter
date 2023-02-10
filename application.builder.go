@@ -123,10 +123,11 @@ func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
 	return h
 }
 
-func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handler) {
+func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handler) *ApplicationBuilder {
 	h.amqpEnable = true
 	h.amqpOptions = c
 	h.amqpHandler = append(h.amqpHandler, handlers...)
+	return h
 }
 
 func (h *ApplicationBuilder) PrintVersion() *ApplicationBuilder {
