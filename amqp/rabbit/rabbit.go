@@ -16,7 +16,7 @@ type Session interface {
 }
 
 type Message struct {
-	Payload []byte
+	Payload interface{}
 	Router  Route
 	Options []PublishOption
 }

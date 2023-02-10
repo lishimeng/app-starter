@@ -71,7 +71,7 @@ func TestSdk001(t *testing.T) {
 
 	}()
 
-	time.Sleep(time.Minute * 20)
+	time.Sleep(time.Minute * 2)
 	log.Info("done")
 	cancel()
 
