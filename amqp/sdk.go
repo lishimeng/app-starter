@@ -1,9 +1,15 @@
-package internal
+package amqp
 
 import (
+	"context"
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/streadway/amqp"
 )
+
+func New(ctx context.Context, c Connector) (session rabbit.Session) {
+	session = rabbit.New(ctx, c.Conn)
+	return
+}
 
 func RegisterHandler(session rabbit.Session, ds ...Downstream) {
 	for _, d := range ds {

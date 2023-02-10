@@ -1,9 +1,18 @@
-package internal
+package amqp
 
-import "github.com/lishimeng/app-starter/amqp/rabbit"
+import (
+	"fmt"
+	"github.com/lishimeng/app-starter/amqp/rabbit"
+)
+
+const addrFormat = "amqp://%s:%s@%s:%d/"
 
 type Connector struct {
 	Conn string
+}
+
+func (c *Connector) Build(host string, port int, user string, passwd string) {
+	c.Conn = fmt.Sprintf(addrFormat, user, passwd, host, port)
 }
 
 // Downstream

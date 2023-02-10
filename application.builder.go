@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/lishimeng/app-starter/amqp"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
@@ -11,10 +12,6 @@ import (
 	persistence "github.com/lishimeng/go-orm"
 	"net/http"
 	"os"
-)
-
-const (
-	defaultWebLogLevel = "error"
 )
 
 type ApplicationBuilder struct {
@@ -39,6 +36,9 @@ type ApplicationBuilder struct {
 	cacheEnable bool
 	redisOpts   cache.RedisOptions
 	cacheOpts   cache.Options
+
+	amqpEnable  bool
+	amqpOptions amqp.Connector
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
@@ -120,6 +120,11 @@ func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts
 func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
 	orm.Debug = true
 	return h
+}
+
+func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector) {
+	h.amqpEnable = true
+	h.amqpOptions = c
 }
 
 func (h *ApplicationBuilder) PrintVersion() *ApplicationBuilder {

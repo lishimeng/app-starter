@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/lishimeng/app-starter/amqp"
+	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
@@ -22,11 +24,18 @@ type application struct {
 var ctx context.Context
 var appCache cache.C
 
+var amqpSession rabbit.Session
+
 func New() (instance Application) {
 	ctx = shutdown.Context()
 	builder := &ApplicationBuilder{}
 	ins := &application{builder: builder}
 	instance = ins
+	return
+}
+
+func GetAmqp() (session rabbit.Session) {
+	session = amqpSession
 	return
 }
 
@@ -68,6 +77,11 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	if err != nil {
 		return
 	}
+
+	if h.builder.amqpEnable {
+		amqpSession = amqp.New(ctx, h.builder.amqpOptions)
+	}
+
 	if h.builder.dbEnable {
 		err = repo.Database(h.builder.dbConfig, h.builder.dbModels...)
 		if err != nil {

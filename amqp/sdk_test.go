@@ -1,4 +1,4 @@
-package internal
+package amqp
 
 import (
 	"context"
@@ -15,7 +15,7 @@ type simpleDs struct {
 
 var rxIndex = 0
 
-func (s *simpleDs) Subscribe(_ string, v interface{}, _ rabbit.TxHandler) {
+func (s *simpleDs) Subscribe(_ string, _ interface{}, _ rabbit.TxHandler) {
 	rxIndex++
 	log.Info("receive:%d", rxIndex)
 }
@@ -35,7 +35,8 @@ func TestSdk001(t *testing.T) {
 	const addr = "amqp://ows:thingple@127.0.0.1:5672/"
 
 	var ctx, cancel = context.WithCancel(context.Background())
-	var session = rabbit.New(ctx, addr)
+	var c = Connector{Conn: addr}
+	var session = New(ctx, c)
 
 	log.Info(session)
 
