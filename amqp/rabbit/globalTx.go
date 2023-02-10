@@ -2,6 +2,7 @@ package rabbit
 
 import (
 	"github.com/lishimeng/go-log"
+	"github.com/streadway/amqp"
 )
 
 func (session *sessionRabbit) globalChannelProcess() {
@@ -46,6 +47,14 @@ func (session *sessionRabbit) globalChannelLoop() {
 		}()
 	}
 
+	err = ch.Confirm(false)
+	if err != nil {
+		return
+	}
+
+	var onPublished = make(chan amqp.Confirmation)
+	ch.NotifyPublish(onPublished)
+
 	for {
 		select {
 		case <-session.ctx.Done():
@@ -59,7 +68,7 @@ func (session *sessionRabbit) globalChannelLoop() {
 				return
 			}
 			// TODO 重发
-			e := publish(session, ch, m)
+			e := publish(session, ch, m, onPublished)
 			if e != nil {
 				log.Info(e) // 发送失败
 			}

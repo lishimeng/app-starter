@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gofrs/uuid"
 	"github.com/streadway/amqp"
 	"time"
 )
@@ -89,7 +90,11 @@ var (
 	}
 	MessageIdOption PublishOption = func(m amqp.Publishing, payload interface{}) (p amqp.Publishing, err error) {
 		p = m
-		p.MessageId = "1"
+		id, err := uuid.NewV4()
+		if err != nil {
+			return
+		}
+		p.MessageId = id.String()
 		return
 	}
 	defaultPublishOption = JsonEncodeOption

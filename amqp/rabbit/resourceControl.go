@@ -12,7 +12,6 @@ func (session *sessionRabbit) initResource() {
 func (session *sessionRabbit) releaseResource() {
 	session.safeCloseGlobalTx()
 	session.safeCloseConnection()
-	//session.safeCloseConnCloseChan()
 }
 
 func (session *sessionRabbit) safeCloseConnection() {
@@ -42,13 +41,4 @@ func (session *sessionRabbit) safeCloseGlobalTx() {
 		}
 	}()
 	close(session.globalTxChannel)
-}
-func (session *sessionRabbit) safeCloseConnCloseChan() {
-	log.Debug("safe close conn notify")
-	defer func() {
-		if e := recover(); e != nil {
-			log.Info(e)
-		}
-	}()
-	close(session.onConnClose)
 }

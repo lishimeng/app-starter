@@ -8,6 +8,7 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/go-redis/cache/v9 v9.0.0
 	github.com/go-resty/resty/v2 v2.7.0
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jeremywohl/flatten v1.0.1
 	github.com/kataras/iris/v12 v12.2.0-beta7
 	github.com/lishimeng/go-app-shutdown v1.0.1

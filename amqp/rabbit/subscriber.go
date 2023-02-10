@@ -76,6 +76,8 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 		log.Info("initConnection channel fail")
 		return
 	}
+	var onPublished = make(chan amqp.Confirmation)
+	ch.NotifyPublish(onPublished)
 
 	err = ch.QueueBind(r.Queue, r.Key, r.Exchange, false, nil)
 	if err != nil {
@@ -93,7 +95,7 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 
 	var txHandler TxHandler = func(m Message) (err error) {
 
-		err = publish(session, ch, m)
+		err = publish(session, ch, m, onPublished)
 		return err
 	}
 
