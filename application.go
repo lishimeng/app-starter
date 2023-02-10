@@ -78,6 +78,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		return
 	}
 
+	// 初始化amqp连接
 	if h.builder.amqpEnable {
 		amqpSession = amqp.New(ctx, h.builder.amqpOptions)
 	}
@@ -91,6 +92,14 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	if h.builder.cacheEnable {
 		appCache = cache.New(ctx, h.builder.redisOpts, h.builder.cacheOpts)
+	}
+
+	// 启动amqp业务
+	if h.builder.amqpEnable {
+		// 在线程中启动每一个handler
+		for _, h := range h.builder.amqpHandler {
+			go amqp.RegisterHandler(amqpSession, h)
+		}
 	}
 
 	err = h.applyComponents(h.builder.componentsBeforeWebServer)

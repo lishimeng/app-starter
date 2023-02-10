@@ -39,6 +39,7 @@ type ApplicationBuilder struct {
 
 	amqpEnable  bool
 	amqpOptions amqp.Connector
+	amqpHandler []amqp.Handler
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
@@ -122,9 +123,10 @@ func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
 	return h
 }
 
-func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector) {
+func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handler) {
 	h.amqpEnable = true
 	h.amqpOptions = c
+	h.amqpHandler = append(h.amqpHandler, handlers...)
 }
 
 func (h *ApplicationBuilder) PrintVersion() *ApplicationBuilder {
