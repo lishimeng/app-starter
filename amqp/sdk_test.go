@@ -40,7 +40,7 @@ func TestSdk001(t *testing.T) {
 
 	log.Info(session)
 
-	var ds Downstream = &simpleDs{}
+	var ds Handler = &simpleDs{}
 
 	log.Info("register subscriber")
 	go RegisterHandler(session, ds)
@@ -63,7 +63,7 @@ func TestSdk001(t *testing.T) {
 							Router:  ds.Router(),
 						}
 						m.SetOption(rabbit.JsonEncodeOption, rabbit.MessageIdOption)
-						session.Publish(m)
+						Publish(session, m)
 					}
 				}()
 			}

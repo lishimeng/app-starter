@@ -11,15 +11,15 @@ func New(ctx context.Context, c Connector) (session rabbit.Session) {
 	return
 }
 
-func RegisterHandler(session rabbit.Session, ds ...Downstream) {
-	for _, d := range ds {
-		registerHandler(session, d)
+func RegisterHandler(session rabbit.Session, handlers ...Handler) {
+	for _, handler := range handlers {
+		registerHandler(session, handler)
 	}
 }
 
-func registerHandler(session rabbit.Session, ds Downstream) {
-	session.Subscribe(ds.Router(), func(msg amqp.Delivery, txHandler rabbit.TxHandler) (err error) {
-		ds.Subscribe(ds.Router().Queue, msg.Body, txHandler)
+func registerHandler(session rabbit.Session, handler Handler) {
+	session.Subscribe(handler.Router(), func(msg amqp.Delivery, txHandler rabbit.TxHandler) (err error) {
+		handler.Subscribe(handler.Router().Queue, msg.Body, txHandler)
 		return nil
 	})
 }
