@@ -15,6 +15,7 @@ require (
 	github.com/lishimeng/go-orm v1.2.2
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/spf13/viper v1.10.1
+	github.com/streadway/amqp v1.0.0
 )
 
 require (
