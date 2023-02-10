@@ -24,6 +24,7 @@ func registerHandler(session rabbit.Session, handler Handler) {
 	})
 }
 
-func Publish(session rabbit.Session, m rabbit.Message) {
-	session.Publish(m)
+// Publish 发送buffer满之后,返回rabbit.ErrPublishTimeout
+func Publish(session rabbit.Session, m rabbit.Message) error {
+	return session.Publish(m)
 }

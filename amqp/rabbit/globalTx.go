@@ -53,11 +53,12 @@ func (session *sessionRabbit) globalChannelLoop() {
 			return
 		case <-session.connCtx.Done():
 			return
-		case m, ok := <-session.globalChannel:
+		case m, ok := <-session.globalTxChannel:
 			if !ok {
 				log.Debug("global tx has closed")
 				return
 			}
+			// TODO 重发
 			e := publish(session, ch, m)
 			if e != nil {
 				log.Info(e) // 发送失败

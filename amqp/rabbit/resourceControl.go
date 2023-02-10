@@ -6,7 +6,7 @@ import (
 
 func (session *sessionRabbit) initResource() {
 	//session.onConnClose = make(chan *amqp.Error)
-	session.globalChannel = make(chan Message, 1024)
+	session.globalTxChannel = make(chan Message, MaxTxBuffer)
 }
 
 func (session *sessionRabbit) releaseResource() {
@@ -41,7 +41,7 @@ func (session *sessionRabbit) safeCloseGlobalTx() {
 			log.Info(e)
 		}
 	}()
-	close(session.globalChannel)
+	close(session.globalTxChannel)
 }
 func (session *sessionRabbit) safeCloseConnCloseChan() {
 	log.Debug("safe close conn notify")

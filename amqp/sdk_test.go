@@ -33,6 +33,7 @@ func TestSdk001(t *testing.T) {
 	log.SetLevelAll(log.DEBUG)
 
 	const addr = "amqp://ows:thingple@127.0.0.1:5672/"
+	rabbit.MaxTxBuffer = 2048
 
 	var ctx, cancel = context.WithCancel(context.Background())
 	var c = Connector{Conn: addr}
@@ -63,7 +64,10 @@ func TestSdk001(t *testing.T) {
 							Router:  ds.Router(),
 						}
 						m.SetOption(rabbit.JsonEncodeOption, rabbit.MessageIdOption)
-						Publish(session, m)
+						e := Publish(session, m)
+						if e != nil {
+							log.Info("publish timeout")
+						}
 					}
 				}()
 			}

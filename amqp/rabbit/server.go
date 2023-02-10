@@ -1,13 +1,19 @@
 package rabbit
 
-import "github.com/lishimeng/go-log"
+import "time"
 
-func (session *sessionRabbit) Publish(m Message) {
-	if !session.isReady {
-		log.Debug("session is unready")
+func (session *sessionRabbit) Publish(m Message) (err error) {
+	defer func() {
+		_ = recover()
+	}()
+	select {
+	case session.globalTxChannel <- m:
+		return
+	case <-time.After(time.Millisecond * 200):
+		err = ErrPublishTimeout
 		return
 	}
-	session.globalChannel <- m
+
 }
 
 // Close will cleanly shut down the channel and conn.

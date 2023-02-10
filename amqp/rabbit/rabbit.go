@@ -10,7 +10,7 @@ import (
 )
 
 type Session interface {
-	Publish(m Message)
+	Publish(m Message) error
 	Close() error
 	Subscribe(r Route, rxHandler RxHandler)
 }
@@ -26,14 +26,14 @@ func (message *Message) SetOption(option ...PublishOption) {
 }
 
 type sessionRabbit struct {
-	name          string
-	ctx           context.Context
-	connCtx       context.Context
-	CloseConn     context.CancelFunc
-	onConnClose   chan *amqp.Error
-	conn          *amqp.Connection
-	isReady       bool
-	globalChannel chan Message
+	name            string
+	ctx             context.Context
+	connCtx         context.Context
+	CloseConn       context.CancelFunc
+	onConnClose     chan *amqp.Error
+	conn            *amqp.Connection
+	isReady         bool
+	globalTxChannel chan Message
 }
 
 const defaultExchange = "amq.direct"
@@ -61,7 +61,8 @@ const (
 )
 
 var (
-	ErrNotConnected = errors.New("not connected to a server")
+	ErrNotConnected   = errors.New("not connected to a server")
+	ErrPublishTimeout = errors.New("publish timeout")
 )
 
 var (
@@ -93,6 +94,8 @@ var (
 	}
 	defaultPublishOption = JsonEncodeOption
 )
+
+var MaxTxBuffer = 1024
 
 func New(ctx context.Context, addr string) Session {
 
