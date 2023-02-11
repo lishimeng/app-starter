@@ -3,6 +3,7 @@ package rabbit
 import (
 	"github.com/lishimeng/go-log"
 	"github.com/streadway/amqp"
+	"time"
 )
 
 func subscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
@@ -39,6 +40,8 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 			log.Info(e)
 		}
 	}()
+
+	var serverCtx = ServerContext{Router: r}
 
 	if !session.isReady {
 		log.Info("session is unready")
@@ -106,6 +109,24 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 		return
 	}
 
+	go func() {
+		for {
+			select {
+			case <-session.ctx.Done():
+				return
+			case <-session.connCtx.Done():
+				return
+			case <-time.After(time.Second * 10):
+				q, e := ch.QueueInspect(r.Queue)
+				if e != nil {
+					return
+				}
+				serverCtx.Messages = q.Messages
+				serverCtx.Consumers = q.Consumers
+			}
+		}
+	}()
+
 	for {
 		select {
 		case <-session.ctx.Done(): // session销毁
@@ -117,18 +138,18 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 				log.Info("message list channel closed")
 				return
 			}
-			handleMessage(m, txHandler, rxHandler)
+			handleMessage(m, txHandler, rxHandler, serverCtx)
 		}
 	}
 }
 
-func handleMessage(m amqp.Delivery, txHandler TxHandler, rxHandler RxHandler) {
+func handleMessage(m amqp.Delivery, txHandler TxHandler, rxHandler RxHandler, ctx ServerContext) {
 
 	var msgId = m.MessageId
 	log.Info("receive message: %s", msgId)
 
 	// TODO cache message id
-	var err = rxHandler(m, txHandler)
+	var err = rxHandler(m, txHandler, ctx)
 	if err != nil {
 		// TODO 从去重cache里删除message id
 	} else {

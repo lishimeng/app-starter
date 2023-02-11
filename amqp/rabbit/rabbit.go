@@ -22,6 +22,13 @@ type Message struct {
 	Options []PublishOption
 }
 
+type ServerContext struct {
+	Consumers int
+	Messages  int
+	Queue     string
+	Router    Route
+}
+
 func (message *Message) SetOption(option ...PublishOption) {
 	message.Options = append(message.Options, option...)
 }
@@ -40,7 +47,7 @@ type sessionRabbit struct {
 const defaultExchange = "amq.direct"
 
 type TxHandler func(m Message) (err error)
-type RxHandler func(msg amqp.Delivery, txHandler TxHandler) (err error)
+type RxHandler func(msg amqp.Delivery, txHandler TxHandler, serverContext ServerContext) (err error)
 
 type PublishOption func(m amqp.Publishing, payload interface{}) (amqp.Publishing, error)
 
@@ -78,17 +85,23 @@ var (
 		return
 	}
 	TextEncodeOption PublishOption = func(m amqp.Publishing, payload interface{}) (p amqp.Publishing, err error) {
-		val, ok := payload.(string)
-		if !ok {
+		var bs []byte
+		switch payload.(type) {
+		case string:
+			s := payload.(string)
+			bs = []byte(s)
+		case []byte:
+			bs = payload.([]byte)
+		default:
 			err = fmt.Errorf("need txt payload")
 			return
 		}
 		p = m
 		p.ContentType = "text/plain"
-		p.Body = []byte(val)
+		p.Body = bs
 		return
 	}
-	MessageIdOption PublishOption = func(m amqp.Publishing, payload interface{}) (p amqp.Publishing, err error) {
+	UUIDMsgIdOption PublishOption = func(m amqp.Publishing, payload interface{}) (p amqp.Publishing, err error) {
 		p = m
 		id, err := uuid.NewV4()
 		if err != nil {

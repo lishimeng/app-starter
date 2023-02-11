@@ -8,7 +8,7 @@ import (
 
 func publish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish chan amqp.Confirmation) (err error) {
 
-	//log.Debug("handle publish message:", m.Router.Exchange, m.Router.Key)
+	log.Debug("handle publish message to exchange:[%s]key:[%s]", m.Router.Exchange, m.Router.Key)
 
 	defer func() {
 		if e := recover(); e != nil {
@@ -17,9 +17,11 @@ func publish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish 
 	}()
 
 	if !session.isReady {
+		log.Debug("session is unready, can't publish the message")
 		return ErrNotConnected
 	}
 	if len(m.Router.Exchange) <= 0 {
+		log.Debug("use default exchange:%s", defaultExchange)
 		m.Router.Exchange = defaultExchange
 	}
 

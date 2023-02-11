@@ -18,10 +18,11 @@ func RegisterHandler(session rabbit.Session, handlers ...Handler) {
 }
 
 func registerHandler(session rabbit.Session, handler Handler) {
-	session.Subscribe(handler.Router(), func(msg amqp.Delivery, txHandler rabbit.TxHandler) (err error) {
-		handler.Subscribe(handler.Router().Queue, msg.Body, txHandler)
-		return nil
-	})
+	session.Subscribe(handler.Router(),
+		func(msg amqp.Delivery, txHandler rabbit.TxHandler, serverCxt rabbit.ServerContext) (err error) {
+			handler.Subscribe(msg.Body, txHandler, serverCxt)
+			return
+		})
 }
 
 // Publish 发送buffer满之后,返回rabbit.ErrPublishTimeout

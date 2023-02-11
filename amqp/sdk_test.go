@@ -15,9 +15,10 @@ type simpleDs struct {
 
 var rxIndex = 0
 
-func (s *simpleDs) Subscribe(_ string, _ interface{}, _ rabbit.TxHandler) {
+func (s *simpleDs) Subscribe(_ interface{}, _ rabbit.TxHandler, serverContext rabbit.ServerContext) {
 	rxIndex++
 	log.Info("receive:%d", rxIndex)
+	log.Info("%+v", serverContext)
 }
 
 func (s *simpleDs) Router() rabbit.Route {
@@ -63,7 +64,12 @@ func TestSdk001(t *testing.T) {
 							Payload: []byte(txt),
 							Router:  ds.Router(),
 						}
-						m.SetOption(rabbit.JsonEncodeOption, rabbit.MessageIdOption)
+						if i%5 == 0 {
+							m.SetOption(rabbit.TextEncodeOption, rabbit.UUIDMsgIdOption)
+						} else {
+							m.SetOption(rabbit.JsonEncodeOption, rabbit.UUIDMsgIdOption)
+						}
+
 						e := Publish(session, m)
 						if e != nil {
 							log.Info("publish timeout")

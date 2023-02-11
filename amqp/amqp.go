@@ -18,6 +18,10 @@ func (c *Connector) Build(host string, port int, user string, passwd string) {
 // Handler
 // 监听一个数据源 Down针对broker是rx
 type Handler interface {
-	Subscribe(topic string, v interface{}, txHandler rabbit.TxHandler)
+
+	// Subscribe 订阅
+	//
+	// payload
+	Subscribe(payload interface{}, txHandler rabbit.TxHandler, serverCtx rabbit.ServerContext)
 	Router() rabbit.Route
 }
