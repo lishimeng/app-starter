@@ -32,10 +32,6 @@ func TestSdk001(t *testing.T) {
 
 	log.SetLevelAll(log.FINE)
 
-	time.AfterFunc(time.Second*10, func() {
-		log.SetLevelAll(log.INFO)
-	})
-
 	const addr = "amqp://ows:thingple@127.0.0.1:5672/"
 	rabbit.MaxTxBuffer = 20
 

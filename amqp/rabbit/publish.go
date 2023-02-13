@@ -80,8 +80,6 @@ func doPublish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublis
 			} else {
 				log.Debug("server not receive:%s", p.MessageId)
 			}
-		case <-time.After(time.Millisecond * 1):
-			log.Info("publish confirm timeout:%s", p.MessageId)
 		}
 	}
 }
