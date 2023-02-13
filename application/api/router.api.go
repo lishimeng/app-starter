@@ -17,4 +17,5 @@ func monitor(p iris.Party) {
 	p.Get("/healthy", Healthy)
 	p.Get("/ready", Ready)
 	p.HandleMany("GET", "/debug/pprof /debug/pprof/{action:path}", pprof.New())
+	p.Post("/cl", changeLogLevel)
 }
