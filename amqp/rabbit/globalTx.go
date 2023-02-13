@@ -5,7 +5,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func (session *sessionRabbit) globalChannelProcess() {
+func (session *sessionRabbit) txProcess(name string) {
 
 	var delay = NewDelay(1, 60, true)
 	for {
@@ -14,21 +14,21 @@ func (session *sessionRabbit) globalChannelProcess() {
 			return
 		case <-session.connCtx.Done():
 			delay.Delay(func(t int) {
-				log.Fine("wait conn ready [%ds]", t)
+				log.Fine("wait conn ready [%s][%ds]", name, t)
 			})
 		default:
 			delay.Reset()
-			session.globalChannelLoop()
+			session.txLoop(name)
 		}
 	}
 }
 
-// globalChannelLoop 不会出现panic
-func (session *sessionRabbit) globalChannelLoop() {
+// txLoop 不会出现panic
+func (session *sessionRabbit) txLoop(name string) {
 
-	log.Fine("global tx loop start")
+	log.Fine("global tx loop start:%s", name)
 	defer func() {
-		log.Fine("global tx loop exit")
+		log.Fine("global tx loop exit:%s", name)
 	}()
 	defer func() {
 		if e := recover(); e != nil {
@@ -58,15 +58,16 @@ func (session *sessionRabbit) globalChannelLoop() {
 	for {
 		select {
 		case <-session.ctx.Done():
-			log.Fine("session ctx close")
+			log.Fine("session ctx close:%s", name)
 			return
 		case <-session.connCtx.Done():
 			return
 		case m, ok := <-session.globalTxChannel:
 			if !ok {
-				log.Debug("global tx has closed")
+				log.Debug("global tx has closed:%s", name)
 				return
 			}
+			log.Debug("publish message:%s[%+v]", name, m.Router)
 			e := publish(session, ch, m, onPublished)
 			if e != nil {
 				log.Info(e) // 发送失败

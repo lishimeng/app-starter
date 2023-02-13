@@ -37,7 +37,7 @@ func TestSdk001(t *testing.T) {
 
 	var ctx, cancel = context.WithCancel(context.Background())
 	var c = Connector{Conn: addr}
-	var session = New(ctx, c)
+	var session = New(ctx, c, rabbit.TxWorkerOption(3))
 
 	log.Info(session)
 

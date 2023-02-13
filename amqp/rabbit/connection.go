@@ -2,6 +2,7 @@ package rabbit
 
 import (
 	"context"
+	"fmt"
 	"github.com/lishimeng/go-log"
 	"github.com/streadway/amqp"
 )
@@ -22,7 +23,10 @@ func (session *sessionRabbit) connect(addr string) (*amqp.Connection, error) {
 // initConnection will initialize channel & declare queue
 func (session *sessionRabbit) initConnection(_ *amqp.Connection) error {
 	session.isReady = true
-	go session.globalChannelProcess()
+	for i := 1; i <= session.multiTx; i++ {
+		name := fmt.Sprintf("tx_process_%d", i)
+		go session.txProcess(name)
+	}
 	return nil
 }
 

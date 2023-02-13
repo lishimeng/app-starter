@@ -43,14 +43,25 @@ type sessionRabbit struct {
 	conn            *amqp.Connection
 	isReady         bool
 	globalTxChannel chan Message
+	multiTx         int
 }
 
 const defaultExchange = "amq.direct"
+const defaultMultiTx = 0
 
 type TxHandler func(m Message) (err error)
 type RxHandler func(msg amqp.Delivery, txHandler TxHandler, serverContext ServerContext) (err error)
 
 type PublishOption func(m amqp.Publishing, payload interface{}) (amqp.Publishing, error)
+
+type SessionOption func(session *sessionRabbit)
+
+var TxWorkerOption = func(workNum int) SessionOption {
+	return func(session *sessionRabbit) {
+		log.Fine("set tx workers:%d", workNum)
+		session.multiTx = workNum
+	}
+}
 
 type Route struct {
 	Exchange string
@@ -117,20 +128,26 @@ var (
 
 var MaxTxBuffer = 1024
 
-func New(ctx context.Context, addr string) Session {
+func New(ctx context.Context, addr string, options ...SessionOption) Session {
 
 	var connCtx, cancel = context.WithCancel(context.Background())
 
-	session := sessionRabbit{
+	session := &sessionRabbit{
 		ctx:     ctx,
 		connCtx: connCtx,
 		isReady: false,
+		multiTx: defaultMultiTx,
 	}
+
+	for _, opt := range options {
+		opt(session)
+	}
+
 	cancel() // 默认不可用
 	session.initResource()
 	session.monitor()
 
 	go session.handleReconnect(addr)
-	var h Session = &session
+	var h Session = session
 	return h
 }

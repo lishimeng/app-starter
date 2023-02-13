@@ -6,8 +6,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func New(ctx context.Context, c Connector) (session rabbit.Session) {
-	session = rabbit.New(ctx, c.Conn)
+func New(ctx context.Context, c Connector, options ...rabbit.SessionOption) (session rabbit.Session) {
+	session = rabbit.New(ctx, c.Conn, options...)
 	return
 }
 
