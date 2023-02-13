@@ -8,6 +8,13 @@ import (
 
 func subscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 
+	if len(r.Queue) <= 0 {
+		log.Info("queue is empty, exit")
+		return
+	}
+	if len(r.Key) <= 0 {
+		r.Key = r.Queue // 如果不提供Key,使用queue名字作为key
+	}
 	if len(r.Exchange) <= 0 {
 		r.Exchange = defaultExchange
 	}
@@ -17,16 +24,16 @@ func subscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 	for {
 		select {
 		case <-session.ctx.Done(): // session销毁
-			log.Info("subscribe exit [%s:%s-%s]", r.Exchange, r.Key, r.Queue)
+			log.Fine("subscribe exit [%s:%s-%s]", r.Exchange, r.Key, r.Queue)
 			return
 		case <-session.connCtx.Done(): // 连接断开
 			// 等待连接
 			delay.Delay(func(t int) {
-				log.Debug("resubscribe after wait conn ready [%ds]", t)
+				log.Fine("resubscribe after wait conn ready [%ds]", t)
 			})
 		default:
 			delay.Reset()
-			log.Debug("build subscribe handler")
+			log.Fine("build subscribe handler")
 			handleSubscribe(session, r, rxHandler)
 		}
 	}
@@ -44,7 +51,7 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 	var serverCtx = ServerContext{Router: r}
 
 	if !session.isReady {
-		log.Info("session is unready")
+		log.Debug("session is unready")
 		return
 	}
 	ch, ok, err := session.openChannel(func(channel *amqp.Channel) (e error) {
@@ -98,11 +105,11 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 
 	var txHandler TxHandler = func(m Message) (err error) {
 
-		err = publish(session, ch, m, onPublished)
+		err = session.Publish(m)
 		return err
 	}
 
-	msgs, err := session.stream(r.Queue, ch)
+	msgQueue, err := session.stream(r.Queue, ch)
 	if err != nil {
 		log.Info("list message fail")
 		log.Info(err)
@@ -133,7 +140,7 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 			return
 		case <-session.connCtx.Done(): // 连接断开
 			return
-		case m, ok := <-msgs:
+		case m, ok := <-msgQueue:
 			if !ok { // channel断开
 				log.Info("message list channel closed")
 				return
@@ -146,13 +153,22 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 func handleMessage(m amqp.Delivery, txHandler TxHandler, rxHandler RxHandler, ctx ServerContext) {
 
 	var msgId = m.MessageId
-	log.Info("receive message: %s", msgId)
+	log.Fine("receive message: %s", msgId)
 
 	// TODO cache message id
 	var err = rxHandler(m, txHandler, ctx)
 	if err != nil {
 		// TODO 从去重cache里删除message id
+		e := m.Nack(false, true)
+		if e != nil {
+			log.Info("nack fail")
+			log.Info(e)
+		}
 	} else {
-		_ = m.Ack(true)
+		e := m.Ack(true)
+		if e != nil {
+			log.Info("ack fail")
+			log.Info(e)
+		}
 	}
 }

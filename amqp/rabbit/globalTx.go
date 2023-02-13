@@ -14,7 +14,7 @@ func (session *sessionRabbit) globalChannelProcess() {
 			return
 		case <-session.connCtx.Done():
 			delay.Delay(func(t int) {
-				log.Debug("wait conn ready [%ds]", t)
+				log.Fine("wait conn ready [%ds]", t)
 			})
 		default:
 			delay.Reset()
@@ -26,9 +26,9 @@ func (session *sessionRabbit) globalChannelProcess() {
 // globalChannelLoop 不会出现panic
 func (session *sessionRabbit) globalChannelLoop() {
 
-	log.Debug("global tx loop start")
+	log.Fine("global tx loop start")
 	defer func() {
-		log.Debug("global tx loop exit")
+		log.Fine("global tx loop exit")
 	}()
 	defer func() {
 		if e := recover(); e != nil {
@@ -58,7 +58,7 @@ func (session *sessionRabbit) globalChannelLoop() {
 	for {
 		select {
 		case <-session.ctx.Done():
-			log.Debug("session ctx close")
+			log.Fine("session ctx close")
 			return
 		case <-session.connCtx.Done():
 			return
@@ -67,7 +67,6 @@ func (session *sessionRabbit) globalChannelLoop() {
 				log.Debug("global tx has closed")
 				return
 			}
-			// TODO 重发
 			e := publish(session, ch, m, onPublished)
 			if e != nil {
 				log.Info(e) // 发送失败

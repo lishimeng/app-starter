@@ -2,7 +2,6 @@ package rabbit
 
 import (
 	"github.com/lishimeng/go-log"
-	"time"
 )
 
 func (session *sessionRabbit) Publish(m Message) (err error) {
@@ -11,11 +10,11 @@ func (session *sessionRabbit) Publish(m Message) (err error) {
 	}()
 	select {
 	case session.globalTxChannel <- m:
-		log.Debug("message to tx task")
+		log.Fine("message to tx task")
 		return
-	case <-time.After(time.Millisecond * 200):
-		err = ErrPublishTimeout
-		return
+	default:
+		err = ErrTxBufferFull
+		return err
 	}
 
 }

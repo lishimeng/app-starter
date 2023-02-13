@@ -8,7 +8,7 @@ import (
 
 func publish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish chan amqp.Confirmation) (err error) {
 
-	log.Debug("handle publish message to exchange:[%s]key:[%s]", m.Router.Exchange, m.Router.Key)
+	log.Fine("handle publish message to exchange:[%s]key:[%s]", m.Router.Exchange, m.Router.Key)
 
 	defer func() {
 		if e := recover(); e != nil {
@@ -42,13 +42,28 @@ func publish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish 
 	}
 
 	p.Timestamp = time.Now()
+	p.DeliveryMode = amqp.Persistent
 
-	//log.Debug("submit completed")
+	err = doPublish(session, ch, m, notifyPublish, p)
+	if err != nil {
+		log.Info(err)
+	}
 
+	return
+}
+
+func doPublish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish chan amqp.Confirmation, p amqp.Publishing) (err error) {
+	log.Fine("publish message to server:%s[%s]", p.MessageId, p.Timestamp.String())
+	var publishTimes = 0
 	for {
+		publishTimes++
+		if publishTimes > 1 {
+			log.Debug("publish times:%d, %s[%s]", publishTimes, p.MessageId, p.Timestamp.String())
+		}
+
 		err = ch.Publish(m.Router.Exchange, m.Router.Key, false, false, p)
 		if err != nil {
-			log.Info("submit failed")
+			log.Info("publish failed")
 			log.Info(err)
 			return
 		}
@@ -60,12 +75,13 @@ func publish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish 
 			return
 		case confirm := <-notifyPublish:
 			if confirm.Ack {
+				log.Fine("server confirmed:%s", p.MessageId)
 				return
+			} else {
+				log.Debug("server not receive:%s", p.MessageId)
 			}
-		case <-time.After(time.Second):
-
+		case <-time.After(time.Millisecond * 1):
+			log.Info("publish confirm timeout:%s", p.MessageId)
 		}
 	}
-
-	return err
 }

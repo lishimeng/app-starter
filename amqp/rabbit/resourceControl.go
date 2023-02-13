@@ -5,17 +5,15 @@ import (
 )
 
 func (session *sessionRabbit) initResource() {
-	//session.onConnClose = make(chan *amqp.Error)
 	session.globalTxChannel = make(chan Message, MaxTxBuffer)
 }
 
 func (session *sessionRabbit) releaseResource() {
-	session.safeCloseGlobalTx()
 	session.safeCloseConnection()
 }
 
 func (session *sessionRabbit) safeCloseConnection() {
-	log.Debug("safe close conn")
+	log.Fine("safe close conn")
 	defer func() {
 		if e := recover(); e != nil {
 			log.Info(e)
@@ -31,14 +29,4 @@ func (session *sessionRabbit) safeCloseConnection() {
 		log.Debug(err)
 	}
 
-}
-
-func (session *sessionRabbit) safeCloseGlobalTx() {
-	log.Debug("safe close tx")
-	defer func() {
-		if e := recover(); e != nil {
-			log.Info(e)
-		}
-	}()
-	close(session.globalTxChannel)
 }

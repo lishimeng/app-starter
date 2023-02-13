@@ -15,7 +15,7 @@ func (session *sessionRabbit) handleReconnect(addr string) {
 		conn, err := session.connect(addr)
 
 		if err != nil {
-			log.Info("Failed to connect. Retrying...")
+			log.Debug("Failed to connect. Retrying...")
 
 			select {
 			case <-session.ctx.Done():
@@ -43,7 +43,7 @@ func (session *sessionRabbit) sessionLoop(conn *amqp.Connection) bool {
 		err := session.initConnection(conn)
 
 		if err != nil {
-			log.Info("Failed to initialize conn. Retrying...")
+			log.Debug("Failed to initialize conn. Retrying...")
 
 			select {
 			case <-session.ctx.Done():
@@ -165,4 +165,20 @@ func (session *sessionRabbit) disposeResources() error {
 
 	session.releaseResource()
 	return err
+}
+
+func (session *sessionRabbit) monitor() {
+	go func() {
+		for {
+			select {
+			case <-session.ctx.Done():
+				return
+			case <-time.After(time.Second * 5):
+				if len(session.globalTxChannel) <= 0 {
+					break
+				}
+				log.Fine("tx status:%d[%d]", len(session.globalTxChannel), cap(session.globalTxChannel))
+			}
+		}
+	}()
 }

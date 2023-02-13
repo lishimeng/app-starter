@@ -22,10 +22,7 @@ func (session *sessionRabbit) connect(addr string) (*amqp.Connection, error) {
 // initConnection will initialize channel & declare queue
 func (session *sessionRabbit) initConnection(_ *amqp.Connection) error {
 	session.isReady = true
-	log.Info("Setup!")
-
 	go session.globalChannelProcess()
-
 	return nil
 }
 

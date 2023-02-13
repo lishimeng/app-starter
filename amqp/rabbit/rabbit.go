@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gofrs/uuid"
+	"github.com/lishimeng/go-log"
 	"github.com/streadway/amqp"
 	"time"
 )
@@ -69,8 +70,8 @@ const (
 )
 
 var (
-	ErrNotConnected   = errors.New("not connected to a server")
-	ErrPublishTimeout = errors.New("publish timeout")
+	ErrNotConnected = errors.New("not connected to a server")
+	ErrTxBufferFull = errors.New("tx queue is full")
 )
 
 var (
@@ -94,6 +95,7 @@ var (
 			bs = payload.([]byte)
 		default:
 			err = fmt.Errorf("need txt payload")
+			log.Fine(err)
 			return
 		}
 		p = m
@@ -126,6 +128,7 @@ func New(ctx context.Context, addr string) Session {
 	}
 	cancel() // 默认不可用
 	session.initResource()
+	session.monitor()
 
 	go session.handleReconnect(addr)
 	var h Session = &session
