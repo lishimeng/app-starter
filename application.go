@@ -80,7 +80,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	// 初始化amqp连接
 	if h.builder.amqpEnable {
-		amqpSession = amqp.New(ctx, h.builder.amqpOptions)
+		amqpSession = amqp.New(ctx, h.builder.amqpOptions, h.builder.sessionOptions...)
 	}
 
 	if h.builder.dbEnable {

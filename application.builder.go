@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/lishimeng/app-starter/amqp"
+	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
@@ -37,9 +38,10 @@ type ApplicationBuilder struct {
 	redisOpts   cache.RedisOptions
 	cacheOpts   cache.Options
 
-	amqpEnable  bool
-	amqpOptions amqp.Connector
-	amqpHandler []amqp.Handler
+	amqpEnable     bool
+	amqpOptions    amqp.Connector
+	amqpHandler    []amqp.Handler
+	sessionOptions []rabbit.SessionOption
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
@@ -127,6 +129,11 @@ func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handl
 	h.amqpEnable = true
 	h.amqpOptions = c
 	h.amqpHandler = append(h.amqpHandler, handlers...)
+	return h
+}
+
+func (h *ApplicationBuilder) AmqpOptions(options ...rabbit.SessionOption) *ApplicationBuilder {
+	h.sessionOptions = append(h.sessionOptions, options...)
 	return h
 }
 
