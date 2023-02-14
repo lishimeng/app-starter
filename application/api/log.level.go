@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/app-starter"
 	"github.com/lishimeng/go-log"
 	"strings"
 )
@@ -11,10 +10,15 @@ type LogLevelReq struct {
 	Level string `json:"level,omitempty"`
 }
 
+type Resp struct {
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+}
+
 func changeLogLevel(ctx iris.Context) {
 	var err error
 	var req LogLevelReq
-	var resp app.Response
+	var resp Resp
 	err = ctx.ReadJSON(&req)
 	if err != nil {
 		resp.Code = 500
