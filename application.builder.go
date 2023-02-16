@@ -9,11 +9,15 @@ import (
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/server"
+	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
 	persistence "github.com/lishimeng/go-orm"
 	"net/http"
 	"os"
 )
+
+type TokenValidatorInjectFunc func(storage token.Storage)
+type TokenValidatorBuilder func(injectFunc TokenValidatorInjectFunc)
 
 type ApplicationBuilder struct {
 	webEnable     bool
@@ -37,6 +41,9 @@ type ApplicationBuilder struct {
 	cacheEnable bool
 	redisOpts   cache.RedisOptions
 	cacheOpts   cache.Options
+
+	tokenValidatorEnable  bool
+	tokenValidatorBuilder TokenValidatorBuilder
 
 	amqpEnable     bool
 	amqpOptions    amqp.Connector
@@ -134,6 +141,13 @@ func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handl
 
 func (h *ApplicationBuilder) AmqpOptions(options ...rabbit.SessionOption) *ApplicationBuilder {
 	h.sessionOptions = append(h.sessionOptions, options...)
+	return h
+}
+
+// EnableTokenValidator 验证Token，使用RedisTokenValidator前需要enableCache
+func (h *ApplicationBuilder) EnableTokenValidator(builder TokenValidatorBuilder) *ApplicationBuilder {
+	h.tokenValidatorEnable = true
+	h.tokenValidatorBuilder = builder
 	return h
 }
 

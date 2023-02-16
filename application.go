@@ -6,9 +6,11 @@ import (
 	"github.com/lishimeng/app-starter/amqp"
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
+	"github.com/lishimeng/app-starter/application/midware"
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/server"
+	"github.com/lishimeng/app-starter/token"
 	shutdown "github.com/lishimeng/go-app-shutdown"
 	"github.com/lishimeng/go-orm"
 )
@@ -92,6 +94,14 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	if h.builder.cacheEnable {
 		appCache = cache.New(ctx, h.builder.redisOpts, h.builder.cacheOpts)
+	}
+
+	if h.builder.tokenValidatorEnable {
+		h.builder.tokenValidatorBuilder(func(storage token.Storage) {
+			if storage != nil {
+				midware.TokenStorage = storage
+			}
+		})
 	}
 
 	// 启动amqp业务
