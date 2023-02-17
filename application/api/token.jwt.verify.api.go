@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter"
-	"github.com/lishimeng/app-starter/application/midware"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
@@ -14,7 +13,7 @@ func JwtTokenVerify(ctx iris.Context) {
 	var err error
 	var resp token.HttpTokenResp
 
-	auth, ok := midware.GetAuth(ctx)
+	auth, ok := tool.GetAuth(ctx)
 	if !ok {
 		resp.Valid = false
 		tool.ResponseJSON(ctx, resp)

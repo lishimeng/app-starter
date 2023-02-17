@@ -2,6 +2,7 @@ package token
 
 import (
 	"github.com/lishimeng/app-starter/rest"
+	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
 )
 
@@ -54,9 +55,9 @@ func (hs *httpStorage) Verify(key string) (p JwtPayload, err error) {
 }
 
 func (hs *httpStorage) verify(key string) (err error) {
-	var req = HttpTokenReq{Token: key}
 	var resp HttpTokenResp
-	code, err := rest.New().PostJson(hs.connector.Server, req, resp)
+	header, value := tool.BuildAuth(key)
+	code, err := rest.New().GetJson(hs.connector.Server, nil, &resp, rest.Header{Name: header, Value: value})
 	if err != nil {
 		log.Info(err)
 		err = ErrInvalid
