@@ -5,11 +5,12 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/go-log"
+	"strings"
 )
 
 const (
-	jwtHeader = "Auth"
-
+	authHeader  = "Authorization"
+	Realm       = "Bearer "
 	OrgKey      = "org"
 	DeptKey     = "dept"
 	ClientKey   = "clientType"
@@ -27,14 +28,24 @@ var TokenStorage token.Storage
 func JwtAuth(ctx iris.Context) {
 
 	var err error
-	h := ctx.GetHeader(jwtHeader)
+
+	h := ctx.GetHeader(authHeader)
 	if len(h) <= 0 {
-		errorWith(ctx, 401, ErrNotAllowed)
+		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
 		return
 	}
+
+	if !strings.HasPrefix(h, Realm) {
+		log.Debug("unsupported realm:%s", h)
+		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
+		return
+	}
+
+	h = strings.ReplaceAll(h, Realm, "")
+
 	if TokenStorage == nil {
 		log.Debug("token storage nil")
-		errorWith(ctx, 401, ErrNotAllowed)
+		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
 		return
 	}
 
@@ -42,7 +53,7 @@ func JwtAuth(ctx iris.Context) {
 	if err != nil {
 		log.Debug("can't verify token")
 		log.Debug(err)
-		errorWith(ctx, 401, ErrNotAllowed)
+		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
 		return
 	}
 
