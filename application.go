@@ -9,6 +9,7 @@ import (
 	"github.com/lishimeng/app-starter/application/midware"
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
+	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	shutdown "github.com/lishimeng/go-app-shutdown"
@@ -23,13 +24,8 @@ type application struct {
 	builder *ApplicationBuilder
 }
 
-var ctx context.Context
-var appCache cache.C
-
-var amqpSession rabbit.Session
-
 func New() (instance Application) {
-	ctx = shutdown.Context()
+	factory.RegisterCtx(shutdown.Context())
 	builder := &ApplicationBuilder{}
 	ins := &application{builder: builder}
 	instance = ins
@@ -37,7 +33,7 @@ func New() (instance Application) {
 }
 
 func GetAmqp() (session rabbit.Session) {
-	session = amqpSession
+	session = factory.GetAmqp()
 	return
 }
 
@@ -49,7 +45,7 @@ func GetNamedOrm(aliaName string) *persistence.OrmContext {
 }
 
 func GetCache() (c cache.C) {
-	c = appCache
+	c = factory.GetCache()
 	return
 }
 
@@ -75,14 +71,14 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		err = fmt.Errorf("application builder function nil")
 		return
 	}
-	err = buildHandler(ctx, h.builder)
+	err = buildHandler(factory.GetCtx(), h.builder)
 	if err != nil {
 		return
 	}
 
 	// 初始化amqp连接
 	if h.builder.amqpEnable {
-		amqpSession = amqp.New(ctx, h.builder.amqpOptions, h.builder.sessionOptions...)
+		factory.RegisterAmqp(amqp.New(factory.GetCtx(), h.builder.amqpOptions, h.builder.sessionOptions...))
 	}
 
 	if h.builder.dbEnable {
@@ -93,7 +89,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	}
 
 	if h.builder.cacheEnable {
-		appCache = cache.New(ctx, h.builder.redisOpts, h.builder.cacheOpts)
+		factory.RegisterCache(cache.New(factory.GetCtx(), h.builder.redisOpts, h.builder.cacheOpts))
 	}
 
 	if h.builder.tokenValidatorEnable {
@@ -108,7 +104,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	if h.builder.amqpEnable {
 		// 在线程中启动每一个handler
 		for _, h := range h.builder.amqpHandler {
-			go amqp.RegisterHandler(amqpSession, h)
+			go amqp.RegisterHandler(factory.GetAmqp(), h)
 		}
 	}
 
@@ -141,7 +137,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		if err != nil {
 			return
 		}
-		err = api.Start(ctx, srv)
+		err = api.Start(factory.GetCtx(), srv)
 		if err != nil {
 			return
 		}

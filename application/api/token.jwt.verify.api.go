@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/app-starter"
+	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
@@ -20,7 +20,7 @@ func JwtTokenVerify(ctx iris.Context) {
 		return
 	}
 	uid := ""
-	err = app.GetCache().Get(auth, &uid)
+	err = factory.GetCache().Get(auth, &uid)
 	if err != nil {
 		log.Info(err)
 		resp.Valid = false
