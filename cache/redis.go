@@ -11,6 +11,7 @@ type C interface {
 	GetProxy() *cache.Cache
 	Exists(key string) bool
 	Set(key string, value interface{}) (err error)
+	SetTTL(key string, value interface{}, ttl time.Duration) (err error)
 }
 
 type redisCache struct {
@@ -45,11 +46,22 @@ err = c.Set(key, &Demo{
 	})
 */
 func (c *redisCache) Set(key string, value interface{}) (err error) {
-	err = c.proxy.Set(&cache.Item{
-		Ctx:   nil,
+	err = c.SetTTL(key, value, 0)
+	return
+}
+
+func (c *redisCache) SetTTL(key string, value interface{}, ttl time.Duration) (err error) {
+	if ttl <= 0 {
+		ttl = c.defaultTtl
+	}
+	item := cache.Item{
+		Ctx:   c.ctx,
 		Key:   key,
 		Value: value,
-		TTL:   c.defaultTtl,
-	})
+	}
+	if ttl > 0 {
+		item.TTL = ttl
+	}
+	err = c.proxy.Set(&item)
 	return
 }
