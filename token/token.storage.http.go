@@ -59,9 +59,16 @@ func (hs *httpStorage) verify(key string) (err error) {
 	code, err := rest.New().PostJson(hs.connector.Server, req, resp)
 	if err != nil {
 		log.Info(err)
+		err = ErrInvalid
 		return
 	}
 	if code != 200 {
+		log.Debug("http status code:%d", code)
+		err = ErrInvalid
+		return
+	}
+	if !resp.Valid {
+		log.Debug("token is not valid")
 		err = ErrInvalid
 		return
 	}

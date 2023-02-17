@@ -28,20 +28,11 @@ var TokenStorage token.Storage
 func JwtAuth(ctx iris.Context) {
 
 	var err error
-
-	h := ctx.GetHeader(authHeader)
-	if len(h) <= 0 {
+	h, ok := GetAuth(ctx)
+	if !ok {
 		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
 		return
 	}
-
-	if !strings.HasPrefix(h, Realm) {
-		log.Debug("unsupported realm:%s", h)
-		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
-		return
-	}
-
-	h = strings.ReplaceAll(h, Realm, "")
 
 	if TokenStorage == nil {
 		log.Debug("token storage nil")
@@ -72,4 +63,21 @@ func JwtAuth(ctx iris.Context) {
 		ctx.Values().Set(DeptKey, p.Dept)
 	}
 	ctx.Next()
+}
+
+func GetAuth(ctx iris.Context) (auth string, ok bool) {
+
+	header := ctx.GetHeader(authHeader)
+	if len(header) <= 0 {
+		log.Debug("no auth")
+		ok = false
+		return
+	}
+	if !strings.HasPrefix(header, Realm) {
+		log.Debug("unsupported realm:%s", header)
+		ok = false
+		return
+	}
+	auth = strings.ReplaceAll(header, Realm, "")
+	return
 }
