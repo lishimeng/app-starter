@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/lishimeng/go-log"
 	"github.com/streadway/amqp"
 	"time"
@@ -116,7 +116,7 @@ var (
 	}
 	UUIDMsgIdOption PublishOption = func(m amqp.Publishing, payload interface{}) (p amqp.Publishing, err error) {
 		p = m
-		id, err := uuid.NewV4()
+		id, err := uuid.NewRandom()
 		if err != nil {
 			return
 		}
