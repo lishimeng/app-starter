@@ -24,6 +24,7 @@ func GetAuth(ctx iris.Context) (auth string, ok bool) {
 		ok = false
 		return
 	}
+	ok = true
 	auth = strings.ReplaceAll(header, Realm, "")
 	return
 }
