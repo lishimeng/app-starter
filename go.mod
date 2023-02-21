@@ -18,6 +18,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/spf13/viper v1.10.1
 	github.com/streadway/amqp v1.0.0
+	golang.org/x/crypto v0.4.0
 )
 
 require (
@@ -73,7 +74,6 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosssi/ace v0.0.5 // indirect
-	golang.org/x/crypto v0.4.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
