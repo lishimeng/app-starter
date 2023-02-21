@@ -1,18 +1,18 @@
-package passwd
+package digest
 
 // SaltingFunc 混淆器
 //
 // plaintext 明文
 type SaltingFunc func(plaintext string) string
 
-// DigestFunc checksum计算器
+// Hash checksum计算器
 //
 // 自行实现或在 Digests 列表中选择
-type DigestFunc func(plain []byte) (digest []byte, err error)
+type Hash func(plain []byte) (digest []byte, err error)
 
 var defaultDigestFunc = sm3Digest
 
-var Digests = map[string]DigestFunc{
+var Digests = map[string]Hash{
 	"SM3":    sm3Digest,
 	"BCRYPT": bcryptDigest,
 	"SHA512": sha512Digest,
@@ -30,7 +30,7 @@ func Generate(plaintext string, nanoTime int64, salting ...SaltingFunc) (r strin
 	return
 }
 
-func GenerateWithAlg(plaintext string, nanoTime int64, alg DigestFunc, salting ...SaltingFunc) (r string) {
+func GenerateWithAlg(plaintext string, nanoTime int64, alg Hash, salting ...SaltingFunc) (r string) {
 	r = genPass(plaintext, nanoTime, alg, salting...)
 	return
 }
@@ -40,7 +40,7 @@ func Verify(plaintext string, encodedPassword string, nanoTime int64, salting ..
 	return
 }
 
-func VerifyWithAlg(plaintext string, encodedPassword string, nanoTime int64, alg DigestFunc, salting ...SaltingFunc) (r bool) {
+func VerifyWithAlg(plaintext string, encodedPassword string, nanoTime int64, alg Hash, salting ...SaltingFunc) (r bool) {
 	encoded := genPass(plaintext, nanoTime, alg, salting...)
 	r = encoded == encodedPassword
 	return

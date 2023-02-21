@@ -1,4 +1,4 @@
-package passwd
+package digest
 
 import (
 	"testing"
