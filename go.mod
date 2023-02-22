@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/ZZMarquis/gm v1.3.2
 	github.com/beego/beego/v2 v2.0.7
+	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/fatih/structs v1.1.0
 	github.com/go-redis/cache/v9 v9.0.0
 	github.com/go-resty/resty/v2 v2.7.0
@@ -36,6 +37,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iris-contrib/schema v0.0.6 // indirect

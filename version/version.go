@@ -27,6 +27,6 @@ func Print() {
 	fmt.Printf("Commit   :%s\n", Commit)
 	fmt.Printf("Build    :%s\n", Build)
 	fmt.Printf("Compiler :%s\n", Compiler)
-	fmt.Printf("OS/Arch  :%s/%s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("Runtime  :%s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Println("***********************************")
 }

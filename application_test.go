@@ -8,6 +8,9 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	go time.AfterFunc(time.Second*20, func() {
+		shutdown.Exit("time to shutdown")
+	})
 	var a = New()
 	e := a.Start(func(ctx context.Context, builder *ApplicationBuilder) error {
 		builder.EnableWeb(":8111")
@@ -19,19 +22,6 @@ func TestNew(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	go time.AfterFunc(time.Second*20, func() {
-		shutdown.Exit("time to shutdown")
-	})
-}
-
-func TestGetOrm(t *testing.T) {
-	o := GetOrm()
-	t.Logf("Orm is :%T", o)
-}
-
-func TestGetCache(t *testing.T) {
-	o := GetCache()
-	t.Logf("Cache is :%T", o)
 }
 
 func TestGetAmqp(t *testing.T) {
