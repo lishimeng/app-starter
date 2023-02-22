@@ -10,6 +10,7 @@ import (
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
+	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	shutdown "github.com/lishimeng/go-app-shutdown"
@@ -34,6 +35,11 @@ func New() (instance Application) {
 
 func GetAmqp() (session rabbit.Session) {
 	session = factory.GetAmqp()
+	return
+}
+
+func GetMqtt() (session mqtt.Session) {
+	session = factory.GetMqtt()
 	return
 }
 
@@ -105,6 +111,15 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		// 在线程中启动每一个handler
 		for _, h := range h.builder.amqpHandler {
 			go amqp.RegisterHandler(factory.GetAmqp(), h)
+		}
+	}
+
+	if h.builder.mqttEnable {
+		session := mqtt.New(factory.GetCtx(), h.builder.mqttOptions...)
+		factory.RegisterMqtt(session)
+		err = session.Connect()
+		if err != nil {
+			return err
 		}
 	}
 

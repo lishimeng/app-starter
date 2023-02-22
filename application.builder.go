@@ -8,9 +8,11 @@ import (
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
+	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
+	"github.com/lishimeng/go-log"
 	persistence "github.com/lishimeng/go-orm"
 	"net/http"
 	"os"
@@ -49,6 +51,9 @@ type ApplicationBuilder struct {
 	amqpOptions    amqp.Connector
 	amqpHandler    []amqp.Handler
 	sessionOptions []rabbit.SessionOption
+
+	mqttEnable  bool
+	mqttOptions []mqtt.ClientOption
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
@@ -141,6 +146,15 @@ func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handl
 
 func (h *ApplicationBuilder) AmqpOptions(options ...rabbit.SessionOption) *ApplicationBuilder {
 	h.sessionOptions = append(h.sessionOptions, options...)
+	return h
+}
+
+func (h *ApplicationBuilder) EnableMqtt(options ...mqtt.ClientOption) *ApplicationBuilder {
+	h.mqttEnable = true
+	if len(options) > 0 {
+		h.mqttOptions = append(h.mqttOptions, options...)
+	}
+	log.Debug("enable mqtt module")
 	return h
 }
 

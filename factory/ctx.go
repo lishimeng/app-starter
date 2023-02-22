@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/cache"
+	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/go-log"
 	persistence "github.com/lishimeng/go-orm"
 )
@@ -11,6 +12,7 @@ import (
 const (
 	amqpKey  = "amqp_session"
 	cacheKey = "cache_redis"
+	mqttKey  = "mqtt_redis"
 )
 
 var globalContext context.Context
@@ -47,6 +49,18 @@ func RegisterAmqp(session rabbit.Session) {
 
 func GetAmqp() (session rabbit.Session) {
 	err := Get(&session, amqpKey)
+	if err != nil {
+		log.Debug(err)
+		session = nil
+	}
+	return
+}
+
+func RegisterMqtt(session mqtt.Session) {
+	Add(&session, mqttKey)
+}
+func GetMqtt() (session mqtt.Session) {
+	err := Get(&session, mqttKey)
 	if err != nil {
 		log.Debug(err)
 		session = nil
