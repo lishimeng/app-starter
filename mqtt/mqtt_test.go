@@ -15,7 +15,7 @@ func TestConn(t *testing.T) {
 	var qos byte = 0
 	var session = New(ctx, WithBroker(broker),
 		WithRandomClientId(),
-		WithAuth("veolia_test_server", "f2383236"))
+		WithAuth("uname", "passwd"))
 
 	err = session.Connect()
 	if err != nil {
