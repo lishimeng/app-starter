@@ -8,17 +8,6 @@ import (
 
 func subscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 
-	if len(r.Queue) <= 0 {
-		log.Info("queue is empty, exit")
-		return
-	}
-	if len(r.Key) <= 0 {
-		r.Key = r.Queue // 如果不提供Key,使用queue名字作为key
-	}
-	if len(r.Exchange) <= 0 {
-		r.Exchange = defaultExchange
-	}
-
 	var delay = NewDelay(1, 60, false)
 
 	for {
@@ -47,6 +36,7 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 			log.Info(e)
 		}
 	}()
+	log.Debug("subscribe:%s[%s-->%s]", r.Exchange, r.Key, r.Queue)
 
 	var serverCtx = ServerContext{Router: r}
 

@@ -46,8 +46,8 @@ type sessionRabbit struct {
 	multiTx         int
 }
 
-const defaultExchange = "amq.direct"
-const defaultMultiTx = 0
+const DefaultExchange = "amq.direct"
+const defaultMultiTx = 1
 
 type TxHandler func(m Message) (err error)
 type RxHandler func(msg amqp.Delivery, txHandler TxHandler, serverContext ServerContext) (err error)

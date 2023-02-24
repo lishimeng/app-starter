@@ -20,10 +20,6 @@ func publish(session *sessionRabbit, ch *amqp.Channel, m Message, notifyPublish 
 		log.Debug("session is unready, can't publish the message")
 		return ErrNotConnected
 	}
-	if len(m.Router.Exchange) <= 0 {
-		log.Debug("use default exchange:%s", defaultExchange)
-		m.Router.Exchange = defaultExchange
-	}
 
 	var p amqp.Publishing
 	if len(m.Options) == 0 {
