@@ -1,6 +1,6 @@
 # App Starter
 
-[![GitHub version](https://badge.fury.io/gh/lishimeng%2Fapp-starter.svg)](https://github.com/lishimeng/app-starter)
+[![Go project version](https://badge.fury.io/go/github.com%2Flishimeng%2Fapp-starter.svg)](https://badge.fury.io/go/github.com%2Flishimeng%2Fapp-starter)
 [![issues](https://img.shields.io/github/issues/lishimeng/app-starter)](https://github.com/lishimeng/app-starter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lishimeng%2Fapp-starter?style=flat-square)](https://goreportcard.com/report/github.com/lishimeng%2Fapp-starter)
 [![Source graph](https://sourcegraph.com/github.com/lishimeng/app-starter/-/badge.svg)](https://sourcegraph.com/github.com/lishimeng/app-starter?badge)
