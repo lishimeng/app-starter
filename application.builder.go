@@ -137,15 +137,18 @@ func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
 	return h
 }
 
-func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, handlers ...amqp.Handler) *ApplicationBuilder {
+func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, options ...rabbit.SessionOption) *ApplicationBuilder {
 	h.amqpEnable = true
 	h.amqpOptions = c
-	h.amqpHandler = append(h.amqpHandler, handlers...)
+	h.sessionOptions = append(h.sessionOptions, options...)
 	return h
 }
 
-func (h *ApplicationBuilder) AmqpOptions(options ...rabbit.SessionOption) *ApplicationBuilder {
-	h.sessionOptions = append(h.sessionOptions, options...)
+// RegisterAmqpHandlers 注册amqp handler
+//
+// 业务类任务使用延时执行策略，在连接型任务之后执行
+func (h *ApplicationBuilder) RegisterAmqpHandlers(handlers ...amqp.Handler) *ApplicationBuilder {
+	h.amqpHandler = append(h.amqpHandler, handlers...)
 	return h
 }
 
