@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrEmptyMessageRouter = errors.New("empty router key")
+	ErrSessionNil         = errors.New("session is nil")
 )
 
 func New(ctx context.Context, c Connector, options ...rabbit.SessionOption) (session rabbit.Session) {
@@ -24,6 +25,10 @@ func RegisterHandler(session rabbit.Session, handlers ...Handler) {
 }
 
 func registerHandler(session rabbit.Session, handler Handler) {
+	if session == nil || handler == nil {
+		return
+	}
+
 	r := handler.Router()
 	if len(r.Queue) <= 0 {
 		log.Info("queue is empty, exit")
@@ -44,6 +49,13 @@ func registerHandler(session rabbit.Session, handler Handler) {
 
 // Publish 发送buffer满之后,返回rabbit.ErrPublishTimeout
 func Publish(session rabbit.Session, m rabbit.Message) error {
+	if session == nil {
+		return ErrSessionNil
+	}
+	if m.Payload == nil {
+		// payload empty
+		return nil
+	}
 	if len(m.Router.Exchange) <= 0 {
 		log.Debug("use default exchange:%s", rabbit.DefaultExchange)
 		m.Router.Exchange = rabbit.DefaultExchange

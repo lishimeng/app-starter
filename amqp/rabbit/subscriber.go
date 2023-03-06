@@ -73,6 +73,7 @@ func handleSubscribe(session *sessionRabbit, r Route, rxHandler RxHandler) {
 	}
 
 	if err != nil {
+		log.Info(err)
 		log.Info("initConnection channel fail")
 		return
 	}
