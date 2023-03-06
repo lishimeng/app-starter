@@ -1,4 +1,4 @@
-package build
+package buildscript
 
 const script = `#!/bin/bash
 Name="{{ .Name }}"
