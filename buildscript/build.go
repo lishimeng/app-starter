@@ -2,9 +2,11 @@ package buildscript
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	text "text/template"
 )
+
+// git update-index --chmod +x script.sh
 
 type Param struct {
 	Name string
@@ -17,7 +19,7 @@ const (
 	dockerFileName = "Dockerfile"
 )
 
-func Generate(name, org, mainPath string) (err error) {
+func Generate(name, org, mainPath string, hasUI bool) (err error) {
 
 	p := Param{
 		Name: name,
@@ -28,13 +30,20 @@ func Generate(name, org, mainPath string) (err error) {
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(scriptName, []byte(scriptContent), 0644)
+	err = os.WriteFile(scriptName, []byte(scriptContent), 0644)
 
-	dockerContent, err := rendText(nil, dockerFile)
+	var dockerContent string
+	if hasUI {
+		dockerContent, err = rendText(nil, dockerFileWithUI)
+	} else {
+		dockerContent, err = rendText(nil, dockerFile)
+	}
+
 	if err != nil {
 		return
 	}
-	err = ioutil.WriteFile(dockerFileName, []byte(dockerContent), 0644)
+
+	err = os.WriteFile(dockerFileName, []byte(dockerContent), 0644)
 	return
 }
 
