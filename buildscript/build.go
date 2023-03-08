@@ -2,6 +2,7 @@ package buildscript
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	text "text/template"
 )
@@ -9,9 +10,10 @@ import (
 // git update-index --chmod +x script.sh
 
 type Param struct {
-	Name string
-	Org  string
-	Main string
+	Name  string
+	Org   string
+	Main  string
+	HasUI bool
 }
 
 const (
@@ -21,10 +23,12 @@ const (
 
 func Generate(name, org, mainPath string, hasUI bool) (err error) {
 
+	fmt.Printf("hasUI:%+v\n", hasUI)
 	p := Param{
-		Name: name,
-		Org:  org,
-		Main: mainPath,
+		Name:  name,
+		Org:   org,
+		Main:  mainPath,
+		HasUI: hasUI,
 	}
 	scriptContent, err := rendText(p, script)
 	if err != nil {
@@ -32,12 +36,7 @@ func Generate(name, org, mainPath string, hasUI bool) (err error) {
 	}
 	err = os.WriteFile(scriptName, []byte(scriptContent), 0644)
 
-	var dockerContent string
-	if hasUI {
-		dockerContent, err = rendText(nil, dockerFileWithUI)
-	} else {
-		dockerContent, err = rendText(nil, dockerFile)
-	}
+	dockerContent, err := rendText(p, dockerFile)
 
 	if err != nil {
 		return
