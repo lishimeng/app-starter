@@ -10,8 +10,6 @@ Version=$(git describe --tags $(git rev-list --tags --max-count=1))
 # shellcheck disable=SC2154
 GitCommit=$(git log --pretty=format:"%h" -1)
 BuildTime=$(date +%FT%T%z)
-# shellcheck disable=SC2154
-Compiler=${go version}
 
 build_application(){
   git checkout "${Version}"
@@ -20,7 +18,6 @@ build_application(){
   --build-arg VERSION="${Version}" \
   --build-arg BUILD_TIME="${BuildTime}" \
   --build-arg COMMIT="${GitCommit}" \
-  --build-arg COMPILER="${Compiler}" \
   --build-arg MAIN_PATH="${MainPath}" .
 }
 
@@ -30,7 +27,6 @@ print_app_info(){
   echo "Version:${Version}"
   echo "Commit:${GitCommit}"
   echo "Build:${BuildTime}"
-  echo "Compiler:${Compiler}"
   echo "Main_Path:${MainPath}"
   echo "****************************************"
   echo ""
