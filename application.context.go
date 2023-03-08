@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/lishimeng/app-starter/amqp"
 	"github.com/lishimeng/app-starter/application/api"
-	"github.com/lishimeng/app-starter/application/midware"
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
+	"github.com/lishimeng/app-starter/midware/auth"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
@@ -77,7 +77,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	if h.builder.tokenValidatorEnable {
 		h.builder.tokenValidatorBuilder(func(storage token.Storage) {
 			if storage != nil {
-				midware.TokenStorage = storage
+				auth.TokenStorage = storage
 			}
 		})
 	}
