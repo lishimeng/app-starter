@@ -2,7 +2,6 @@ package buildscript
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	text "text/template"
 )
@@ -23,7 +22,6 @@ const (
 
 func Generate(name, org, mainPath string, hasUI bool) (err error) {
 
-	fmt.Printf("hasUI:%+v\n", hasUI)
 	p := Param{
 		Name:  name,
 		Org:   org,
