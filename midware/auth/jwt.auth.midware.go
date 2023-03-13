@@ -48,17 +48,19 @@ func JwtAuth(ctx iris.Context) {
 
 	ctx.Values().Set(UserInfoKey, p)
 
+	r := ctx.Request()
+
 	if len(p.Uid) > 0 {
-		ctx.Header(UidKey, p.Uid)
+		r.Header.Set(UidKey, p.Uid)
 	}
 	if len(p.Client) > 0 {
-		ctx.Header(ClientKey, p.Client)
+		r.Header.Set(ClientKey, p.Client)
 	}
 	if len(p.Org) > 0 {
-		ctx.Header(OrgKey, p.Org)
+		r.Header.Set(OrgKey, p.Org)
 	}
 	if len(p.Dept) > 0 {
-		ctx.Values().Set(DeptKey, p.Dept)
+		r.Header.Set(DeptKey, p.Dept)
 	}
 	ctx.Next()
 }
