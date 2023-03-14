@@ -1,9 +1,24 @@
 package auth
 
 import (
+	"errors"
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/token"
 )
+
+const (
+	OrgKey      = "org"
+	DeptKey     = "dept"
+	ClientKey   = "clientType"
+	UidKey      = "uid"
+	UserInfoKey = "ui"
+)
+
+var (
+	ErrNotAllowed = errors.New("401 not allowed")
+)
+
+var TokenStorage token.Storage
 
 type Response struct {
 	Code    interface{} `json:"code,omitempty"`

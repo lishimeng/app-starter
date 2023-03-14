@@ -1,29 +1,17 @@
 package auth
 
 import (
-	"errors"
 	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
 )
 
-const (
-	OrgKey      = "org"
-	DeptKey     = "dept"
-	ClientKey   = "clientType"
-	UidKey      = "uid"
-	UserInfoKey = "ui"
-)
-
-var (
-	ErrNotAllowed = errors.New("401 not allowed")
-)
-
-var TokenStorage token.Storage
-
-// JwtAuth 验证器， EnableTokenValidator后可用
-func JwtAuth(ctx iris.Context) {
+// SimpleJwtAuth 简单验证器
+//
+// 判定无权限后返回json类型message和http401.如有权限,将数据存入 UserInfoKey 和相应header
+//
+// 需要启动token验证器
+func SimpleJwtAuth(ctx iris.Context) {
 
 	var err error
 	h, ok := tool.GetAuth(ctx)
