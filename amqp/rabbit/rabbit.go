@@ -44,6 +44,7 @@ type sessionRabbit struct {
 	isReady         bool
 	globalTxChannel chan Message
 	multiTx         int
+	publishConfirm  bool
 }
 
 const DefaultExchange = "amq.direct"
@@ -60,6 +61,13 @@ var TxWorkerOption = func(workNum int) SessionOption {
 	return func(session *sessionRabbit) {
 		log.Fine("set tx workers:%d", workNum)
 		session.multiTx = workNum
+	}
+}
+
+// WithPublishConfirm 启用publish confirm模式
+var WithPublishConfirm = func(usePublishConfirm bool) SessionOption {
+	return func(session *sessionRabbit) {
+		session.publishConfirm = usePublishConfirm
 	}
 }
 

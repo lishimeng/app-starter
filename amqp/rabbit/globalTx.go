@@ -47,13 +47,14 @@ func (session *sessionRabbit) txLoop(name string) {
 		}()
 	}
 
-	err = ch.Confirm(false)
-	if err != nil {
-		return
+	var onPublished chan amqp.Confirmation
+	if session.publishConfirm {
+		err = ch.Confirm(false)
+		if err != nil {
+			return
+		}
+		onPublished = ch.NotifyPublish(make(chan amqp.Confirmation))
 	}
-
-	var onPublished = make(chan amqp.Confirmation)
-	ch.NotifyPublish(onPublished)
 
 	for {
 		select {
@@ -68,7 +69,7 @@ func (session *sessionRabbit) txLoop(name string) {
 				return
 			}
 			log.Debug("publish message:%s[%+v]", name, m.Router)
-			e := publish(session, ch, m, onPublished)
+			e := session.publish(ch, m, onPublished)
 			if e != nil {
 				log.Info(e) // 发送失败
 			}

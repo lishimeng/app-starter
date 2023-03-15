@@ -10,7 +10,7 @@ import (
 func (session *sessionRabbit) handleReconnect(addr string) {
 	for {
 		session.isReady = false
-		log.Debug("Attempting to connect")
+		log.Fine("Attempting to connect")
 
 		conn, err := session.connect(addr)
 
