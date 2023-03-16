@@ -8,3 +8,10 @@ func TestBuild(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestGenBaseDockerfile(t *testing.T) {
+	err := GenerateBaseDockerfile()
+	if err != nil {
+		t.Fatal(err)
+	}
+}

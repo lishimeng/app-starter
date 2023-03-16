@@ -57,3 +57,15 @@ func rendText(data interface{}, temp string) (content string, err error) {
 	content = w.String()
 	return
 }
+
+func GenerateBaseDockerfile() (err error) {
+
+	dockerContent, err := rendText(nil, baseDockerFile)
+
+	if err != nil {
+		return
+	}
+
+	err = os.WriteFile(dockerFileName, []byte(dockerContent), 0644)
+	return
+}
