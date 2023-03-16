@@ -72,3 +72,16 @@ COPY --from=build /release/${NAME} /
 RUN ln -s /${NAME} /app
 CMD [ "/app"]
 `
+
+// 基础镜像, 设置了+8时区
+//
+// docker build -t {org}/alpine:{version} .
+const baseDockerFile = `FROM alpine:3.17
+MAINTAINER lishimeng
+ENV TZ=Asia/Shanghai
+
+RUN apk update \
+    && apk add --no-cache tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone
+`
