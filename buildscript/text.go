@@ -50,7 +50,7 @@ ARG COMMIT
 ARG BUILD_TIME
 ARG MAIN_PATH
 ARG BASE="github.com/lishimeng/app-starter/version"
-ARG GOPROXY=https://goproxy.cn,direct
+ENV GOPROXY=https://goproxy.cn,direct
 ARG LDFLAGS=" \
     -X ${BASE}.AppName=${NAME} \
     -X ${BASE}.Version=${VERSION} \
@@ -76,7 +76,9 @@ CMD [ "/app"]
 // 基础镜像, 设置了+8时区
 //
 // docker build -t {org}/alpine:{version} .
-const baseDockerFile = `FROM alpine:3.17
+const baseDockerFile = baseDockerfileAlpine
+
+const baseDockerfileAlpine = `FROM alpine:3.17
 MAINTAINER lishimeng
 ENV TZ=Asia/Shanghai
 
@@ -86,4 +88,17 @@ RUN apk update \
     && echo "Asia/Shanghai" > /etc/timezone \
     && mkdir /lib64 \
     && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+`
+
+const baseDockerfileUbuntu = `FROM ubuntu
+MAINTAINER lishimeng
+ENV TIME_ZONE Asia/Shanghai
+ 
+RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y tzdata \
+    && ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && apt-get clean \
+    && rm -rf /tmp/* /var/cache/* /usr/share/doc/* /usr/share/man/* /var/lib/apt/lists/*
 `
