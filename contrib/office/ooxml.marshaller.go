@@ -117,6 +117,7 @@ func extractFile(item *zip.File, dest string) (err error) {
 			log.Info(err)
 			return
 		}
+		return
 	}
 	rc, err := item.Open()
 	if err != nil {
