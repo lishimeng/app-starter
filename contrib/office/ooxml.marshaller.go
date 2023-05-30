@@ -111,6 +111,13 @@ func (d *OpenXmlMarshaller) unCompact(inputFile string, outFolder string) (err e
 }
 
 func extractFile(item *zip.File, dest string) (err error) {
+	if item.FileInfo().IsDir() {
+		err = os.MkdirAll(dest, 755)
+		if err != nil {
+			log.Info(err)
+			return
+		}
+	}
 	rc, err := item.Open()
 	if err != nil {
 		log.Info(err)
