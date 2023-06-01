@@ -11,7 +11,7 @@ Version=$(git describe --tags $(git rev-list --tags --max-count=1))
 GitCommit=$(git log --pretty=format:"%h" -1)
 BuildTime=$(date +%FT%T%z)
 
-build_application(){
+build_image(){
   git checkout "${Version}"
   docker build -t "${Org}/${Name}:${Version}" \
   --build-arg NAME="${Name}" \
@@ -32,8 +32,24 @@ print_app_info(){
   echo ""
 }
 
+push_image(){
+  echo "****************************************"
+  echo "Push:${Org}:${Name}:${Version}"
+  echo "****************************************"
+  echo ""
+  docker push "${Org}/${Name}:${Version}"
+}
+
 print_app_info
-build_application
+
+case  $1 in
+    push)
+		push_image
+        ;;
+    *)
+		build_image
+        ;;
+esac
 `
 
 const dockerFile = `{{if .HasUI}}FROM node:18.4.0 as ui
