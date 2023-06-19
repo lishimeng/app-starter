@@ -120,10 +120,12 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 				return
 			}
 		}
+
 		err = api.EnableComponents(srv, h.builder.webComponents...)
 		if err != nil {
 			return
 		}
+
 		err = api.EnableMonitors(srv)
 		if err != nil {
 			return
