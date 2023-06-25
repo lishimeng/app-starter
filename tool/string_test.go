@@ -8,6 +8,10 @@ func TestJoin(t *testing.T) {
 }
 
 func TestGetRandomString(t *testing.T) {
-	s := GetRandomString(4)
+	s := GetRandomString(16)
 	t.Log(s)
+}
+
+func TestGetUUIDString(t *testing.T) {
+	t.Log(GetUUIDString())
 }
