@@ -37,6 +37,9 @@ type JwtProvider struct {
 
 type JwtBuildOption func(provider *JwtProvider)
 
+// HS256：bit 长度要>=256，即字节长度>=32
+// HS384：bit 长度要>=384，即字节长度>=48
+// HS512：bit 长度要>=512，即字节长度>=64
 var jwtAllAlg = []jwt.Alg{
 	jwt.NONE,
 	jwt.HS256,
@@ -91,8 +94,6 @@ func NewJwtProvider(issuer string, options ...JwtBuildOption) (jp *JwtProvider) 
 	return
 }
 
-var sharedKey = []byte("sercrethatmaycontainch@r$32chars")
-
 func (jp *JwtProvider) Verify(t []byte) (verifiedToken *jwt.VerifiedToken, err error) {
 	verifiedToken, err = jwt.Verify(jp.alg, jp.verifyKey, t, jwt.Plain, jwt.Expected{Issuer: jp.issuer})
 	return
@@ -108,7 +109,7 @@ func (jp *JwtProvider) Gen(p JwtPayload) (t []byte, err error) {
 		Subject:   sub,
 		Audience:  []string{p.Client},
 	}
-	t, err = jwt.Sign(jwt.HS256, sharedKey, p, standardClaims, jwt.MaxAge(jp.defaultTTL))
+	t, err = jwt.Sign(jwt.HS256, jp.signKey, p, standardClaims, jwt.MaxAge(jp.defaultTTL))
 	return
 }
 
@@ -122,7 +123,7 @@ func (jp *JwtProvider) GenWithTTL(p JwtPayload, ttl time.Duration) (t []byte, er
 		Subject:   sub,
 		Audience:  []string{p.Client},
 	}
-	t, err = jwt.Sign(jwt.HS256, sharedKey, p, standardClaims, jwt.MaxAge(ttl))
+	t, err = jwt.Sign(jwt.HS256, jp.signKey, p, standardClaims, jwt.MaxAge(ttl))
 	return
 }
 
