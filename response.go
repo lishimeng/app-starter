@@ -6,6 +6,12 @@ type Response struct {
 	Code    interface{} `json:"code,omitempty"`
 	Success interface{} `json:"success,omitempty"`
 	Message string      `json:"message,omitempty"`
+	Status  interface{} `json:"status,omitempty"`
+}
+
+type ResponseWrapper struct {
+	Response
+	Data interface{} `json:"data,omitempty"`
 }
 
 type Pager struct {
