@@ -1,6 +1,10 @@
 package token
 
-import "errors"
+import (
+	"crypto/md5"
+	"errors"
+	"github.com/lishimeng/app-starter/tool"
+)
 
 var (
 	ErrInvalid = errors.New("invalid token")
@@ -32,4 +36,16 @@ type Storage interface {
 
 func FullVerify(key string) {
 
+}
+
+const (
+	JwtTokenPrefix = "jwt_"
+)
+
+// Digest jwt hash摘要
+func Digest(content []byte) (d string) {
+	sh := md5.New()
+	bs := sh.Sum(content)
+	d = JwtTokenPrefix + tool.BytesToHex(bs)
+	return
 }
