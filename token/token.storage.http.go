@@ -1,6 +1,7 @@
 package token
 
 import (
+	"github.com/kataras/jwt"
 	"github.com/lishimeng/app-starter/rest"
 	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
@@ -10,8 +11,7 @@ import (
 //
 // 通过http接口验证token
 type httpStorage struct {
-	connector   HttpStorageConnector
-	jwtProvider *JwtProvider
+	connector HttpStorageConnector
 }
 
 type HttpStorageConnector struct {
@@ -23,8 +23,8 @@ const (
 	defaultTokenServer = "http://token.default.svc.cluster.local/api/token/verify"
 )
 
-func NewHttpStorage(c HttpStorageConnector, provider *JwtProvider) (s Storage) {
-	server := &httpStorage{connector: c, jwtProvider: provider}
+func NewHttpStorage(c HttpStorageConnector) (s Storage) {
+	server := &httpStorage{connector: c}
 	if len(server.connector.Server) == 0 {
 		server.connector.Server = defaultTokenServer
 	}
@@ -41,7 +41,7 @@ type HttpTokenResp struct {
 }
 
 func (hs *httpStorage) Verify(key string) (p JwtPayload, err error) {
-	ut, err := hs.jwtProvider.Decode([]byte(key))
+	ut, err := jwt.Decode([]byte(key))
 	if err != nil {
 		return
 	}
