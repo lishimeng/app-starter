@@ -1,6 +1,7 @@
 package token
 
 import (
+	"github.com/kataras/jwt"
 	"github.com/lishimeng/app-starter/cache"
 )
 
@@ -10,25 +11,26 @@ type redisStorage struct {
 	jwtProvider *JwtProvider
 }
 
-func NewRedisStorage(c cache.C, provider *JwtProvider) (s Storage) {
-	s = &redisStorage{
-		Conn:        c,
-		jwtProvider: provider,
-	}
+func NewRedisStorage(c cache.C) (s Storage) {
+	s = &redisStorage{Conn: c}
 	return
 }
 
 func (rs *redisStorage) Verify(key string) (p JwtPayload, err error) {
-	ok := rs.Conn.Exists(key)
+	ut, err := jwt.Decode([]byte(key)) // 校验格式
+	if err != nil {
+		return
+	}
+	// TODO 校验时间
+
+	tokenDigest := Digest([]byte(key)) // 计算摘要
+	ok := rs.Conn.Exists(tokenDigest)  // 缓存检查
 	if !ok {
 		err = ErrInvalid
 		return
 	}
-	vt, err := rs.jwtProvider.Verify([]byte(key))
-	if err != nil {
-		return
-	}
-	err = vt.Claims(&p)
+
+	err = ut.Claims(&p) // 取出payload
 	if err != nil {
 		return
 	}

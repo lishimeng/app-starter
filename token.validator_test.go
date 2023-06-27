@@ -19,7 +19,7 @@ func TestTokenValidatorBuild001(t *testing.T) {
 		builder.
 			//EnableCache().
 			EnableTokenValidator(func(inject TokenValidatorInjectFunc) {
-				prov := token.NewRedisStorage(GetCache(), token.NewJwtProvider(""))
+				prov := token.NewRedisStorage(GetCache())
 				inject(prov)
 			})
 		return nil
