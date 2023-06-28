@@ -45,7 +45,8 @@ const (
 // Digest jwt hash摘要
 func Digest(content []byte) (d string) {
 	sh := md5.New()
-	bs := sh.Sum(content)
+	sh.Write(content)
+	bs := sh.Sum(nil)
 	d = JwtTokenPrefix + tool.BytesToHex(bs)
 	return
 }
