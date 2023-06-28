@@ -52,14 +52,14 @@ case  $1 in
 esac
 `
 
-const dockerFile = `{{if .HasUI}}FROM node:18.4.0 as ui
+const dockerFile = `{{if .HasUI}}FROM node:20 as ui
 ARG NAME
 ARG VERSION
 WORKDIR /ui_build
 ADD ui .
 RUN npm install && npm run build
 
-{{end}}FROM golang:1.18 as build
+{{end}}FROM golang:1.20 as build
 ARG NAME
 ARG VERSION
 ARG COMMIT
