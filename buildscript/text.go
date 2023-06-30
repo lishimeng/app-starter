@@ -75,7 +75,7 @@ esac
 
 `
 
-const dockerFile = `{{- if .HasUI }}
+const dockerFile = `{{- if .App.HasUI }}
 FROM node:20 as ui
 ARG NAME
 ARG VERSION
@@ -101,7 +101,7 @@ ARG LDFLAGS=" \
     "
 WORKDIR /release
 ADD . .
-{{- if .HasUI }}
+{{- if .App.HasUI }}
 COPY --from=ui /ui_build/dist/ ${APP_PATH}/static/
 {{- end }}
 RUN go mod download && go mod verify

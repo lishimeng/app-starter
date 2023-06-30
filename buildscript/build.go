@@ -13,8 +13,8 @@ type Param struct {
 	Applications []Application
 }
 type DockerParam struct {
-	Org          string
-	Applications Application
+	Org string
+	App Application
 }
 type Application struct {
 	Name    string
@@ -63,8 +63,8 @@ func createDockers(org string, apps ...Application) (err error) {
 
 func createDocker(org string, app Application) (err error) {
 	p := DockerParam{
-		Org:          org,
-		Applications: app,
+		Org: org,
+		App: app,
 	}
 	dockerContent, err := rendText(p, dockerFile)
 	if err != nil {
