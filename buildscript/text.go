@@ -45,6 +45,8 @@ push_image(){
   echo "Push:${Org}:${Name}:${Version}"
   echo "****************************************"
   echo ""
+  docker tag  "${Org}/${Name}:${Version}" "${Org}/${Name}"
+  docker push "${Org}/${Name}"
   docker push "${Org}/${Name}:${Version}"
 }
 
