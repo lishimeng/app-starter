@@ -16,7 +16,6 @@ checkout_tag(){
 build_image(){
   local Name=$1
   local AppPath=$2
-
   print_app_info "${Name}" "${AppPath}"
 
   docker build -t "${Org}/${Name}:${Version}" \

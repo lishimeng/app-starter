@@ -10,12 +10,16 @@ import (
 
 type Param struct {
 	Org          string
-	HasUI        bool
 	Applications []Application
+}
+type DockerParam struct {
+	Org          string
+	Applications Application
 }
 type Application struct {
 	Name    string
 	AppPath string
+	HasUI   bool
 }
 
 const (
@@ -23,34 +27,56 @@ const (
 	dockerFileName = "Dockerfile"
 )
 
-func App(name, appPath string) Application {
-	return Application{
-		Name:    name,
-		AppPath: appPath,
+func Generate(org string, apps ...Application) (err error) {
+
+	err = createShell(org, apps...)
+	if err != nil {
+		return
 	}
+
+	err = createDockers(org, apps...)
+	return
 }
 
-func Generate(org string, hasUI bool, apps ...Application) (err error) {
-
+func createShell(org string, apps ...Application) (err error) {
 	p := Param{
 		Org:          org,
-		HasUI:        hasUI,
 		Applications: apps,
 	}
-
 	scriptContent, err := rendText(p, script)
 	if err != nil {
 		return
 	}
 	err = os.WriteFile(scriptName, []byte(scriptContent), 0644)
+	return
+}
 
+func createDockers(org string, apps ...Application) (err error) {
+	for _, app := range apps {
+		err = createDocker(org, app)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+func createDocker(org string, app Application) (err error) {
+	p := DockerParam{
+		Org:          org,
+		Applications: app,
+	}
 	dockerContent, err := rendText(p, dockerFile)
-
 	if err != nil {
 		return
 	}
 
-	err = os.WriteFile(dockerFileName, []byte(dockerContent), 0644)
+	dir := app.AppPath
+	err = os.MkdirAll(dir, 755)
+	if err != nil {
+		return
+	}
+	err = os.WriteFile(dir+"/"+dockerFileName, []byte(dockerContent), 0644)
 	return
 }
 
