@@ -1,8 +1,6 @@
 package buildscript
 
 const script = `#!/bin/bash
-Name="{{ .Name }}"
-MainPath="{{ .Main }}"
 Org="{{ .Org }}"
 
 # shellcheck disable=SC2046
@@ -11,28 +9,39 @@ Version=$(git describe --tags $(git rev-list --tags --max-count=1))
 GitCommit=$(git log --pretty=format:"%h" -1)
 BuildTime=$(date +%FT%T%z)
 
-build_image(){
+checkout_tag(){
   git checkout "${Version}"
+}
+
+build_image(){
+  local Name=$1
+  local AppPath=$2
+
+  print_app_info "${Name}" "${AppPath}"
+
   docker build -t "${Org}/${Name}:${Version}" \
   --build-arg NAME="${Name}" \
   --build-arg VERSION="${Version}" \
   --build-arg BUILD_TIME="${BuildTime}" \
   --build-arg COMMIT="${GitCommit}" \
-  --build-arg MAIN_PATH="${MainPath}" .
+  --build-arg APP_PATH="${AppPath}" -f "./${AppPath}/Dockerfile" .
 }
 
 print_app_info(){
+  local Name=$1
+  local AppPath=$2
   echo "****************************************"
   echo "App:${Org}:${Name}"
   echo "Version:${Version}"
   echo "Commit:${GitCommit}"
   echo "Build:${BuildTime}"
-  echo "Main_Path:${MainPath}"
+  echo "Main_Path:${AppPath}"
   echo "****************************************"
   echo ""
 }
 
 push_image(){
+  local Name=$1
   echo "****************************************"
   echo "Push:${Org}:${Name}:${Version}"
   echo "****************************************"
@@ -40,31 +49,49 @@ push_image(){
   docker push "${Org}/${Name}:${Version}"
 }
 
-print_app_info
+#
+#@name
+#@path
+build_all(){
+  checkout_tag
+  {{- range $_, $item := .Applications }}
+  build_image '{{ $item.Name }}' '{{ $item.AppPath }}'
+  {{- end }}
+}
+
+push_all(){
+  {{- range $_, $item := .Applications }}
+  push_image '{{ $item.Name }}'
+  {{- end }}
+}
 
 case  $1 in
     push)
-		push_image
+		push_all
         ;;
     *)
-		build_image
+		build_all
         ;;
 esac
+
 `
 
-const dockerFile = `{{if .HasUI}}FROM node:20 as ui
+const dockerFile = `{{- if .HasUI }}
+FROM node:20 as ui
 ARG NAME
 ARG VERSION
+ARG APP_PATH
 WORKDIR /ui_build
-ADD ui .
-RUN npm install && npm run build
+ADD ${APP_PATH}/ui .
+RUN npm i pnpm -g && pnpm install && pnpm run build
+{{- end }}
 
-{{end}}FROM golang:1.20 as build
+FROM golang:1.20 as build
 ARG NAME
 ARG VERSION
 ARG COMMIT
 ARG BUILD_TIME
-ARG MAIN_PATH
+ARG APP_PATH
 ARG BASE="github.com/lishimeng/app-starter/version"
 ENV GOPROXY=https://goproxy.cn,direct
 ARG LDFLAGS=" \
@@ -74,11 +101,12 @@ ARG LDFLAGS=" \
     -X ${BASE}.Build=${BUILD_TIME} \
     "
 WORKDIR /release
-ADD . .{{ if .HasUI }}
-COPY --from=ui /ui_build/dist/ static/
-{{ end }}
+ADD . .
+{{- if .HasUI }}
+COPY --from=ui /ui_build/dist/ ${APP_PATH}/static/
+{{- end }}
 RUN go mod download && go mod verify
-RUN go build -v --ldflags "${LDFLAGS} -X ${BASE}.Compiler=$(go version | sed 's/[ ][ ]*/_/g')" -o ${NAME} ${MAIN_PATH}
+RUN go build -v --ldflags "${LDFLAGS} -X ${BASE}.Compiler=$(go version | sed 's/[ ][ ]*/_/g')" -o ${NAME} ${APP_PATH}/main.go
 
 FROM lishimeng/alpine:3.17 as prod
 ARG NAME

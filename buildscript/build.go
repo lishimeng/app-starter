@@ -9,10 +9,13 @@ import (
 // git update-index --chmod +x script.sh
 
 type Param struct {
-	Name  string
-	Org   string
-	Main  string
-	HasUI bool
+	Org          string
+	HasUI        bool
+	Applications []Application
+}
+type Application struct {
+	Name    string
+	AppPath string
 }
 
 const (
@@ -20,14 +23,21 @@ const (
 	dockerFileName = "Dockerfile"
 )
 
-func Generate(name, org, mainPath string, hasUI bool) (err error) {
+func App(name, appPath string) Application {
+	return Application{
+		Name:    name,
+		AppPath: appPath,
+	}
+}
+
+func Generate(org string, hasUI bool, apps ...Application) (err error) {
 
 	p := Param{
-		Name:  name,
-		Org:   org,
-		Main:  mainPath,
-		HasUI: hasUI,
+		Org:          org,
+		HasUI:        hasUI,
+		Applications: apps,
 	}
+
 	scriptContent, err := rendText(p, script)
 	if err != nil {
 		return
