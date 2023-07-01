@@ -46,13 +46,10 @@ push_image(){
   echo "****************************************"
   echo ""
   docker tag  "${Org}/${Name}:${Version}" "${Org}/${Name}"
-  docker push "${Org}/${Name}"
   docker push "${Org}/${Name}:${Version}"
+  docker push "${Org}/${Name}"
 }
 
-#
-#@name
-#@path
 build_all(){
   checkout_tag
   {{- range $_, $item := .Applications }}
