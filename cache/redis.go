@@ -8,6 +8,7 @@ import (
 
 type C interface {
 	Get(key string, value interface{}) (err error)
+	GetSkipLocal(key string, value interface{}) (err error)
 	GetProxy() *cache.Cache
 	Exists(key string) bool
 	Set(key string, value interface{}) (err error)
@@ -31,6 +32,11 @@ err = c.Get(key, &obj)
 */
 func (c *redisCache) Get(key string, value interface{}) (err error) {
 	err = c.proxy.Get(c.ctx, key, value)
+	return
+}
+
+func (c *redisCache) GetSkipLocal(key string, value interface{}) (err error) {
+	err = c.proxy.GetSkippingLocalCache(c.ctx, key, value)
 	return
 }
 
