@@ -12,6 +12,7 @@ type C interface {
 	Exists(key string) bool
 	Set(key string, value interface{}) (err error)
 	SetTTL(key string, value interface{}, ttl time.Duration) (err error)
+	Del(key string) error
 }
 
 type redisCache struct {
@@ -63,5 +64,11 @@ func (c *redisCache) SetTTL(key string, value interface{}, ttl time.Duration) (e
 		item.TTL = ttl
 	}
 	err = c.proxy.Set(&item)
+	return
+}
+
+// Del 删除, 慎用
+func (c *redisCache) Del(key string) (err error) {
+	err = c.proxy.Delete(c.ctx, key)
 	return
 }
