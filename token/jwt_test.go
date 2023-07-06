@@ -12,7 +12,7 @@ func TestJwt001(t *testing.T) {
 		Uid:    "wx_23432fve4",
 		Client: "wechat",
 	}
-	var provider = NewJwtProvider("www.demo.com",
+	var provider = NewJwtProvider(WithIssuer("www.demo.com"),
 		WithAlg("HS256"),
 		WithKey(sharedKey, sharedKey),
 		WithDefaultTTL(time.Hour*2))
@@ -47,7 +47,7 @@ func TestJwtDecode(t *testing.T) {
 		Uid:    "wx_23432fve4",
 		Client: "wechat",
 	}
-	var provider = NewJwtProvider("www.demo.com",
+	var provider = NewJwtProvider(WithIssuer("www.demo.com"),
 		WithAlg("HS256"),
 		WithKey(sharedKey, nil),
 		WithDefaultTTL(time.Hour*2))

@@ -28,11 +28,12 @@ func (jp *JwtPayload) WithClient(clientType ClientTye) *JwtPayload {
 }
 
 type JwtProvider struct {
-	alg        jwt.Alg
-	signKey    jwt.PrivateKey
-	verifyKey  jwt.PublicKey
-	issuer     string
-	defaultTTL time.Duration
+	alg         jwt.Alg
+	signKey     jwt.PrivateKey
+	verifyKey   jwt.PublicKey
+	issuer      string
+	defaultTTL  time.Duration
+	checkIssuer bool
 }
 
 type JwtBuildOption func(provider *JwtProvider)
@@ -68,6 +69,15 @@ var WithAlg = func(alg string) JwtBuildOption {
 	}
 }
 
+// WithIssuer 设置issuer, 如不设置,将不能创建jwt, 校验的时候不会检查issuer是否相同
+var WithIssuer = func(issuer string) JwtBuildOption {
+	return func(provider *JwtProvider) {
+		provider.issuer = issuer
+		provider.checkIssuer = true
+	}
+}
+
+// WithKey 设置秘钥
 var WithKey = func(signKey interface{}, verifyKey interface{}) JwtBuildOption {
 	return func(provider *JwtProvider) {
 		provider.signKey = signKey
@@ -75,16 +85,15 @@ var WithKey = func(signKey interface{}, verifyKey interface{}) JwtBuildOption {
 	}
 }
 
+// WithDefaultTTL 设置ttl
 var WithDefaultTTL = func(ttl time.Duration) JwtBuildOption {
 	return func(provider *JwtProvider) {
 		provider.defaultTTL = ttl
 	}
 }
 
-func NewJwtProvider(issuer string, options ...JwtBuildOption) (jp *JwtProvider) {
-	jp = &JwtProvider{
-		issuer: issuer,
-	}
+func NewJwtProvider(options ...JwtBuildOption) (jp *JwtProvider) {
+	jp = &JwtProvider{}
 	for _, opt := range options {
 		opt(jp)
 	}
@@ -95,7 +104,11 @@ func NewJwtProvider(issuer string, options ...JwtBuildOption) (jp *JwtProvider) 
 }
 
 func (jp *JwtProvider) Verify(t []byte) (verifiedToken *jwt.VerifiedToken, err error) {
-	verifiedToken, err = jwt.Verify(jp.alg, jp.verifyKey, t, jwt.Plain, jwt.Expected{Issuer: jp.issuer})
+	var validators []jwt.TokenValidator
+	if jp.checkIssuer {
+		validators = append(validators, jwt.Plain, jwt.Expected{Issuer: jp.issuer})
+	}
+	verifiedToken, err = jwt.Verify(jp.alg, jp.verifyKey, t, validators...)
 	return
 }
 
