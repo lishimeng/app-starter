@@ -33,7 +33,7 @@ var WithAuth = func(username, password string) ClientOption {
 
 var WithRandomClientId = func() ClientOption {
 	return func(options *proxy.ClientOptions) *proxy.ClientOptions {
-		options = options.SetClientID(tool.GetRandomString(32))
+		options = options.SetClientID(tool.UUIDString())
 		log.Debug("ClientId:%s", options.ClientID)
 		return options
 	}

@@ -13,9 +13,9 @@ func TestGetRandHex(t *testing.T) {
 }
 
 func TestGetUUIDString(t *testing.T) {
-	t.Log(GetUUIDString())
+	t.Log(UUIDString())
 }
 
 func TestGetRandStr(t *testing.T) {
-	t.Log(GetRandStr(15))
+	t.Log(RandStr(15))
 }

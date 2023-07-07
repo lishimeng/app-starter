@@ -19,8 +19,8 @@ const letters = "qwertyuipasdfghjkzxcvbnmQWERTYUIPASDFGHJKLZXCVBNM123456789!@#$%
 var src = mathRand.NewSource(time.Now().UnixNano())
 var size = len(letters)
 
-// GetRandStr 随机字符串,返回n个字符
-func GetRandStr(n int) (s string) {
+// RandStr 随机字符串,返回n个字符
+func RandStr(n int) (s string) {
 	var count = 0
 	buf := bytes.Buffer{}
 	for {
@@ -59,7 +59,7 @@ func RandHexStr(n int) (s string) {
 	return
 }
 
-func GetUUIDString() (s string) {
+func UUIDString() (s string) {
 	u, err := uuid.NewRandom()
 	if err != nil {
 		return
