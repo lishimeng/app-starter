@@ -7,11 +7,15 @@ func TestJoin(t *testing.T) {
 	t.Log(Join(delimiter, "sss", "bbb", "mmm"))
 }
 
-func TestGetRandomString(t *testing.T) {
-	s := GetRandomString(16)
+func TestGetRandHex(t *testing.T) {
+	s := RandHexStr(16)
 	t.Log(s)
 }
 
 func TestGetUUIDString(t *testing.T) {
 	t.Log(GetUUIDString())
+}
+
+func TestGetRandStr(t *testing.T) {
+	t.Log(GetRandStr(15))
 }
