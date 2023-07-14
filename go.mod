@@ -19,7 +19,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/robertkrimen/otto v0.2.1
 	github.com/spf13/viper v1.10.1
-	github.com/streadway/amqp v1.0.0
+	github.com/streadway/amqp v1.1.0
 	golang.org/x/crypto v0.7.0
 )
 
