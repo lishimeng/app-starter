@@ -1,12 +1,16 @@
 package rabbit
 
 import (
+	"errors"
+	"fmt"
 	"github.com/lishimeng/go-log"
 )
 
 func (session *sessionRabbit) Publish(m Message) (err error) {
 	defer func() {
-		_ = recover()
+		e := recover()
+		err = errors.New(fmt.Sprintf("%v", e))
+		log.Fine(err)
 	}()
 	select {
 	case session.globalTxChannel <- m:
