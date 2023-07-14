@@ -9,8 +9,10 @@ import (
 func (session *sessionRabbit) Publish(m Message) (err error) {
 	defer func() {
 		e := recover()
-		err = errors.New(fmt.Sprintf("%v", e))
-		log.Fine(err)
+		if e != nil {
+			err = errors.New(fmt.Sprintf("%v", e))
+			log.Fine(err)
+		}
 	}()
 	select {
 	case session.globalTxChannel <- m:
