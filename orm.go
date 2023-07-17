@@ -46,3 +46,8 @@ type TableInfo struct {
 	// 创建时间
 	CreateTime time.Time `orm:"auto_now_add;type(datetime);column(ctime)"`
 }
+
+const (
+	Disable = iota
+	Enable
+)
