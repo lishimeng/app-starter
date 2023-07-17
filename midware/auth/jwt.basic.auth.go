@@ -48,6 +48,9 @@ func JwtBasic() func(iris.Context) {
 		if len(p.Dept) > 0 {
 			r.Header.Set(DeptKey, p.Dept)
 		}
+		if len(p.Scope) > 0 {
+			r.Header.Set(ScopeKey, p.Scope)
+		}
 		ctx.Next()
 	}
 }

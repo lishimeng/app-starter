@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/token"
+	"strings"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 	ClientKey   = "clientType"
 	UidKey      = "uid"
 	UserInfoKey = "ui"
+	ScopeKey    = "auth_scope"
 )
 
 var (
@@ -49,6 +51,24 @@ func GetOrg(ctx iris.Context) (org string) {
 
 func GetDept(ctx iris.Context) (dept string) {
 	dept = ctx.GetHeader(DeptKey)
+	return
+}
+
+func GetScope(ctx iris.Context) (scope string) {
+	scope = ctx.GetHeader(ScopeKey)
+	return
+}
+
+// HasScope 检查是否包含了指定的scope
+func HasScope(ctx iris.Context, expect string) (ok bool) {
+	scope := ctx.GetHeader(ScopeKey)
+	ss := strings.Split(scope, ",")
+	for _, v := range ss {
+		if expect == v {
+			ok = true
+			return
+		}
+	}
 	return
 }
 
