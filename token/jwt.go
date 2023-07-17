@@ -12,6 +12,7 @@ type JwtPayload struct {
 	Dept   string `json:"dept,omitempty"`
 	Uid    string `json:"uid,omitempty"`
 	Client string `json:"client,omitempty"`
+	Scope  string `json:"scope,omitempty"` // 逗号分隔a,b,c,d,.....
 }
 
 func (jp *JwtPayload) WithClient(clientType ClientTye) *JwtPayload {
