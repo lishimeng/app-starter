@@ -62,6 +62,11 @@ func GetScope(ctx iris.Context) (scope string) {
 // HasScope 检查是否包含了指定的scope
 func HasScope(ctx iris.Context, expect string) (ok bool) {
 	scope := ctx.GetHeader(ScopeKey)
+	return hasScope(scope, expect)
+}
+
+func hasScope(scopeHeader string, expect string) (ok bool) {
+	scope := scopeHeader
 	ss := strings.Split(scope, ",")
 	for _, v := range ss {
 		if expect == v {
