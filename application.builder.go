@@ -9,11 +9,11 @@ import (
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/mqtt"
+	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
 	"github.com/lishimeng/go-log"
-	persistence "github.com/lishimeng/go-orm"
 	"net/http"
 	"os"
 )

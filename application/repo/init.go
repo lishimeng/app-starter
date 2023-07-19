@@ -1,6 +1,6 @@
 package repo
 
-import "github.com/lishimeng/go-orm"
+import "github.com/lishimeng/app-starter/persistence"
 
 func Database(config persistence.BaseConfig, models ...interface{}) (err error) {
 

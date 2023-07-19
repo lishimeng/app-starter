@@ -126,8 +126,6 @@ github.com/lishimeng/go-app-shutdown v1.0.1 h1:2tfKpJHSsM8NUm0nVPq1QvDCiVNsJgUtx
 github.com/lishimeng/go-app-shutdown v1.0.1/go.mod h1:t6IWDp1O20Ppmyrftos+/FeZRIkuX/htRT6aAmnSuvM=
 github.com/lishimeng/go-log v1.0.0 h1:f4EVvzYfuaNRQVDAlfIfPpGmsnElWbdCRFFy2GoyqtQ=
 github.com/lishimeng/go-log v1.0.0/go.mod h1:hks9J+MpGLNmJ48oxvfoxHN6v+jhUIHi3a7dweRa8OQ=
-github.com/lishimeng/go-orm v1.2.2 h1:woLBaC8Jsx2zV5vDvQ/237tKRj1yp4fYulNJmD8xV8Q=
-github.com/lishimeng/go-orm v1.2.2/go.mod h1:hzaPqV9DnRHI8PuMjRNLr6JB2isGj4C4tOH8J6QB2fs=
 github.com/lishimeng/log4go v1.0.0 h1:oQMcyx/jby6jVCZ4ywnMP+tvZoRL4L3sKYktxTX0DFQ=
 github.com/lishimeng/log4go v1.0.0/go.mod h1:7CZh60epG3cgLa4RpxzFRzYVbQzp7lXmBMlMho1cRbE=
 github.com/magiconair/properties v1.8.5 h1:b6kJs+EmPFMYGkow9GiUyCyOvIwYetYJ3fSaWak/Gls=

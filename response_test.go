@@ -9,12 +9,10 @@ import (
 func TestResponse001(t *testing.T) {
 	r := PagerResponse{
 		Response{},
-		Pager{
-
-		},
+		Pager{},
 	}
 	r.Response.SetCode(1)
-	r.Response.Message="success"
+	r.Response.Message = "success"
 	bs, err := json.Marshal(r)
 	if err != nil {
 		t.Fatal(err)
@@ -28,7 +26,7 @@ func TestResponse002(t *testing.T) {
 		Response: Response{},
 	}
 	r.Response.SetCode(1)
-	r.Response.Message="success"
+	r.Response.Message = "success"
 	bs, err := json.Marshal(r)
 	if err != nil {
 		t.Fatal(err)
@@ -38,10 +36,9 @@ func TestResponse002(t *testing.T) {
 }
 
 func TestResponse003(t *testing.T) {
-	r := Response{
-	}
+	r := Response{}
 	r.SetCode(1)
-	r.Message="success"
+	r.Message = "success"
 	bs, err := json.Marshal(r)
 	if err != nil {
 		t.Fatal(err)

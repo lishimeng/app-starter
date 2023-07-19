@@ -5,8 +5,8 @@ import (
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/mqtt"
+	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/go-log"
-	persistence "github.com/lishimeng/go-orm"
 )
 
 const (

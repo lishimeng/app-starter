@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/beego/beego/v2/client/orm"
-	persistence "github.com/lishimeng/go-orm"
+	"github.com/lishimeng/app-starter/persistence"
 )
 
 func Query(h func(ctx persistence.OrmContext) (err error)) (err error) {

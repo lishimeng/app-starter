@@ -15,7 +15,6 @@ require (
 	github.com/kataras/jwt v0.1.8
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
-	github.com/lishimeng/go-orm v1.2.2
 	github.com/redis/go-redis/v9 v9.0.2
 	github.com/robertkrimen/otto v0.2.1
 	github.com/spf13/viper v1.10.1

@@ -6,7 +6,7 @@ import (
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/mqtt"
-	"github.com/lishimeng/go-orm"
+	"github.com/lishimeng/app-starter/persistence"
 )
 
 type Application interface {
