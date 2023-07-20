@@ -70,9 +70,14 @@ func responseForbidden(ctx iris.Context, opt ForbiddenOption) {
 }
 
 func checkForbidden(ctx iris.Context, opt ForbiddenOption) (pass bool) {
-	if ctx.Values().Get(UserInfoKey) != nil {
-		pass = true
+	pass = true
+	// 检查不通过的情况
+	// ui为空
+	if ctx.Values().Get(UserInfoKey) == nil {
+		pass = false
+		return
 	}
+	// scope检查
 	grantedScope := ctx.GetHeader(ScopeKey)
 	if len(opt.Scope) > 0 {
 		pass = checkScope(grantedScope, opt.Scope)
