@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"encoding/json"
+	"errors"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -11,9 +13,9 @@ type Header struct {
 
 type Rest interface {
 	Get(uri string) (code int, body string, err error)
-	GetJson(uri string, body interface{}, result interface{}, headers ...Header) (code int, err error)
+	GetJson(uri string, body interface{}, resultPrt interface{}, headers ...Header) (code int, err error)
 	Post(uri string) (code int, result string, err error)
-	PostJson(uri string, req interface{}, result interface{}, headers ...Header) (code int, err error)
+	PostJson(uri string, req interface{}, resultPrt interface{}, headers ...Header) (code int, err error)
 }
 
 type Handler struct {
@@ -52,7 +54,7 @@ func (r *Handler) Post(uri string) (code int, body string, err error) {
 	return
 }
 
-func (r *Handler) GetJson(uri string, req interface{}, result interface{}, headers ...Header) (code int, err error) {
+func (r *Handler) GetJson(uri string, req interface{}, resultPtr interface{}, headers ...Header) (code int, err error) {
 	client := r.proxy.NewRequest()
 	for _, h := range headers {
 		client = client.SetHeader(h.Name, h.Value)
@@ -60,8 +62,16 @@ func (r *Handler) GetJson(uri string, req interface{}, result interface{}, heade
 	resp, err := client.
 		SetHeader("Content-Type", "application/json").
 		SetBody(req).
-		SetResult(&result).
 		Get(uri)
+	if err != nil {
+		return
+	}
+	body := resp.Body()
+	if body == nil {
+		err = errors.New("response empty")
+		return
+	}
+	err = json.Unmarshal(body, resultPtr)
 	if err != nil {
 		return
 	}
@@ -78,8 +88,16 @@ func (r *Handler) PostJson(uri string, req interface{}, result interface{}, head
 	resp, err := client.
 		SetHeader("Content-Type", "application/json").
 		SetBody(req).
-		SetResult(&result).
 		Post(uri)
+	if err != nil {
+		return
+	}
+	body := resp.Body()
+	if body == nil {
+		err = errors.New("response empty")
+		return
+	}
+	err = json.Unmarshal(body, result)
 	if err != nil {
 		return
 	}

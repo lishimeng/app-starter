@@ -33,7 +33,7 @@ func (ak *MiniAccessToken) Credentials() (accessToken string, err error) {
 	// cache中没有，从微信服务器获取
 	var resAccessToken ResAccessToken
 	var url = fmt.Sprintf(credentialsURL, ak.handler.appID, ak.handler.appSecret)
-	err = GetTokenFromServer(url, resAccessToken)
+	err = GetTokenFromServer(url, &resAccessToken)
 	if err != nil {
 		return
 	}
@@ -42,10 +42,12 @@ func (ak *MiniAccessToken) Credentials() (accessToken string, err error) {
 		return
 	}
 
-	expires := resAccessToken.ExpiresIn - 1500
-	err = ak.handler.cache.SetTTL(accessTokenCacheKey, resAccessToken.AccessToken, time.Duration(expires)*time.Second)
-	if err != nil {
-		return
+	if ak.handler.cacheEnable {
+		expires := resAccessToken.ExpiresIn - 1500
+		err = ak.handler.cache.SetTTL(accessTokenCacheKey, resAccessToken.AccessToken, time.Duration(expires)*time.Second)
+		if err != nil {
+			return
+		}
 	}
 	accessToken = resAccessToken.AccessToken
 	return
@@ -68,9 +70,9 @@ func (ak *MiniAccessToken) AuthorizeCode(code string) (accessToken WxMiniLoginRe
 }
 
 // GetTokenFromServer 强制从微信服务器获取token
-func GetTokenFromServer(url string, resp interface{}) (err error) {
+func GetTokenFromServer(url string, respPtr interface{}) (err error) {
 	req := rest.New()
-	code, err := req.GetJson(url, nil, &resp)
+	code, err := req.GetJson(url, nil, respPtr)
 	if err != nil {
 		return
 	}
