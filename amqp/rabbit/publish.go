@@ -2,7 +2,7 @@ package rabbit
 
 import (
 	"github.com/lishimeng/go-log"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"time"
 )
 

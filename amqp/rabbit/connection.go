@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/lishimeng/go-log"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // connect will create a new AMQP conn
