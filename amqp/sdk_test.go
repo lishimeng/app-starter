@@ -2,6 +2,7 @@ package amqp
 
 import (
 	"context"
+	"fmt"
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/go-log"
 	"math/rand"
@@ -13,6 +14,13 @@ type simpleDs struct {
 }
 
 var rxIndex = 0
+
+const (
+	testUser   = "office"
+	testPasswd = "thingple"
+	testHost   = "192.168.10.254"
+	testPort   = 15672
+)
 
 func (s *simpleDs) Subscribe(_ interface{}, _ rabbit.TxHandler, serverContext rabbit.ServerContext) {
 	rxIndex++
@@ -32,7 +40,8 @@ func TestSdk001(t *testing.T) {
 
 	log.SetLevelAll(log.FINE)
 
-	const addr = "amqp://ows:thingple@127.0.0.1:5672/"
+	var addr = fmt.Sprintf(connTpl, testUser, testPasswd, testHost, testPort)
+	log.Info(addr)
 	rabbit.MaxTxBuffer = 20
 
 	var ctx, cancel = context.WithCancel(context.Background())
@@ -44,7 +53,7 @@ func TestSdk001(t *testing.T) {
 	var ds Handler = &simpleDs{}
 
 	log.Info("register subscriber")
-	//go RegisterHandler(session, ds)
+	go RegisterHandler(session, ds)
 
 	time.Sleep(time.Second * 3)
 	go func() {
@@ -80,6 +89,8 @@ func TestSdk001(t *testing.T) {
 						if e != nil {
 							log.Info("publish timeout")
 							log.Info(e)
+							log.Info("cancel")
+							cancel()
 						}
 					}
 				}()
@@ -99,7 +110,7 @@ func TestSdk001(t *testing.T) {
 func TestPubOnce(t *testing.T) {
 	log.SetLevelAll(log.FINE)
 
-	const addr = "amqp://ows:thingple@127.0.0.1:5672/"
+	var addr = fmt.Sprintf(connTpl, testUser, testPasswd, testHost, testPort)
 	rabbit.MaxTxBuffer = 20
 
 	var ctx, cancel = context.WithCancel(context.Background())

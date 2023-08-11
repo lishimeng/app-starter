@@ -5,8 +5,10 @@ import (
 	"errors"
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/go-log"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+const connTpl = "amqp://%s:%s@%s:%d/"
 
 var (
 	ErrEmptyMessageRouter = errors.New("empty router key")

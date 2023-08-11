@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/lishimeng/go-log"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"time"
 )
 
@@ -138,7 +138,7 @@ var MaxTxBuffer = 1024
 
 func New(ctx context.Context, addr string, options ...SessionOption) Session {
 
-	var connCtx, cancel = context.WithCancel(context.Background())
+	var connCtx, cancel = context.WithCancel(ctx)
 
 	session := &sessionRabbit{
 		ctx:     ctx,
