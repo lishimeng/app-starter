@@ -1,11 +1,14 @@
 package app
 
-import "context"
+import (
+	"context"
+	"github.com/lishimeng/app-starter/factory"
+)
 
 func (h *application) applyComponents(components []func(ctx context.Context) (err error)) (err error) {
 
-	for _, c := range components {
-		err = c(ctx)
+	for _, componentFunc := range components {
+		err = componentFunc(factory.GetCtx())
 		if err != nil {
 			break
 		}
@@ -13,7 +16,7 @@ func (h *application) applyComponents(components []func(ctx context.Context) (er
 	return
 }
 
-func (h *ApplicationBuilder) ComponentBefore(component func(context.Context)(err error)) *ApplicationBuilder {
+func (h *ApplicationBuilder) ComponentBefore(component func(context.Context) (err error)) *ApplicationBuilder {
 
 	if component != nil {
 		h.componentsBeforeWebServer = append(h.componentsBeforeWebServer, component)
@@ -21,7 +24,7 @@ func (h *ApplicationBuilder) ComponentBefore(component func(context.Context)(err
 	return h
 }
 
-func (h *ApplicationBuilder) ComponentAfter(component func(context.Context)(err error)) *ApplicationBuilder {
+func (h *ApplicationBuilder) ComponentAfter(component func(context.Context) (err error)) *ApplicationBuilder {
 
 	if component != nil {
 		h.componentsAfterWebServer = append(h.componentsAfterWebServer, component)

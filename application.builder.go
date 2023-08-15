@@ -2,18 +2,24 @@ package app
 
 import (
 	"context"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/lishimeng/app-starter/amqp"
+	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/etc"
+	"github.com/lishimeng/app-starter/mqtt"
+	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
-	persistence "github.com/lishimeng/go-orm"
+	"github.com/lishimeng/app-starter/token"
+	"github.com/lishimeng/app-starter/version"
+	"github.com/lishimeng/go-log"
 	"net/http"
 	"os"
 )
 
-const (
-	defaultWebLogLevel = "error"
-)
+type TokenValidatorInjectFunc func(storage token.Storage)
+type TokenValidatorBuilder func(injectFunc TokenValidatorInjectFunc)
 
 type ApplicationBuilder struct {
 	webEnable     bool
@@ -37,6 +43,17 @@ type ApplicationBuilder struct {
 	cacheEnable bool
 	redisOpts   cache.RedisOptions
 	cacheOpts   cache.Options
+
+	tokenValidatorEnable  bool
+	tokenValidatorBuilder TokenValidatorBuilder
+
+	amqpEnable     bool
+	amqpOptions    amqp.Connector
+	amqpHandler    []amqp.Handler
+	sessionOptions []rabbit.SessionOption
+
+	mqttEnable  bool
+	mqttOptions []mqtt.ClientOption
 
 	// other components
 	componentsBeforeWebServer []func(ctx context.Context) (err error)
@@ -112,5 +129,46 @@ func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts
 	h.cacheEnable = true
 	h.redisOpts = redisOpts
 	h.cacheOpts = cacheOpts
+	return h
+}
+
+func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
+	orm.Debug = true
+	return h
+}
+
+func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, options ...rabbit.SessionOption) *ApplicationBuilder {
+	h.amqpEnable = true
+	h.amqpOptions = c
+	h.sessionOptions = append(h.sessionOptions, options...)
+	return h
+}
+
+// RegisterAmqpHandlers 注册amqp handler
+//
+// 业务类任务使用延时执行策略，在连接型任务之后执行
+func (h *ApplicationBuilder) RegisterAmqpHandlers(handlers ...amqp.Handler) *ApplicationBuilder {
+	h.amqpHandler = append(h.amqpHandler, handlers...)
+	return h
+}
+
+func (h *ApplicationBuilder) EnableMqtt(options ...mqtt.ClientOption) *ApplicationBuilder {
+	h.mqttEnable = true
+	if len(options) > 0 {
+		h.mqttOptions = append(h.mqttOptions, options...)
+	}
+	log.Debug("enable mqtt module")
+	return h
+}
+
+// EnableTokenValidator 验证Token，使用RedisTokenValidator前需要enableCache
+func (h *ApplicationBuilder) EnableTokenValidator(builder TokenValidatorBuilder) *ApplicationBuilder {
+	h.tokenValidatorEnable = true
+	h.tokenValidatorBuilder = builder
+	return h
+}
+
+func (h *ApplicationBuilder) PrintVersion() *ApplicationBuilder {
+	version.Print()
 	return h
 }

@@ -17,8 +17,8 @@ type Loader interface {
 }
 
 type loader struct {
-	v *viper.Viper
-	name string
+	v               *viper.Viper
+	name            string
 	envSearchEnable bool
 }
 
