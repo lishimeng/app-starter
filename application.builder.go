@@ -11,6 +11,7 @@ import (
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
+	"github.com/lishimeng/app-starter/theme"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
 	"github.com/lishimeng/go-log"
@@ -170,5 +171,10 @@ func (h *ApplicationBuilder) EnableTokenValidator(builder TokenValidatorBuilder)
 
 func (h *ApplicationBuilder) PrintVersion() *ApplicationBuilder {
 	version.Print()
+	return h
+}
+
+func (h *ApplicationBuilder) SetAppName(appName string) *ApplicationBuilder {
+	theme.AppName = appName
 	return h
 }
