@@ -3,11 +3,10 @@ package web
 import (
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/cms"
+	"github.com/lishimeng/app-starter/tool"
 )
 
 var Name cms.WebSiteName
-
-const Frame = "WebsiteFrame"
 
 func Website(ctx iris.Context) {
 
@@ -20,6 +19,6 @@ func Website(ctx iris.Context) {
 		ctx.Next()
 		return
 	}
-	ctx.ViewData(Frame, ws)
+	ctx.ViewData(tool.WebsiteCtx, ws)
 	ctx.Next()
 }
