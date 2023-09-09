@@ -1,19 +1,16 @@
-package theme
-
-var AppName string
+package cms
 
 const (
-	pageThemeCacheKeyTpl = "theme_app-%s_page-%s"
-	webViewCacheKeyTpl   = "theme_app-%s"
+	pageThemeCacheKeyTpl = "theme_app-%s"
 )
 
-type response struct {
+type SpaResp struct {
 	Code    interface{} `json:"code,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
-type themeConfig struct {
+type SpaConfigInfo struct {
 	Id                int         `json:"id,omitempty"`
 	AppName           string      `json:"appName,omitempty"`
 	ConfigPage        string      `json:"configPage,omitempty"`

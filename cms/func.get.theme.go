@@ -1,4 +1,4 @@
-package theme
+package cms
 
 import (
 	"encoding/json"
@@ -9,18 +9,18 @@ import (
 	"strconv"
 )
 
-//GetPageTheme 开放方法：获取页面主题配置。从缓存中获取
-func GetPageTheme(page string) (configs []themeConfig) {
-	if !existPageCache(page) {
+// GetPageTheme 开放方法：获取页面主题配置。从缓存中获取
+func GetPageTheme() (configs []SpaConfigInfo) {
+	if !existPageCache() {
 		return
 	}
-	configs, err := getPageCache(page)
+	configs, err := getPageCache()
 	if err == nil {
 		return
 	}
 	log.Debug(err)
-	configs = GetPageThemeSkipCache(page)
-	err = setPageCache(page, configs)
+	configs = GetPageThemeSkipCache()
+	err = setPageCache(configs)
 	if err != nil {
 		log.Debug(err)
 		return
@@ -28,12 +28,11 @@ func GetPageTheme(page string) (configs []themeConfig) {
 	return
 }
 
-//GetPageThemeSkipCache 开放方法：获取页面主题配置。跳过缓存
-func GetPageThemeSkipCache(page string) (configs []themeConfig) {
-	var themeConfigs []AppThemeConfig
-	_, err := persistence.New().Context.QueryTable(new(AppThemeConfig)).
-		Filter("AppName", AppName).
-		Filter("ConfigPage", page).
+// GetPageThemeSkipCache 开放方法：获取页面主题配置。跳过缓存
+func GetPageThemeSkipCache() (configs []SpaConfigInfo) {
+	var themeConfigs []SpaConfig
+	_, err := persistence.New().Context.QueryTable(new(SpaConfig)).
+		Filter("AppName", name).
 		All(&themeConfigs)
 	if err != nil {
 		log.Debug(err)
@@ -55,10 +54,9 @@ func GetPageThemeSkipCache(page string) (configs []themeConfig) {
 		if configValue == nil {
 			return
 		}
-		configs = append(configs, themeConfig{
+		configs = append(configs, SpaConfigInfo{
 			Id:                item.Id,
-			AppName:           item.AppName,
-			ConfigPage:        item.ConfigPage,
+			AppName:           string(item.AppName),
 			ConfigName:        item.ConfigName,
 			ConfigContent:     configValue,
 			ConfigContentType: item.ConfigContentType,
@@ -67,8 +65,8 @@ func GetPageThemeSkipCache(page string) (configs []themeConfig) {
 	return
 }
 
-//FormatPageTheme 格式化->map
-func FormatPageTheme(configs []themeConfig) (mapConfigs map[string]interface{}) {
+// FormatPageTheme 格式化->map
+func FormatPageTheme(configs []SpaConfigInfo) (mapConfigs map[string]interface{}) {
 	mapConfigs = make(map[string]interface{})
 	for _, config := range configs {
 		mapConfigs[config.ConfigName] = config.ConfigContent
@@ -76,7 +74,7 @@ func FormatPageTheme(configs []themeConfig) (mapConfigs map[string]interface{}) 
 	return
 }
 
-func setPageCache(page string, configs []themeConfig) (err error) {
+func setPageCache(configs []SpaConfigInfo) (err error) {
 	if factory.GetCache() == nil {
 		return
 	}
@@ -84,22 +82,22 @@ func setPageCache(page string, configs []themeConfig) (err error) {
 	if err != nil {
 		return
 	}
-	return factory.GetCache().Set(pageKey(page), data)
+	return factory.GetCache().Set(pageKey(), data)
 }
 
-func existPageCache(page string) bool {
+func existPageCache() bool {
 	if factory.GetCache() == nil {
 		return false
 	}
-	return factory.GetCache().Exists(pageKey(page))
+	return factory.GetCache().Exists(pageKey())
 }
 
-func getPageCache(page string) (configs []themeConfig, err error) {
+func getPageCache() (configs []SpaConfigInfo, err error) {
 	if factory.GetCache() == nil {
 		return
 	}
 	data := make([]byte, 0)
-	err = factory.GetCache().GetSkipLocal(pageKey(page), &data)
+	err = factory.GetCache().GetSkipLocal(pageKey(), &data)
 	if err != nil {
 		return
 	}
@@ -110,6 +108,6 @@ func getPageCache(page string) (configs []themeConfig, err error) {
 	return
 }
 
-func pageKey(page string) string {
-	return fmt.Sprintf(pageThemeCacheKeyTpl, AppName, page)
+func pageKey() string {
+	return fmt.Sprintf(pageThemeCacheKeyTpl, name)
 }
