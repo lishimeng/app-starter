@@ -7,16 +7,12 @@ import (
 )
 
 // Website 注入网站的基本配置
-func Website(opts ...cms.OptionFunc) func(iris.Context) {
-	cms.Init(opts...)
-	return func(ctx iris.Context) {
-		ws, err := cms.GetWebsiteInfo()
-		if err != nil {
-			ctx.Next()
-			return
-		}
-		ctx.ViewData(tool.WebsiteCtx, ws)
+func Website(ctx iris.Context) {
+	ws, err := cms.GetWebsiteInfo()
+	if err != nil {
 		ctx.Next()
+		return
 	}
-
+	ctx.ViewData(tool.WebsiteCtx, ws)
+	ctx.Next()
 }
