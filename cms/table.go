@@ -8,7 +8,7 @@ import (
 // WebSite 网站程序配置, 动态html输出
 type WebSite struct {
 	app.Pk
-	AppName   WebSiteName `orm:"column(app_name)"`  // 应用名称
+	Name      WebSiteName `orm:"column(name)"`      // 应用名称
 	BaseUrl   string      `orm:"column(base_url)"`  // url前缀
 	Copyright string      `orm:"column(copyright)"` // 版权
 	Icp       string      `orm:"column(icp)"`       // icp
@@ -20,7 +20,7 @@ type WebSite struct {
 // SpaConfig SPA一般由vite控制, 使用localstorage管理数据
 type SpaConfig struct {
 	Id                int         `orm:"pk;auto;column(id)"`
-	AppName           WebSiteName `orm:"column(app_name);"`                           //应用名称
+	Name              WebSiteName `orm:"column(app_name);"`                           //应用名称
 	ConfigName        string      `orm:"column(config_name);"`                        //配置字段名称
 	ConfigContent     string      `orm:"column(config_content);default()"`            //配置字段内容
 	ConfigContentType string      `orm:"column(config_content_Type);default(string)"` //配置字段内容类型
@@ -30,7 +30,7 @@ type SpaConfig struct {
 // TableUnique 联合唯一约束
 func (atc *SpaConfig) TableUnique() [][]string {
 	return [][]string{
-		{"AppName", "ConfigName"},
+		{"Name", "ConfigName"},
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 var c WebSiteInfo
 
 func fromConfig(info WebSiteInfo) {
-	info = c
+	c = info
 }
 
 func getWebsiteFromDb(name WebSiteName) (ws WebSiteInfo, err error) {
@@ -15,7 +15,7 @@ func getWebsiteFromDb(name WebSiteName) (ws WebSiteInfo, err error) {
 	var website WebSite
 	err = app.GetOrm().Context.
 		QueryTable(new(WebSite)).
-		Filter("AppName", name).
+		Filter("Name", name).
 		Filter("Status", app.Enable).
 		One(&website)
 	if err != nil {

@@ -12,7 +12,7 @@ type SpaResp struct {
 
 type SpaConfigInfo struct {
 	Id                int         `json:"id,omitempty"`
-	AppName           string      `json:"appName,omitempty"`
+	Name              string      `json:"name,omitempty"`
 	ConfigPage        string      `json:"configPage,omitempty"`
 	ConfigName        string      `json:"configName,omitempty"`
 	ConfigContent     interface{} `json:"configContent,omitempty"`

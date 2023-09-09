@@ -32,7 +32,7 @@ func GetPageTheme() (configs []SpaConfigInfo) {
 func GetPageThemeSkipCache() (configs []SpaConfigInfo) {
 	var themeConfigs []SpaConfig
 	_, err := persistence.New().Context.QueryTable(new(SpaConfig)).
-		Filter("AppName", name).
+		Filter("Name", name).
 		All(&themeConfigs)
 	if err != nil {
 		log.Debug(err)
@@ -56,7 +56,7 @@ func GetPageThemeSkipCache() (configs []SpaConfigInfo) {
 		}
 		configs = append(configs, SpaConfigInfo{
 			Id:                item.Id,
-			AppName:           string(item.AppName),
+			Name:              string(item.Name),
 			ConfigName:        item.ConfigName,
 			ConfigContent:     configValue,
 			ConfigContentType: item.ConfigContentType,
