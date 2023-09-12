@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/go-log"
 	"net/http"
 	"time"
 )
@@ -98,6 +99,7 @@ func (s *Server) Start(ctx context.Context) error {
 		_ = monitorServer.ListenAndServe()
 	}()
 
+	log.Info("web server listen %s", s.config.Listen)
 	return srv.ListenAndServe()
 }
 
