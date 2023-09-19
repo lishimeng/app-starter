@@ -14,6 +14,9 @@ type WebSite struct {
 	Icp       string      `orm:"column(icp)"`       // icp
 	Favicon   string      `orm:"column(favicon)"`   // favicon url
 	Logo      string      `orm:"column(logo)"`      // logo名称
+	Attr1     string      `orm:"column(attr1)"`     // 扩展
+	Attr2     string      `orm:"column(attr2)"`     // 扩展
+	Attr3     string      `orm:"column(attr3)"`     // 扩展
 	app.TableChangeInfo
 }
 

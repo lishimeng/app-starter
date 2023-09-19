@@ -32,8 +32,8 @@ func getWebsiteFromDb(name WebSiteName) (ws WebSiteInfo, err error) {
 
 func getDefaultConfig() (ws WebSiteInfo) {
 
-	ws.Name = ""
-	ws.BaseUrl = ""
+	ws.Name = "app"
+	ws.BaseUrl = "http://localhost"
 	ws.Copyright = ""
 	ws.Icp = ""
 	ws.Favicon = ""

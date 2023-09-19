@@ -7,6 +7,9 @@ type WebSiteInfo struct {
 	Icp       string      // icp
 	Favicon   string      // favicon url
 	Logo      string      // logo名称
+	Attr1     string      // 扩展内容
+	Attr2     string      // 扩展内容
+	Attr3     string      // 扩展内容
 }
 
 type WebSiteName string
