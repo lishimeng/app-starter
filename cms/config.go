@@ -27,6 +27,10 @@ func getWebsiteFromDb(name WebSiteName) (ws WebSiteInfo, err error) {
 	ws.Icp = website.Icp
 	ws.Favicon = website.Favicon
 	ws.Logo = website.Logo
+
+	ws.Attr1 = website.Attr1
+	ws.Attr2 = website.Attr2
+	ws.Attr3 = website.Attr3
 	return
 }
 
