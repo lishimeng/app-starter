@@ -2,7 +2,7 @@ package rabbit
 
 import (
 	"github.com/lishimeng/go-log"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func (session *sessionRabbit) txProcess(name string) {
@@ -10,8 +10,6 @@ func (session *sessionRabbit) txProcess(name string) {
 	var delay = NewDelay(1, 60, true)
 	for {
 		select {
-		case <-session.ctx.Done():
-			return
 		case <-session.connCtx.Done():
 			delay.Delay(func(t int) {
 				log.Fine("wait conn ready [%s][%ds]", name, t)
@@ -58,18 +56,17 @@ func (session *sessionRabbit) txLoop(name string) {
 
 	for {
 		select {
-		case <-session.ctx.Done():
-			log.Fine("session ctx close:%s", name)
-			return
 		case <-session.connCtx.Done():
 			return
 		case m, ok := <-session.globalTxChannel:
+			var e error
 			if !ok {
 				log.Debug("global tx has closed:%s", name)
 				return
 			}
 			log.Debug("publish message:%s[%+v]", name, m.Router)
-			e := session.publish(ch, m, onPublished)
+
+			e = session.publish(ch, m, onPublished)
 			if e != nil {
 				log.Info(e) // 发送失败
 			}

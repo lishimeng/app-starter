@@ -28,6 +28,9 @@ func init() {
 	}
 }
 
+// Get 获取
+//
+// var some; 必须用: Get(&some). 原理是: 变量先存在于内存中. 如果定义一个指针, 必须是var some=new(type)
 func Get[T any](ptrType *T, name ...string) (err error) {
 
 	defer func() {
@@ -40,6 +43,12 @@ func Get[T any](ptrType *T, name ...string) (err error) {
 	defer func() {
 		c.ready.Unlock()
 	}()
+
+	rv := reflect.ValueOf(ptrType)
+	if rv.Kind() != reflect.Pointer || rv.IsNil() {
+		err = ErrNotFound
+		return
+	}
 
 	typeName := getTypeName(ptrType)
 	var m, ok = c.m[typeName]
@@ -56,7 +65,9 @@ func Get[T any](ptrType *T, name ...string) (err error) {
 	}
 	obj, has := m[id]
 	if has {
-		*ptrType = *obj.(*T) // 刷新到原始值，不是指针变量
+		val := reflect.ValueOf(obj).Elem()
+		rv.Elem().Set(val)
+		//*ptrType = *obj.(*T) // 刷新到原始值，不是指针变量
 		return
 	} else {
 		err = ErrNotFound
@@ -64,6 +75,10 @@ func Get[T any](ptrType *T, name ...string) (err error) {
 	}
 }
 
+// Add 保存
+//
+// @Code var some
+// Add(&some)
 func Add[T any](o *T, name ...string) {
 
 	defer func() {
