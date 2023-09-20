@@ -24,6 +24,8 @@ func ResponseHtml(ctx iris.Context, layout string, view string, data any) {
 
 	if len(layout) > 0 {
 		ctx.ViewLayout(layout)
+	} else {
+		ctx.ViewLayout(iris.NoLayout)
 	}
 
 	ctx.ViewData(PageCtx, data)
