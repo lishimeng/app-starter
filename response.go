@@ -3,8 +3,8 @@ package app
 import "math"
 
 type Response struct {
-	Code    interface{} `json:"code,omitempty"`
-	Success interface{} `json:"success,omitempty"`
+	Code    int         `json:"code,omitempty"`
+	Success string      `json:"success,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Status  interface{} `json:"status,omitempty"`
 }
@@ -36,14 +36,4 @@ func (p *Pager) Total(count int64) int {
 type PagerResponse struct {
 	Response
 	Pager
-}
-
-func (r *Response) SetCode(code int) *Response {
-	r.Code = &code
-	return r
-}
-
-func (r *Response) SetSuccess(success bool) *Response {
-	r.Success = &success
-	return r
 }
