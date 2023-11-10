@@ -21,6 +21,7 @@ require (
 	github.com/redis/go-redis/v9 v9.2.1
 	github.com/robertkrimen/otto v0.2.1
 	github.com/spf13/viper v1.17.0
+	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 	golang.org/x/crypto v0.14.0
 )
 
