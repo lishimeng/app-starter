@@ -1,8 +1,17 @@
 package stream
 
-import "io"
+import (
+	"io"
+)
 
 func (s *SessionCtx) rxLoop() {
+	defer func() {
+		if e := recover(); e != nil {
+			if s.onErr != nil {
+				s.onErr(e)
+			}
+		}
+	}()
 	var buf = make([]byte, 1024)
 	for {
 		select {
@@ -11,7 +20,7 @@ func (s *SessionCtx) rxLoop() {
 		default:
 			n, err := s.proxy.Read(buf)
 			if err != nil {
-				if err == io.EOF {
+				if err == io.EOF { // 关闭了
 					panic(err)
 				}
 			}

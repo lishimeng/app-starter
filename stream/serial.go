@@ -12,6 +12,7 @@ type Session interface {
 	OnData(p []byte, size int, err error)
 	Read(p []byte) (size int, err error)
 	Write(p []byte) (size int, err error)
+	OnIOErr(err func(interface{}))
 }
 
 type SessionCtx struct {
@@ -23,6 +24,7 @@ type SessionCtx struct {
 	pp             PacketProcessor
 	readSubscriber func([]byte, error)
 	reactMode      bool
+	onErr          func(interface{})
 }
 
 type Option func(s *SessionCtx)
@@ -51,6 +53,17 @@ func NewSerialSession(ctx context.Context, name string, baud int, opts ...Option
 	if err != nil {
 		return
 	}
+	go func() {
+		for {
+			select {
+			case <-ctx.Done(): // 正常关闭
+				if port == nil {
+					return
+				}
+				_ = port.Close()
+			}
+		}
+	}()
 	s = NewSession(ctx, port, opts...)
 	return
 }
@@ -58,7 +71,7 @@ func NewSerialSession(ctx context.Context, name string, baud int, opts ...Option
 func NewSession(ctx context.Context, rwc io.ReadWriter, opts ...Option) (s Session) {
 
 	buf := bytes.NewBuffer(nil)
-	buf.Grow(1024)
+	buf.Grow(1024 * 1024)
 	handler := &SessionCtx{
 		proxy:     rwc,
 		ctx:       ctx,
@@ -74,6 +87,6 @@ func NewSession(ctx context.Context, rwc io.ReadWriter, opts ...Option) (s Sessi
 	return
 }
 
-func (s *SessionCtx) Close() {
-
+func (s *SessionCtx) OnIOErr(errHandler func(interface{})) {
+	s.onErr = errHandler
 }
