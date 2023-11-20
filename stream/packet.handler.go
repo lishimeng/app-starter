@@ -1,6 +1,8 @@
 package stream
 
 import (
+	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/go-log"
 	"io"
 )
 
@@ -36,6 +38,9 @@ func (s *SessionCtx) _packet() {
 	}
 	n := s.pp.Data([]byte(s.packetBuf.String()))
 	if n > 0 {
-		_ = s.packetBuf.Next(n)
+		packet := s.packetBuf.Next(n)
+		if ioLog {
+			log.Info("<<%s", tool.BytesToHex(packet))
+		}
 	}
 }

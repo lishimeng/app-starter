@@ -6,6 +6,12 @@ import (
 	"io"
 )
 
+var ioLog = false
+
+func SetIOLog(enable bool) {
+	ioLog = enable
+}
+
 type PacketProcessor interface {
 	Listen(onPacket func(p []byte))
 	Data(data []byte) (n int)
