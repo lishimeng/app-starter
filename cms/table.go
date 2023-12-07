@@ -1,8 +1,9 @@
 package cms
 
 import (
-	"github.com/lishimeng/app-starter"
 	"time"
+
+	"github.com/lishimeng/app-starter"
 )
 
 // WebSite 网站程序配置, 动态html输出
@@ -26,7 +27,7 @@ type SpaConfig struct {
 	Name              WebSiteName `orm:"column(app_name);"`                           //应用名称
 	ConfigName        string      `orm:"column(config_name);"`                        //配置字段名称
 	ConfigContent     string      `orm:"column(config_content);default()"`            //配置字段内容
-	ConfigContentType string      `orm:"column(config_content_Type);default(string)"` //配置字段内容类型
+	ConfigContentType string      `orm:"column(config_content_type);default(string)"` //配置字段内容类型
 	CreateTime        time.Time   `orm:"auto_now_add;type(datetime);column(ctime)"`
 }
 
