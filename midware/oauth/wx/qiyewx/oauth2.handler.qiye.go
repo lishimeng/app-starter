@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/cache"
-	"github.com/lishimeng/app-starter/rest"
+	"github.com/lishimeng/x/rest"
 	"sync"
 	"time"
 )

@@ -2,9 +2,9 @@ package token
 
 import (
 	"github.com/kataras/jwt"
-	"github.com/lishimeng/app-starter/rest"
 	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/x/rest"
 )
 
 // httpStorage http token server

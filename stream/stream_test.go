@@ -3,7 +3,7 @@ package stream
 import (
 	"bytes"
 	"context"
-	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/x/util"
 	"testing"
 	"time"
 )
@@ -34,7 +34,7 @@ func TestSerial(t *testing.T) {
 
 	pp := NewHeadTailPP([]byte{0x68}, []byte{0x16})
 	pp.Listen(func(p []byte) {
-		t.Log(tool.BytesToHex(p, "-"))
+		t.Log(util.BytesToHex(p, "-"))
 	})
 	s, err := NewSerialSession(ctx, "COM5", 115200, WithReact(), WithPacketProcessor(pp))
 

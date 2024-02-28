@@ -2,7 +2,7 @@ package mqtt
 
 import (
 	"fmt"
-	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/x/util"
 	"strings"
 )
 
@@ -54,9 +54,9 @@ func TopicBuilder(opt BuilderOption, format string, key ...any) (t string) {
 	t = fmt.Sprintf(format, tmp...)
 	if opt.Share {
 		if strings.HasPrefix(t, "/") {
-			t = tool.Join("", shareTopicPrefix, group, t)
+			t = util.Join("", shareTopicPrefix, group, t)
 		} else {
-			t = tool.Join("", shareTopicPrefix, group, "/", t)
+			t = util.Join("", shareTopicPrefix, group, "/", t)
 		}
 	}
 	return

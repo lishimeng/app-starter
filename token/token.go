@@ -3,7 +3,7 @@ package token
 import (
 	"crypto/md5"
 	"errors"
-	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/x/util"
 )
 
 var (
@@ -47,6 +47,6 @@ func Digest(content []byte) (d string) {
 	sh := md5.New()
 	sh.Write(content)
 	bs := sh.Sum(nil)
-	d = JwtTokenPrefix + tool.BytesToHex(bs)
+	d = JwtTokenPrefix + util.BytesToHex(bs)
 	return
 }

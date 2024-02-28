@@ -1,8 +1,8 @@
 package stream
 
 import (
-	"github.com/lishimeng/app-starter/tool"
 	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/x/util"
 	"io"
 )
 
@@ -40,7 +40,7 @@ func (s *SessionCtx) _packet() {
 	if n > 0 {
 		packet := s.packetBuf.Next(n)
 		if ioLog {
-			log.Info("<<%s", tool.BytesToHex(packet))
+			log.Info("<<%s", util.BytesToHex(packet))
 		}
 	}
 }
