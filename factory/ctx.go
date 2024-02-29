@@ -7,6 +7,7 @@ import (
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/go-log"
+	proxy "github.com/lishimeng/x/factory"
 )
 
 const (
@@ -31,11 +32,11 @@ func GetCtx() (ctx context.Context) {
 }
 
 func RegisterCache(c cache.C) {
-	Add(&c, cacheKey)
+	proxy.Add(&c, cacheKey)
 }
 
 func GetCache() (c cache.C) {
-	err := Get(&c, cacheKey)
+	err := proxy.Get(&c, cacheKey)
 	if err != nil {
 		log.Debug(err)
 		c = nil
@@ -44,11 +45,11 @@ func GetCache() (c cache.C) {
 }
 
 func RegisterAmqp(session rabbit.Session) {
-	Add(&session, amqpKey)
+	proxy.Add(&session, amqpKey)
 }
 
 func GetAmqp() (session rabbit.Session) {
-	err := Get(&session, amqpKey)
+	err := proxy.Get(&session, amqpKey)
 	if err != nil {
 		log.Debug(err)
 		session = nil
@@ -57,10 +58,10 @@ func GetAmqp() (session rabbit.Session) {
 }
 
 func RegisterMqtt(session mqtt.Session) {
-	Add(&session, mqttKey)
+	proxy.Add(&session, mqttKey)
 }
 func GetMqtt() (session mqtt.Session) {
-	err := Get(&session, mqttKey)
+	err := proxy.Get(&session, mqttKey)
 	if err != nil {
 		log.Debug(err)
 		session = nil
