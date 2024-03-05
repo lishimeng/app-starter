@@ -7,7 +7,7 @@ import (
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/go-log"
-	proxy "github.com/lishimeng/x/factory"
+	proxy "github.com/lishimeng/x/container"
 )
 
 const (

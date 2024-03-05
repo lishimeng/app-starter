@@ -138,8 +138,8 @@ github.com/lishimeng/go-log v1.0.0 h1:f4EVvzYfuaNRQVDAlfIfPpGmsnElWbdCRFFy2Goyqt
 github.com/lishimeng/go-log v1.0.0/go.mod h1:hks9J+MpGLNmJ48oxvfoxHN6v+jhUIHi3a7dweRa8OQ=
 github.com/lishimeng/log4go v1.0.0 h1:oQMcyx/jby6jVCZ4ywnMP+tvZoRL4L3sKYktxTX0DFQ=
 github.com/lishimeng/log4go v1.0.0/go.mod h1:7CZh60epG3cgLa4RpxzFRzYVbQzp7lXmBMlMho1cRbE=
-github.com/lishimeng/x v1.1.3 h1:wYBxPPbiv0OVBIx8wCQBc5DHeSXYEpKmSKs+pa0vlUo=
-github.com/lishimeng/x v1.1.3/go.mod h1:X4pivrFO4QfM/pRV+8yQvJDVRf7eZHfY99CPNJa9AB8=
+github.com/lishimeng/x v1.1.4 h1:OSX78qf62j5HBC1LrGmdsusbBrNJclJkWmNU5GDxpi0=
+github.com/lishimeng/x v1.1.4/go.mod h1:X4pivrFO4QfM/pRV+8yQvJDVRf7eZHfY99CPNJa9AB8=
 github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0VQdvPDY=
 github.com/magiconair/properties v1.8.7/go.mod h1:Dhd985XPs7jluiymwWYZ0G4Z61jb3vdS329zhj2hYo0=
 github.com/mailgun/raymond/v2 v2.0.48 h1:5dmlB680ZkFG2RN/0lvTAghrSxIESeu9/2aeDqACtjw=
