@@ -7,13 +7,13 @@ import (
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
-	"github.com/lishimeng/app-starter/etc"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
 	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/x/etc"
 	"net/http"
 	"os"
 )
@@ -60,13 +60,17 @@ type ApplicationBuilder struct {
 	componentsAfterWebServer  []func(ctx context.Context) (err error)
 }
 
+var WithDefaultCallback = func(configName string) (f func(loader etc.Loader)) {
+	return func(loader etc.Loader) {
+		loader.SetFileSearcher(configName, ".").SetEnvPrefix("").SetEnvSearcher()
+	}
+}
+
 func (h *ApplicationBuilder) LoadConfig(config interface{}, callback func(etc.Loader)) (err error) {
 	var cb = callback
 	loader := etc.New()
 	if cb == nil {
-		cb = func(ld etc.Loader) {
-			ld.SetFileSearcher("config", ".").SetEnvPrefix("").SetEnvSearcher()
-		}
+		cb = WithDefaultCallback("config")
 	}
 	cb(loader)
 	err = loader.Load(config)
