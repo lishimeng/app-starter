@@ -2,7 +2,8 @@ package auth
 
 import (
 	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/app-starter/midware/auth/bearer"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
 )
 
@@ -11,10 +12,10 @@ import (
 // 判定无权限后返回json类型message和http401.如有权限,将数据存入 UserInfoKey 和相应header
 //
 // 需要启动token验证器
-func SimpleJwtAuth(ctx iris.Context) {
+func SimpleJwtAuth(ctx server.Context) {
 
 	var err error
-	h, ok := tool.GetAuth(ctx)
+	h, ok := bearer.GetAuth(ctx)
 	if !ok {
 		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
 		return
@@ -34,9 +35,9 @@ func SimpleJwtAuth(ctx iris.Context) {
 		return
 	}
 
-	ctx.Values().Set(UserInfoKey, p)
+	ctx.C.Values().Set(UserInfoKey, p)
 
-	r := ctx.Request()
+	r := ctx.C.Request()
 
 	if len(p.Uid) > 0 {
 		r.Header.Set(UidKey, p.Uid)
@@ -53,5 +54,5 @@ func SimpleJwtAuth(ctx iris.Context) {
 	if len(p.Scope) > 0 {
 		r.Header.Set(ScopeKey, p.Scope)
 	}
-	ctx.Next()
+	ctx.C.Next()
 }

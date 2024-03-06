@@ -2,14 +2,15 @@ package api
 
 import (
 	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/app-starter/server"
 )
 
 var LivenessHandler func() int
 
-func Healthy(ctx iris.Context) {
+func Healthy(ctx server.Context) {
 	if LivenessHandler != nil {
-		ctx.StatusCode(LivenessHandler())
+		ctx.C.StatusCode(LivenessHandler())
 	} else {
-		ctx.StatusCode(iris.StatusOK)
+		ctx.C.StatusCode(iris.StatusOK)
 	}
 }

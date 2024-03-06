@@ -1,26 +1,26 @@
 package auth
 
 import (
-	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/app-starter/midware/auth/bearer"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
 )
 
 // JwtBasic 预处理jwt,解析后存入 UserInfoKey 和相应header
 //
 // 需要启动token验证器
-func JwtBasic() func(iris.Context) {
-	return func(ctx iris.Context) {
+func JwtBasic() func(server.Context) {
+	return func(ctx server.Context) {
 		var err error
-		h, ok := tool.GetAuth(ctx)
+		h, ok := bearer.GetAuth(ctx)
 		if !ok {
-			ctx.Next()
+			ctx.C.Next()
 			return
 		}
 
 		if TokenStorage == nil {
 			log.Debug("token storage nil")
-			ctx.Next()
+			ctx.C.Next()
 			return
 		}
 
@@ -28,13 +28,13 @@ func JwtBasic() func(iris.Context) {
 		if err != nil {
 			log.Debug("can't verify token")
 			log.Debug(err)
-			ctx.Next()
+			ctx.C.Next()
 			return
 		}
 
-		ctx.Values().Set(UserInfoKey, p)
+		ctx.C.Values().Set(UserInfoKey, p)
 
-		r := ctx.Request()
+		r := ctx.C.Request()
 
 		if len(p.Uid) > 0 {
 			r.Header.Set(UidKey, p.Uid)
@@ -51,6 +51,6 @@ func JwtBasic() func(iris.Context) {
 		if len(p.Scope) > 0 {
 			r.Header.Set(ScopeKey, p.Scope)
 		}
-		ctx.Next()
+		ctx.C.Next()
 	}
 }

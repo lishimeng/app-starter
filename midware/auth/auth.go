@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"strings"
 )
@@ -27,41 +27,41 @@ type Response struct {
 	Message string      `json:"message,omitempty"`
 }
 
-func errorWith(ctx iris.Context, code int, err error) {
+func errorWith(ctx server.Context, code int, err error) {
 	var resp Response
 	resp.Code = code
 	resp.Message = err.Error()
-	_ = ctx.JSON(resp)
+	ctx.Json(resp)
 }
 
-func GetUid(ctx iris.Context) (uid string) {
-	uid = ctx.GetHeader(UidKey)
+func GetUid(ctx server.Context) (uid string) {
+	uid = ctx.C.GetHeader(UidKey)
 	return
 }
 
-func GetClientType(ctx iris.Context) (ct string) {
-	ct = ctx.GetHeader(ClientKey)
+func GetClientType(ctx server.Context) (ct string) {
+	ct = ctx.C.GetHeader(ClientKey)
 	return
 }
 
-func GetOrg(ctx iris.Context) (org string) {
-	org = ctx.GetHeader(OrgKey)
+func GetOrg(ctx server.Context) (org string) {
+	org = ctx.C.GetHeader(OrgKey)
 	return
 }
 
-func GetDept(ctx iris.Context) (dept string) {
-	dept = ctx.GetHeader(DeptKey)
+func GetDept(ctx server.Context) (dept string) {
+	dept = ctx.C.GetHeader(DeptKey)
 	return
 }
 
-func GetScope(ctx iris.Context) (scope string) {
-	scope = ctx.GetHeader(ScopeKey)
+func GetScope(ctx server.Context) (scope string) {
+	scope = ctx.C.GetHeader(ScopeKey)
 	return
 }
 
 // HasScope 检查是否包含了指定的scope
-func HasScope(ctx iris.Context, expect string) (ok bool) {
-	scope := ctx.GetHeader(ScopeKey)
+func HasScope(ctx server.Context, expect string) (ok bool) {
+	scope := ctx.C.GetHeader(ScopeKey)
 	return hasScope(scope, expect)
 }
 
@@ -77,8 +77,8 @@ func hasScope(scopeHeader string, expect string) (ok bool) {
 	return
 }
 
-func GetUserInfo(ctx iris.Context) (uid token.JwtPayload, err error) {
-	var ui = ctx.Values().Get(UserInfoKey)
+func GetUserInfo(ctx server.Context) (uid token.JwtPayload, err error) {
+	var ui = ctx.C.Values().Get(UserInfoKey)
 	uid, ok := ui.(token.JwtPayload)
 	if !ok {
 		err = ErrNotAllowed

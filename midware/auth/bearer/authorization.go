@@ -1,7 +1,7 @@
-package tool
+package bearer
 
 import (
-	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
 	"strings"
 )
@@ -11,9 +11,9 @@ const (
 	Realm      = "Bearer "
 )
 
-func GetAuth(ctx iris.Context) (auth string, ok bool) {
+func GetAuth(ctx server.Context) (auth string, ok bool) {
 
-	header := ctx.GetHeader(AuthHeader)
+	header := ctx.C.GetHeader(AuthHeader)
 	if len(header) <= 0 {
 		log.Debug("no auth")
 		ok = false

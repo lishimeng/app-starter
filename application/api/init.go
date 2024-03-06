@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"github.com/kataras/iris/v12"
+
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
 	"net/http"
@@ -24,7 +25,8 @@ func EnableComponents(srv *server.Server, components ...server.Component) (err e
 }
 
 func EnableMonitors(srv *server.Server) (err error) {
-	Router(srv.GetMonitor())
+	var r = server.NewRouter(srv.GetMonitor())
+	Router(r)
 	return
 }
 

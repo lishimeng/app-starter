@@ -12,7 +12,9 @@ const (
 	defaultMonitorAddr = ":8888"
 )
 
-type Component func(app *iris.Application)
+//type Component func(app *iris.Application)
+
+type Component func(root Router)
 type Config struct {
 	Listen string
 	LogLvl string
@@ -46,7 +48,8 @@ func (s *Server) setLogLvl(lvl string) *Server {
 }
 
 func (s *Server) RegisterComponent(component Component) *Server {
-	component(s.proxy)
+	var r = NewRouter(s.proxy)
+	component(r)
 	return s
 }
 

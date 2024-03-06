@@ -2,7 +2,7 @@ package token
 
 import (
 	"github.com/kataras/jwt"
-	"github.com/lishimeng/app-starter/tool"
+	"github.com/lishimeng/app-starter/midware/auth/bearer"
 	"github.com/lishimeng/go-log"
 	"github.com/lishimeng/x/rest"
 )
@@ -56,7 +56,7 @@ func (hs *httpStorage) Verify(key string) (p JwtPayload, err error) {
 
 func (hs *httpStorage) verify(key string) (err error) {
 	var resp HttpTokenResp
-	header, value := tool.BuildAuth(key)
+	header, value := bearer.BuildAuth(key)
 	code, err := rest.New().GetJson(hs.connector.Server, nil, &resp, rest.Header{Name: header, Value: value})
 	if err != nil {
 		log.Info(err)

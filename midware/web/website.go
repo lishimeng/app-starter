@@ -1,18 +1,18 @@
 package web
 
 import (
-	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/cms"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/tool"
 )
 
 // Website 注入网站的基本配置
-func Website(ctx iris.Context) {
+func Website(ctx server.Context) {
 	ws, err := cms.GetWebsiteInfo()
 	if err != nil {
-		ctx.Next()
+		ctx.C.Next()
 		return
 	}
-	ctx.ViewData(tool.WebsiteCtx, ws)
-	ctx.Next()
+	ctx.C.ViewData(tool.WebsiteCtx, ws)
+	ctx.C.Next()
 }
