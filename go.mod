@@ -11,10 +11,9 @@ require (
 	github.com/kataras/jwt v0.1.12
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
-	github.com/lishimeng/x v1.1.4
+	github.com/lishimeng/x v1.2.0
 	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/redis/go-redis/v9 v9.4.0
-	github.com/robertkrimen/otto v0.3.0
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 )
 
@@ -85,6 +84,5 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
