@@ -11,7 +11,7 @@ require (
 	github.com/kataras/jwt v0.1.12
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
-	github.com/lishimeng/x v1.2.0
+	github.com/lishimeng/x v1.2.1
 	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
