@@ -29,6 +29,26 @@ func (r *router) Post(path string, middleware ...Handler) {
 	r.p.Post(path, handlers...)
 }
 
+func (r *router) Put(path string, middleware ...Handler) {
+	var handlers []iris.Handler
+	for _, h := range middleware {
+		handlers = append(handlers, func(ctx iris.Context) {
+			h(Context{C: ctx})
+		})
+	}
+	r.p.Put(path, handlers...)
+}
+
+func (r *router) Delete(path string, middleware ...Handler) {
+	var handlers []iris.Handler
+	for _, h := range middleware {
+		handlers = append(handlers, func(ctx iris.Context) {
+			h(Context{C: ctx})
+		})
+	}
+	r.p.Delete(path, handlers...)
+}
+
 func (r *router) Get(path string, middleware ...Handler) {
 	var handlers []iris.Handler
 	for _, h := range middleware {
