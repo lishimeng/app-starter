@@ -1,7 +1,7 @@
 package cms
 
 import (
-	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/tool"
 )
 
@@ -75,14 +75,14 @@ func GetWebsiteInfo() (ws WebSiteInfo, err error) {
 }
 
 // Router Theme提供的默认接口
-func Router(p iris.Party) {
+func Router(p server.Router) {
 	p.Get("/theme", ApiGetSpaConfig)
 }
 
 // ApiGetSpaConfig 开放接口：获取页面主题配置。
-func ApiGetSpaConfig(ctx iris.Context) {
+func ApiGetSpaConfig(ctx server.Context) {
 	var resp SpaResp
-	skipCache := ctx.URLParamIntDefault("skipCache", 0) //0-默认从缓存获取；1-跳过缓存；
+	skipCache := ctx.C.URLParamIntDefault("skipCache", 0) //0-默认从缓存获取；1-跳过缓存；
 	//默认AppName
 
 	var themeConfigs []SpaConfigInfo
@@ -94,5 +94,5 @@ func ApiGetSpaConfig(ctx iris.Context) {
 	}
 	resp.Data = FormatPageTheme(themeConfigs)
 	resp.Code = tool.RespCodeSuccess
-	tool.ResponseJSON(ctx, resp)
+	ctx.Json(resp)
 }
