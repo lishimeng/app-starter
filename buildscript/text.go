@@ -30,7 +30,7 @@ print_app_info(){
   local Name=$1
   local AppPath=$2
   echo "****************************************"
-  echo "App:${Org}:${Name}"
+  echo "App:${Name}[${Org}]"
   echo "Version:${Version}"
   echo "Commit:${GitCommit}"
   echo "Build:${BuildTime}"
