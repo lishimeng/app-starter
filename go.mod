@@ -1,10 +1,10 @@
 module github.com/lishimeng/app-starter
 
-go 1.22
+go 1.23
 
 require (
-	github.com/beego/beego/v2 v2.2.1
-	github.com/eclipse/paho.mqtt.golang v1.4.3
+	github.com/beego/beego/v2 v2.3.1
+	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/go-redis/cache/v9 v9.0.0
 	github.com/google/uuid v1.6.0
 	github.com/kataras/iris/v12 v12.2.11
@@ -12,8 +12,8 @@ require (
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
 	github.com/lishimeng/x v1.2.1
-	github.com/rabbitmq/amqp091-go v1.9.0
-	github.com/redis/go-redis/v9 v9.5.1
+	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/redis/go-redis/v9 v9.6.1
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 )
 
@@ -34,7 +34,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomarkdown/markdown v0.0.0-20240328165702-4d01890c35c0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
-	github.com/gorilla/websocket v1.5.1 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iris-contrib/schema v0.0.6 // indirect
@@ -75,14 +75,14 @@ require (
 	github.com/yosssi/ace v0.0.5 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0 // indirect
-	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
