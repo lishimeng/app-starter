@@ -13,6 +13,16 @@ checkout_tag(){
   git checkout "${Version}"
 }
 
+handle_org(){
+  if [ -n "${IMAGE_REPO}" ]; then
+    Org="${IMAGE_REPO}/${Org}"
+  fi
+}
+
+common(){
+  handle_org
+}
+
 build_image(){
   local Name=$1
   local AppPath=$2
@@ -51,6 +61,7 @@ push_image(){
 }
 
 build_all(){
+  common
   checkout_tag
   {{- range $_, $item := .Applications }}
   build_image '{{ $item.Name }}' '{{ $item.AppPath }}'
@@ -58,6 +69,7 @@ build_all(){
 }
 
 push_all(){
+  common
   {{- range $_, $item := .Applications }}
   push_image '{{ $item.Name }}'
   {{- end }}
