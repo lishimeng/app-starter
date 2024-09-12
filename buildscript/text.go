@@ -84,7 +84,7 @@ ADD ${APP_PATH}/ui .
 RUN npm i pnpm -g && pnpm install && pnpm run build
 {{- end }}
 
-FROM golang:1.22 as build
+FROM golang:1.23 as build
 ARG NAME
 ARG VERSION
 ARG COMMIT
