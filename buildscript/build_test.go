@@ -4,8 +4,8 @@ import "testing"
 
 func TestBuildHasUi(t *testing.T) {
 	err := Generate(Project{
-		//ImageRegistry: "registry.my.domain.com",
-		Namespace: "proj111",
+		ImageRegistry: "registry.my.domain.com",
+		Namespace:     "proj111",
 	}, Application{
 		Name:    "Bala",
 		AppPath: "main_file_path",

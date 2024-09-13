@@ -9,10 +9,12 @@ import (
 
 // git update-index --chmod +x script.sh
 
-const (
-	defaultNodeImageVersion    = "node:20"
-	defaultGolangImageVersion  = "golang:1.23"
-	defaultRuntimeImageVersion = "lishimeng/alpine:3.17"
+// runtime image config
+var (
+	NodeImageVersion    = "node:20"
+	GolangImageVersion  = "golang:1.23"
+	RuntimeImageVersion = "lishimeng/alpine:3.17"
+	ImageSubNamespace   = "library"
 )
 
 type Project struct {
@@ -36,9 +38,10 @@ type Application struct {
 }
 
 type ImageVersion struct {
-	Node    string // UI编译镜像
-	Golang  string // golang编译镜像
-	Runtime string // 运行时镜像
+	Node         string // UI编译镜像
+	Golang       string // golang编译镜像
+	Runtime      string // 运行时镜像
+	SubNamespace string // 镜像存放的二级地址,registry设置后生效 不空:{registry}/{subNamespace} 空:{registry}
 }
 
 const (
@@ -76,9 +79,10 @@ func createShell(pro Project, apps ...Application) (err error) {
 func createDockers(p Project, apps ...Application) (err error) {
 	for _, app := range apps {
 		err = createDocker(p, app, ImageVersion{
-			Node:    defaultNodeImageVersion,
-			Golang:  defaultGolangImageVersion,
-			Runtime: defaultRuntimeImageVersion,
+			Node:         NodeImageVersion,
+			Golang:       GolangImageVersion,
+			Runtime:      RuntimeImageVersion,
+			SubNamespace: ImageSubNamespace,
 		})
 		if err != nil {
 			return
@@ -94,9 +98,13 @@ func createDocker(pro Project, app Application, version ImageVersion) (err error
 		BuildImageVersion: version,
 	}
 	if len(pro.ImageRegistry) > 0 {
-		p.BuildImageVersion.Node = fmt.Sprintf("%s/%s", pro.ImageRegistry, p.BuildImageVersion.Node)
-		p.BuildImageVersion.Golang = fmt.Sprintf("%s/%s", pro.ImageRegistry, p.BuildImageVersion.Golang)
-		p.BuildImageVersion.Runtime = fmt.Sprintf("%s/%s", pro.ImageRegistry, p.BuildImageVersion.Runtime)
+		var registry = pro.ImageRegistry
+		if len(version.SubNamespace) > 0 {
+			registry = fmt.Sprintf("%s/%s", registry, version.SubNamespace)
+		}
+		p.BuildImageVersion.Node = fmt.Sprintf("%s/%s", registry, p.BuildImageVersion.Node)
+		p.BuildImageVersion.Golang = fmt.Sprintf("%s/%s", registry, p.BuildImageVersion.Golang)
+		p.BuildImageVersion.Runtime = fmt.Sprintf("%s/%s", registry, p.BuildImageVersion.Runtime)
 	}
 	dockerContent, err := rendText(p, dockerFile)
 	if err != nil {
