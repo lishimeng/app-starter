@@ -14,6 +14,7 @@ checkout_tag(){
 }
 
 common(){
+  echo ""
 }
 
 build_image(){
