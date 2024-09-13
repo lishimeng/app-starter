@@ -1,7 +1,7 @@
 package buildscript
 
 const script = `#!/bin/bash
-Org="{{ .Org }}"
+Namespace="{{ .Pro.Namespace }}"
 
 # shellcheck disable=SC2046
 Version=$(git describe --tags $(git rev-list --tags --max-count=1))
@@ -13,14 +13,7 @@ checkout_tag(){
   git checkout "${Version}"
 }
 
-handle_org(){
-  if [ -n "${IMAGE_REPO}" ]; then
-    Org="${IMAGE_REPO}/${Org}"
-  fi
-}
-
 common(){
-  handle_org
 }
 
 build_image(){
@@ -28,7 +21,7 @@ build_image(){
   local AppPath=$2
   print_app_info "${Name}" "${AppPath}"
 
-  docker build -t "${Org}/${Name}:${Version}" \
+  docker build -t "${Namespace}/${Name}:${Version}" \
   --build-arg NAME="${Name}" \
   --build-arg VERSION="${Version}" \
   --build-arg BUILD_TIME="${BuildTime}" \
@@ -40,7 +33,7 @@ print_app_info(){
   local Name=$1
   local AppPath=$2
   echo "****************************************"
-  echo "App:${Name}[${Org}]"
+  echo "App:${Name}[${Namespace}]"
   echo "Version:${Version}"
   echo "Commit:${GitCommit}"
   echo "Build:${BuildTime}"
@@ -52,12 +45,12 @@ print_app_info(){
 push_image(){
   local Name=$1
   echo "****************************************"
-  echo "Push:${Org}:${Name}:${Version}"
+  echo "Push:${Namespace}:${Name}:${Version}"
   echo "****************************************"
   echo ""
-  docker tag  "${Org}/${Name}:${Version}" "${Org}/${Name}"
-  docker push "${Org}/${Name}:${Version}"
-  docker push "${Org}/${Name}"
+  docker tag  "${Namespace}/${Name}:${Version}" "${Namespace}/${Name}"
+  docker push "${Namespace}/${Name}:${Version}"
+  docker push "${Namespace}/${Name}"
 }
 
 build_all(){
@@ -87,7 +80,7 @@ esac
 `
 
 const dockerFile = `{{- if .App.HasUI }}
-FROM node:20 as ui
+FROM {{ .BuildImageVersion.Node }} as ui
 ARG NAME
 ARG VERSION
 ARG APP_PATH
@@ -96,7 +89,7 @@ ADD ${APP_PATH}/ui .
 RUN npm i pnpm -g && pnpm install && pnpm run build
 
 {{- end }}
-FROM golang:1.23 as build
+FROM {{ .BuildImageVersion.Golang }} as build
 ARG NAME
 ARG VERSION
 ARG COMMIT
@@ -115,10 +108,11 @@ ADD . .
 {{- if .App.HasUI }}
 COPY --from=ui /ui_build/dist/ ${APP_PATH}/static/
 {{- end }}
+
 RUN go mod download && go mod verify
 RUN go build -v --ldflags "${LDFLAGS} -X ${BASE}.Compiler=$(go version | sed 's/[ ][ ]*/_/g')" -o ${NAME} ${APP_PATH}/main.go
 
-FROM lishimeng/alpine:3.17 as prod
+FROM {{ .BuildImageVersion.Runtime }} as prod
 ARG NAME
 EXPOSE 80/tcp
 WORKDIR /
@@ -129,8 +123,7 @@ CMD [ "/app"]
 
 // 基础镜像, 设置了+8时区
 //
-// docker build -t {org}/alpine:{version} .
-const baseDockerFile = baseDockerfileAlpine
+// docker build -t {namespace}/alpine:{version} .
 
 const baseDockerfileAlpine = `FROM alpine:3.17
 MAINTAINER lishimeng

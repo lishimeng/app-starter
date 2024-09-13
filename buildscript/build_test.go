@@ -3,8 +3,11 @@ package buildscript
 import "testing"
 
 func TestBuildHasUi(t *testing.T) {
-	err := Generate("ORG_DEMO", Application{
-		Name:    "AppName",
+	err := Generate(Project{
+		//ImageRegistry: "registry.my.domain.com",
+		Namespace: "proj111",
+	}, Application{
+		Name:    "Bala",
 		AppPath: "main_file_path",
 		HasUI:   true,
 	})
@@ -16,8 +19,10 @@ func TestBuildHasUi(t *testing.T) {
 }
 
 func TestBuildNoUi(t *testing.T) {
-	err := Generate("ORG_DEMO", Application{
-		Name:    "AppName",
+	err := Generate(Project{
+		Namespace: "proj111",
+	}, Application{
+		Name:    "Bala",
 		AppPath: "main_file_path",
 		HasUI:   false,
 	})
@@ -25,5 +30,12 @@ func TestBuildNoUi(t *testing.T) {
 		t.Fatal(err)
 	} else {
 		t.Log("ok")
+	}
+}
+
+func TestGenBaseImage(t *testing.T) {
+	err := GenerateBaseDockerfile()
+	if err != nil {
+		t.Fatal(err)
 	}
 }
