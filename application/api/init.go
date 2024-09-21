@@ -32,9 +32,6 @@ func EnableMonitors(srv *server.Server) (err error) {
 
 func EnableStatic(srv *server.Server, assetFile func() http.FileSystem) (err error) {
 
-	if err != nil {
-		return
-	}
 	srv.AdvancedConfig(func(app *iris.Application) {
 		app.HandleDir("/", assetFile())
 	})

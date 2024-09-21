@@ -9,15 +9,17 @@ import (
 )
 
 var (
-	h    bool
-	org  string
-	args []string
+	h        bool
+	ns       string
+	args     []string
+	registry string
 )
 
 func init() {
 	flag.Usage = usage
 	flag.BoolVar(&h, "h", false, "help")
-	flag.StringVar(&org, "org", "", "app organization")
+	flag.StringVar(&ns, "ns", "", "app namespace")
+	flag.StringVar(&registry, "registry", "", "docker image registry")
 }
 
 func usage() {
@@ -38,13 +40,14 @@ func main() {
 		flag.Usage()
 		return
 	}
-	if len(org) == 0 || len(args) == 0 {
+	if len(ns) == 0 || len(args) == 0 {
+		flag.Usage()
 		return
 	}
-	_main(org, args...)
+	_main(args...)
 }
 
-func _main(org string, components ...string) {
+func _main(components ...string) {
 	var appInfo []buildscript.Application
 	for _, content := range components {
 		var name string
@@ -70,15 +73,25 @@ func _main(org string, components ...string) {
 	}
 	fmt.Println("Generate application")
 	fmt.Println()
-	fmt.Println("App org:", org)
+	fmt.Println("Namespace:", ns)
+	if len(registry) > 0 {
+		fmt.Println("Registry:", registry)
+	}
 	for _, info := range appInfo {
 		fmt.Println("  app name:", info.Name)
 		fmt.Println("  app path:", info.AppPath)
 		fmt.Println("  hasUI:", info.HasUI)
 		fmt.Println()
 	}
+	var projectInfo = buildscript.Project{
+		Namespace: ns,
+	}
+	if len(registry) > 0 {
+		projectInfo.ImageRegistry = registry
+	}
+
 	fmt.Println("Start generate...")
-	err := buildscript.Generate(org, appInfo...)
+	err := buildscript.Generate(projectInfo, appInfo...)
 	if err != nil {
 		fmt.Println(err)
 	} else {
