@@ -75,10 +75,13 @@ func RegisterWebServer(s server.Server) {
 	proxy.Add(&s, webServerKey)
 }
 func GetWebServer() (s *server.Server) {
-	err := proxy.Get(s, webServerKey)
+	var svr server.Server
+	err := proxy.Get(&svr, webServerKey)
 	if err != nil {
 		log.Debug(err)
 		s = nil
+	} else {
+		s = &svr
 	}
 	return
 }

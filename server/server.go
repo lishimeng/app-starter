@@ -33,6 +33,8 @@ func New(config Config) (handler *Server) {
 		proxy:   iris.New(),
 		monitor: iris.New(),
 	}
+	s.proxy.SetName("web_server")
+	s.monitor.SetName("web_monitor")
 	s.setLogLvl(config.LogLvl)
 	return &s
 }

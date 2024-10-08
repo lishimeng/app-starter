@@ -7,14 +7,16 @@ import (
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/server"
 )
 
 type Application interface {
 	Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate ...func(string)) error
 }
 
-func GetWebServer() {
-
+func GetWebServer() (s *server.Server) {
+	s = factory.GetWebServer()
+	return
 }
 
 func GetAmqp() (session rabbit.Session) {
