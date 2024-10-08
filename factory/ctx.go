@@ -6,14 +6,16 @@ import (
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
 	proxy "github.com/lishimeng/x/container"
 )
 
 const (
-	amqpKey  = "amqp_session"
-	cacheKey = "cache_redis"
-	mqttKey  = "mqtt_redis"
+	amqpKey      = "amqp_session"
+	cacheKey     = "cache_redis"
+	mqttKey      = "mqtt_key"
+	webServerKey = "webserver_key"
 )
 
 var globalContext context.Context
@@ -65,6 +67,18 @@ func GetMqtt() (session mqtt.Session) {
 	if err != nil {
 		log.Debug(err)
 		session = nil
+	}
+	return
+}
+
+func RegisterWebServer(s server.Server) {
+	proxy.Add(&s, webServerKey)
+}
+func GetWebServer() (s *server.Server) {
+	err := proxy.Get(s, webServerKey)
+	if err != nil {
+		log.Debug(err)
+		s = nil
 	}
 	return
 }

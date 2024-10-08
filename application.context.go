@@ -113,6 +113,10 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 			conf.LogLvl = h.builder.webLogLevel
 		}
 		srv, err = api.Server(conf)
+		if err != nil {
+			return
+		}
+		factory.RegisterWebServer(*srv)
 		if h.builder.webStaticEnable {
 			err = api.EnableStatic(srv,
 				h.builder.assetFile)

@@ -37,6 +37,12 @@ func New(config Config) (handler *Server) {
 	return &s
 }
 
+// GetApplication 服务器实例
+func (s *Server) GetApplication() *iris.Application {
+	return s.proxy
+}
+
+// GetMonitor 监控实例
 func (s *Server) GetMonitor() *iris.Application {
 	return s.monitor
 }

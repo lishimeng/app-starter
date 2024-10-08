@@ -13,6 +13,10 @@ type Application interface {
 	Start(buildHandler func(ctx context.Context, builder *ApplicationBuilder) error, onTerminate ...func(string)) error
 }
 
+func GetWebServer() {
+
+}
+
 func GetAmqp() (session rabbit.Session) {
 	session = factory.GetAmqp()
 	return
