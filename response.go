@@ -1,6 +1,9 @@
 package app
 
-import "math"
+import (
+	"github.com/lishimeng/app-starter/persistence"
+	"math"
+)
 
 type Response struct {
 	Code    int         `json:"code,omitempty"`
@@ -11,7 +14,7 @@ type Response struct {
 
 type ResponseWrapper struct {
 	Response
-	Data interface{} `json:"data,omitempty"`
+	Data any `json:"data,omitempty"`
 }
 
 type Pager struct {
@@ -31,6 +34,14 @@ func (p *Pager) Total(count int64) int {
 	totalPage := int(t)
 	p.TotalPage = totalPage
 	return totalPage
+}
+
+type SimplePager[DbModel any, Dto any] struct {
+	Pager
+	DataSet      []DbModel
+	Transform    func(src DbModel, dst *Dto)
+	OrderByExp   []string
+	QueryBuilder func(tx persistence.TxContext) any
 }
 
 type PagerResponse struct {
