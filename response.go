@@ -17,19 +17,23 @@ type ResponseWrapper struct {
 	Data any `json:"data,omitempty"`
 }
 
-type Pager struct {
-	TotalPage int           `json:"totalPage"` // 总页数
-	PageSize  int           `json:"pageSize"`  // 页面大小
-	PageNum   int           `json:"pageNum"`   // 页号
-	More      int           `json:"more"`      // 是否有下一页
-	Data      []interface{} `json:"items,omitempty"`
+type Pager[Dto any] struct {
+	BasePager
+	Data []Dto `json:"items,omitempty"`
 }
 
-func (p *Pager) Offset() int {
+type BasePager struct {
+	TotalPage int `json:"totalPage"` // 总页数
+	PageSize  int `json:"pageSize"`  // 页面大小
+	PageNum   int `json:"pageNum"`   // 页号
+	More      int `json:"more"`      // 是否有下一页
+}
+
+func (p *BasePager) Offset() int {
 	return (p.PageNum - 1) * p.PageSize
 }
 
-func (p *Pager) Total(count int64) int {
+func (p *BasePager) Total(count int64) int {
 	t := math.Ceil(float64(count) / float64(p.PageSize))
 	totalPage := int(t)
 	p.TotalPage = totalPage
@@ -37,7 +41,7 @@ func (p *Pager) Total(count int64) int {
 }
 
 type SimplePager[DbModel any, Dto any] struct {
-	Pager
+	Pager[Dto]
 	DataSet      []DbModel
 	Transform    func(src DbModel, dst *Dto)
 	OrderByExp   []string
@@ -46,5 +50,4 @@ type SimplePager[DbModel any, Dto any] struct {
 
 type PagerResponse struct {
 	Response
-	Pager
 }
