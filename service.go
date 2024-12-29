@@ -57,6 +57,9 @@ func QueryPage[Model any, Dto any](pager *SimplePager[Model, Dto]) (err error) {
 		if er != nil {
 			return
 		}
+		if pager.Transform == nil {
+			return
+		}
 		for _, data := range pager.DataSet {
 			var dto Dto
 			pager.Transform(data, &dto)
