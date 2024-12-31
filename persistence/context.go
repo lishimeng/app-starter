@@ -22,6 +22,10 @@ func NewOrm(aliasName string) *OrmContext {
 	return c
 }
 
+func (o *OrmContext) SetLogEnable(enable bool) {
+	orm.Debug = enable
+}
+
 func (o *OrmContext) Transaction(h func(TxContext) error) (err error) {
 
 	var ctx TxContext

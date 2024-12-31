@@ -39,6 +39,7 @@ type ApplicationBuilder struct {
 	dbEnable bool
 	dbConfig persistence.BaseConfig
 	dbModels []interface{}
+	dbDebug  bool
 
 	cacheEnable bool
 	redisOpts   cache.RedisOptions
@@ -125,6 +126,12 @@ func (h *ApplicationBuilder) EnableDatabase(config persistence.BaseConfig,
 	h.dbConfig = config
 	h.dbModels = models
 	// TODO check
+	return h
+}
+
+// EnableDatabaseLog 打开orm log输出
+func (h *ApplicationBuilder) EnableDatabaseLog() *ApplicationBuilder {
+	h.dbDebug = true
 	return h
 }
 
