@@ -3,7 +3,7 @@ module github.com/lishimeng/app-starter
 go 1.23
 
 require (
-	github.com/beego/beego/v2 v2.3.1
+	github.com/beego/beego/v2 v2.3.4
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/go-redis/cache/v9 v9.0.0
 	github.com/google/uuid v1.6.0
