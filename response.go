@@ -37,6 +37,11 @@ func (p *BasePager) Total(count int64) int {
 	t := math.Ceil(float64(count) / float64(p.PageSize))
 	totalPage := int(t)
 	p.TotalPage = totalPage
+	var more = 0
+	if p.PageNum < p.TotalPage {
+		more = 1
+	}
+	p.More = more
 	return totalPage
 }
 
