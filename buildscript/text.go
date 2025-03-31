@@ -71,8 +71,8 @@ build(){
             -X ${Base}.Commit=${GitCommit} \
             -X ${Base}.Build=${BuildTime} \
             "
-  #go mod tidy && go mod vendor
-  go build -v --ldflags "${LdFlags} -X ${Base}.Compiler=$(go version | sed 's/[ ][ ]*/_/g')" -o "${Name}" "${AppPath}"/main.go
+  go mod tidy && go mod vendor
+  GOOS="${GOOS}" GOARCH="${GOARCH}" go build -v --ldflags "${LdFlags} -X ${Base}.Compiler=$(go version | sed 's/[ ][ ]*/_/g')" -o "${Name}" "${AppPath}"/main.go
 }
 
 build_app(){
