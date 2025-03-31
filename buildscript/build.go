@@ -3,6 +3,7 @@ package buildscript
 import (
 	"bytes"
 	"fmt"
+	"github.com/lishimeng/go-log"
 	"os"
 	text "text/template"
 )
@@ -45,8 +46,9 @@ type ImageVersion struct {
 }
 
 const (
-	scriptName     = "build.sh"
-	dockerFileName = "Dockerfile"
+	localBuildScriptName = "build_local.sh"
+	scriptName           = "build.sh"
+	dockerFileName       = "Dockerfile"
 )
 
 func Generate(p Project, apps ...Application) (err error) {
@@ -56,7 +58,32 @@ func Generate(p Project, apps ...Application) (err error) {
 		return
 	}
 
+	err = createLocalBuildShell(p, apps...)
+	if err != nil {
+		return
+	}
+
 	err = createDockers(p, apps...)
+	return
+}
+
+func createLocalBuildShell(pro Project, apps ...Application) (err error) {
+	p := Param{
+		Pro:          pro,
+		Applications: apps,
+	}
+	if len(pro.ImageRegistry) > 0 {
+		p.Pro.Namespace = fmt.Sprintf("%s/%s", pro.ImageRegistry, pro.Namespace)
+	}
+	scriptContent, err := rendText(p, localBuildScript)
+	if err != nil {
+		return
+	}
+	err = os.WriteFile(localBuildScriptName, []byte(scriptContent), 0644)
+	if err != nil {
+		log.Info(err)
+		return
+	}
 	return
 }
 
@@ -73,6 +100,10 @@ func createShell(pro Project, apps ...Application) (err error) {
 		return
 	}
 	err = os.WriteFile(scriptName, []byte(scriptContent), 0644)
+	if err != nil {
+		log.Info(err)
+		return
+	}
 	return
 }
 
