@@ -10,9 +10,10 @@ import (
 )
 
 type sessionContext struct {
-	conn   proxy.Client
-	locker *sync.Mutex
-	ctx    context.Context
+	conn      proxy.Client
+	locker    *sync.Mutex
+	ctx       context.Context
+	onConnect func()
 }
 
 func New(ctx context.Context, options ...ClientOption) Session {
@@ -45,7 +46,18 @@ func (session *sessionContext) listenExit() {
 }
 
 func (session *sessionContext) Connect() error {
-	return session.ensureConnected()
+	var err = session.ensureConnected()
+	if err != nil {
+		return err
+	}
+	if session.onConnect != nil {
+		go session.onConnect()
+	}
+	return nil
+}
+
+func (session *sessionContext) OnConnect(handler func()) {
+	session.onConnect = handler
 }
 
 func (session *sessionContext) ensureConnected() error {

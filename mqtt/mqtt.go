@@ -17,6 +17,7 @@ type Session interface {
 	Publish(topic string, qos byte, retained bool, data []byte) error
 	Subscribe(handler func(topic string, payload []byte), qos byte, topic string) error
 	Unsubscribe(topics ...string)
+	OnConnect(cb func())
 }
 
 type ClientOption func(*proxy.ClientOptions) *proxy.ClientOptions
