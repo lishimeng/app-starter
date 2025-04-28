@@ -19,8 +19,16 @@ var (
 )
 
 type Project struct {
-	ImageRegistry string // 镜像库,默认empty
-	Namespace     string // namespace
+	ImageRegistry  string // 镜像库,默认empty
+	Namespace      string // namespace
+	NamespaceAlias string //  namespace别名,不为空时替换namespace
+}
+
+func (p *Project) Build() *Project {
+	if len(p.NamespaceAlias) > 0 {
+		p.Namespace = p.NamespaceAlias
+	}
+	return p
 }
 
 type Param struct {
@@ -33,9 +41,17 @@ type DockerParam struct {
 	BuildImageVersion ImageVersion
 }
 type Application struct {
-	Name    string
-	AppPath string
-	HasUI   bool
+	Name      string
+	NameAlias string // name别名, 不为空时替换name
+	AppPath   string
+	HasUI     bool
+}
+
+func (a *Application) Build() *Application {
+	if len(a.NameAlias) > 0 {
+		a.Name = a.NameAlias
+	}
+	return a
 }
 
 type ImageVersion struct {
@@ -68,12 +84,17 @@ func Generate(p Project, apps ...Application) (err error) {
 }
 
 func createLocalBuildShell(pro Project, apps ...Application) (err error) {
-	p := Param{
-		Pro:          pro,
-		Applications: apps,
+	var compiledApp []Application
+	for _, app := range apps {
+		compiledApp = append(compiledApp, *app.Build())
 	}
-	if len(pro.ImageRegistry) > 0 {
-		p.Pro.Namespace = fmt.Sprintf("%s/%s", pro.ImageRegistry, pro.Namespace)
+	var compiledPro = *pro.Build()
+	p := Param{
+		Pro:          compiledPro,
+		Applications: compiledApp,
+	}
+	if len(p.Pro.ImageRegistry) > 0 {
+		p.Pro.Namespace = fmt.Sprintf("%s/%s", p.Pro.ImageRegistry, p.Pro.Namespace)
 	}
 	scriptContent, err := rendText(p, localBuildScript)
 	if err != nil {
@@ -88,12 +109,17 @@ func createLocalBuildShell(pro Project, apps ...Application) (err error) {
 }
 
 func createShell(pro Project, apps ...Application) (err error) {
-	p := Param{
-		Pro:          pro,
-		Applications: apps,
+	var compiledApp []Application
+	for _, app := range apps {
+		compiledApp = append(compiledApp, *app.Build())
 	}
-	if len(pro.ImageRegistry) > 0 {
-		p.Pro.Namespace = fmt.Sprintf("%s/%s", pro.ImageRegistry, pro.Namespace)
+	var compiledPro = *pro.Build()
+	p := Param{
+		Pro:          compiledPro,
+		Applications: compiledApp,
+	}
+	if len(p.Pro.ImageRegistry) > 0 {
+		p.Pro.Namespace = fmt.Sprintf("%s/%s", p.Pro.ImageRegistry, p.Pro.Namespace)
 	}
 	scriptContent, err := rendText(p, script)
 	if err != nil {
@@ -108,7 +134,9 @@ func createShell(pro Project, apps ...Application) (err error) {
 }
 
 func createDockers(p Project, apps ...Application) (err error) {
+	p = *p.Build()
 	for _, app := range apps {
+		app = *app.Build()
 		err = createDocker(p, app, ImageVersion{
 			Node:         NodeImageVersion,
 			Golang:       GolangImageVersion,

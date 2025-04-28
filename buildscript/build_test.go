@@ -39,3 +39,21 @@ func TestGenBaseImage(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestAlias(t *testing.T) {
+	err := Generate(Project{
+		ImageRegistry:  "registry.somAlias.domain.com",
+		Namespace:      "proj_111",
+		NamespaceAlias: "project_use_alias_xxxx",
+	}, Application{
+		Name:      "Balabala",
+		NameAlias: "TheNameAliasReplace",
+		AppPath:   "main_file_path",
+		HasUI:     true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	} else {
+		t.Log("ok")
+	}
+}
