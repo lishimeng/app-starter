@@ -128,6 +128,12 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 				return
 			}
 		}
+		if h.builder.vue3PluginEnable {
+			err = api.EnableVue3Plugin(srv, h.builder.vue3Plugin)
+			if err != nil {
+				return
+			}
+		}
 
 		err = api.EnableComponents(srv, h.builder.webComponents...)
 		if err != nil {

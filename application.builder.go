@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/amqp"
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
@@ -16,6 +17,9 @@ import (
 	"github.com/lishimeng/x/etc"
 	"net/http"
 	"os"
+	"path"
+	"strings"
+	"time"
 )
 
 type TokenValidatorInjectFunc func(storage token.Storage)
@@ -33,6 +37,9 @@ type ApplicationBuilder struct {
 	assetNames      func() []string
 	webStaticHome   string
 	assetFile       func() http.FileSystem
+
+	vue3PluginEnable bool
+	vue3Plugin       func(app *iris.Application)
 
 	webLogLevel string
 
@@ -116,6 +123,48 @@ func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 func (h *ApplicationBuilder) EnableStaticWeb(assetFile func() http.FileSystem) *ApplicationBuilder {
 	h.webStaticEnable = true
 	h.assetFile = assetFile
+	return h
+}
+
+/*
+EnableVueHistoryPlugin 页面路径使用index.html替换
+*/
+func (h *ApplicationBuilder) EnableVueHistoryPlugin(whiteList ...string) *ApplicationBuilder {
+
+	h.vue3PluginEnable = true
+	const indexPage = "index.html"
+	var handler = func(app *iris.Application) {
+		var m = map[string]byte{}
+		for _, f := range whiteList {
+			m[f] = 1
+		}
+		app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
+			p := ctx.Path()
+			ext := path.Ext(p)
+			if len(ext) > 0 {
+				ctx.Next()
+				return
+			}
+			inWhiteList := false
+			for k, _ := range m {
+				inWhiteList = strings.HasSuffix(p, k)
+				if inWhiteList {
+					break
+				}
+			}
+			if inWhiteList {
+				ctx.Next()
+				return
+			}
+			index, err := h.assetFile().Open(indexPage)
+			if err != nil {
+				ctx.Next()
+				return
+			}
+			ctx.ServeContent(index, indexPage, time.Now())
+		})
+	}
+	h.vue3Plugin = handler
 	return h
 }
 

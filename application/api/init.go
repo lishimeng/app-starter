@@ -38,6 +38,11 @@ func EnableStatic(srv *server.Server, assetFile func() http.FileSystem) (err err
 	return
 }
 
+func EnableVue3Plugin(srv *server.Server, handler func(app *iris.Application)) (err error) {
+	srv.AdvancedConfig(handler)
+	return
+}
+
 func Start(ctx context.Context, srv *server.Server) (err error) {
 	go func() {
 		log.Info("start web server")
