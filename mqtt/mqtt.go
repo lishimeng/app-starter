@@ -66,15 +66,31 @@ var WithSessionControl = func(keepAlive, pingTimeout, writeTimeout time.Duration
 	}
 }
 
-var WithOnConnectHandler = func(h proxy.OnConnectHandler) ClientOption {
+type ClientWrapper struct {
+	C proxy.Client
+}
+
+var WithOnConnectHandler = func(h func(*ClientWrapper)) ClientOption {
 	return func(options *proxy.ClientOptions) *proxy.ClientOptions {
-		options = options.SetOnConnectHandler(h)
+		options = options.SetOnConnectHandler(func(c proxy.Client) {
+			h(&ClientWrapper{C: c})
+		})
 		return options
 	}
 }
-var WithOnLostHandler = func(h proxy.ConnectionLostHandler) ClientOption {
+var WithOnLostHandler = func(h func(*ClientWrapper, error)) ClientOption {
 	return func(options *proxy.ClientOptions) *proxy.ClientOptions {
-		options = options.SetConnectionLostHandler(h)
+		options = options.SetConnectionLostHandler(func(c proxy.Client, err error) {
+			h(&ClientWrapper{C: c}, err)
+		})
+		options = options.SetConnectRetry(true)
+		return options
+	}
+}
+
+var WithWill = func(topic string, payload string, qos byte, retained bool) ClientOption {
+	return func(options *proxy.ClientOptions) *proxy.ClientOptions {
+		options = options.SetWill(topic, payload, qos, retained)
 		return options
 	}
 }
