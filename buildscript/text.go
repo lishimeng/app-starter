@@ -32,7 +32,7 @@ meta(){
 
 meta_dev(){
   # shellcheck disable=SC2046
-  Version="snapshot_"$(git log --pretty=format:"%s" -1)
+  Version="snapshot_"$(git log --pretty=format:"%ct" -1)
   # shellcheck disable=SC2154
   GitCommit=$(git log --pretty=format:"%h" -1)
   BuildTime=$(date +%FT%T%z)
