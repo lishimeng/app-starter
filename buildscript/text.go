@@ -66,11 +66,11 @@ build(){
   local Name=$1
   local AppPath=$2
   local LdFlags=" \
-            -X ${Base}.AppName=${Name} \
-            -X ${Base}.Version=${Version} \
-            -X ${Base}.Commit=${GitCommit} \
-            -X ${Base}.Build=${BuildTime} \
-            "
+-X ${Base}.AppName=${Name} \
+-X ${Base}.Version=${Version} \
+-X ${Base}.Commit=${GitCommit} \
+-X ${Base}.Build=${BuildTime} \
+"
   go mod tidy && go mod vendor
   GOOS="${GOOS}" GOARCH="${GOARCH}" go build -v --ldflags "${LdFlags} -X ${Base}.Compiler=$(go version | sed 's/[ ][ ]*/_/g')" -o "${Name}" "${AppPath}"/main.go
 }
@@ -204,11 +204,11 @@ ARG APP_PATH
 ARG BASE="github.com/lishimeng/app-starter/version"
 ENV GOPROXY=https://goproxy.cn,direct
 ARG LDFLAGS=" \
-    -X ${BASE}.AppName=${NAME} \
-    -X ${BASE}.Version=${VERSION} \
-    -X ${BASE}.Commit=${COMMIT} \
-    -X ${BASE}.Build=${BUILD_TIME} \
-    "
+-X ${BASE}.AppName=${NAME} \
+-X ${BASE}.Version=${VERSION} \
+-X ${BASE}.Commit=${COMMIT} \
+-X ${BASE}.Build=${BUILD_TIME} \
+"
 WORKDIR /release
 ADD . .
 {{- if .App.HasUI }}
