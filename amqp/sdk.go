@@ -16,7 +16,7 @@ var (
 )
 
 func New(ctx context.Context, c Connector, options ...rabbit.SessionOption) (session rabbit.Session) {
-	session = rabbit.New(ctx, c.Conn, options...)
+	session = rabbit.New(ctx, c.conn, options...)
 	return
 }
 

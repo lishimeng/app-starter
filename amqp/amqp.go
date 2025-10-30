@@ -8,11 +8,11 @@ import (
 const addrFormat = "amqp://%s:%s@%s:%d/"
 
 type Connector struct {
-	Conn string
+	conn string
 }
 
 func (c *Connector) Build(host string, port int, user string, passwd string) {
-	c.Conn = fmt.Sprintf(addrFormat, user, passwd, host, port)
+	c.conn = fmt.Sprintf(addrFormat, user, passwd, host, port)
 }
 
 // Handler

@@ -45,7 +45,7 @@ func TestSdk001(t *testing.T) {
 	rabbit.MaxTxBuffer = 20
 
 	var ctx, cancel = context.WithCancel(context.Background())
-	var c = Connector{Conn: addr}
+	var c = Connector{conn: addr}
 	var session = New(ctx, c, rabbit.TxWorkerOption(3))
 
 	log.Info(session)
@@ -114,7 +114,7 @@ func TestPubOnce(t *testing.T) {
 	rabbit.MaxTxBuffer = 20
 
 	var ctx, cancel = context.WithCancel(context.Background())
-	var c = Connector{Conn: addr}
+	var c = Connector{conn: addr}
 	var session = New(ctx, c)
 
 	log.Info(session)

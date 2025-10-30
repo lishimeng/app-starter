@@ -9,7 +9,6 @@ import (
 func TestResponse001(t *testing.T) {
 	r := PagerResponse{
 		Response{},
-		Pager{},
 	}
 	r.Response.Code = 1
 	r.Response.Message = "success"

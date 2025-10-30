@@ -6,8 +6,16 @@ type OrmContext struct {
 	Context orm.Ormer
 }
 
+func (o *OrmContext) NewCondition() *orm.Condition {
+	return orm.NewCondition()
+}
+
 type TxContext struct {
 	Context orm.TxOrmer
+}
+
+func (o *TxContext) NewCondition() *orm.Condition {
+	return orm.NewCondition()
 }
 
 func New() *OrmContext {
