@@ -61,6 +61,26 @@ func (r *router) Get(path string, middleware ...Handler) {
 	r.p.Get(path, handlers...)
 }
 
+func (r *router) Patch(path string, middleware ...Handler) {
+	var handlers []iris.Handler
+	for _, h := range middleware {
+		handlers = append(handlers, func(ctx iris.Context) {
+			h(Context{C: ctx})
+		})
+	}
+	r.p.Patch(path, handlers...)
+}
+
+func (r *router) Options(path string, middleware ...Handler) {
+	var handlers []iris.Handler
+	for _, h := range middleware {
+		handlers = append(handlers, func(ctx iris.Context) {
+			h(Context{C: ctx})
+		})
+	}
+	r.p.Options(path, handlers...)
+}
+
 func NewRouter(app *iris.Application) Router {
 	return &router{p: app.Party("/")}
 }
