@@ -11,6 +11,8 @@ type Router interface {
 	Party() iris.Party
 	Put(path string, middleware ...Handler)
 	Delete(path string, middleware ...Handler)
+	Options(path string, middleware ...Handler)
+	Patch(path string, middleware ...Handler)
 }
 
 type router struct {
