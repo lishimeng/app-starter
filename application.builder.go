@@ -2,6 +2,12 @@ package app
 
 import (
 	"context"
+	"net/http"
+	"os"
+	"path"
+	"strings"
+	"time"
+
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/amqp"
@@ -15,11 +21,6 @@ import (
 	"github.com/lishimeng/app-starter/version"
 	"github.com/lishimeng/go-log"
 	"github.com/lishimeng/x/etc"
-	"net/http"
-	"os"
-	"path"
-	"strings"
-	"time"
 )
 
 type TokenValidatorInjectFunc func(storage token.Storage)
@@ -45,7 +46,8 @@ type ApplicationBuilder struct {
 
 	dbEnable bool
 	dbConfig persistence.BaseConfig
-	dbModels []interface{}
+	dbModels []any
+	dbViews  []any
 	dbDebug  bool
 
 	cacheEnable bool
@@ -175,6 +177,11 @@ func (h *ApplicationBuilder) EnableDatabase(config persistence.BaseConfig,
 	h.dbConfig = config
 	h.dbModels = models
 	// TODO check
+	return h
+}
+
+func (h *ApplicationBuilder) EnableDatabaseView(views ...interface{}) *ApplicationBuilder {
+	h.dbViews = views
 	return h
 }
 

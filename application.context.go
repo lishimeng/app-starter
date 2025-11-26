@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/lishimeng/app-starter/amqp"
 	"github.com/lishimeng/app-starter/application/api"
@@ -68,7 +69,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		if h.builder.dbDebug { // 检查是否需要打开debug日志
 			orm.Debug = true
 		}
-		err = repo.Database(h.builder.dbConfig, h.builder.dbModels...)
+		err = repo.Database(h.builder.dbConfig, h.builder.dbViews, h.builder.dbModels...)
 		if err != nil {
 			return
 		}
