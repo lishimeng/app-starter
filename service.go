@@ -48,7 +48,7 @@ func QueryPage[Model any, Dto any](pager *SimplePager[Model, Dto]) (err error) {
 		if count == 0 {
 			return
 		}
-		pager.TotalPage = pager.Total(count)
+		pager.TotalPage = pager.SetTotal(count)
 		if len(pager.OrderByExp) > 0 {
 			query = query.OrderBy(pager.OrderByExp...)
 		}

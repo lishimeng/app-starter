@@ -1,8 +1,9 @@
 package app
 
 import (
-	"github.com/lishimeng/app-starter/persistence"
 	"math"
+
+	"github.com/lishimeng/app-starter/persistence"
 )
 
 type Response struct {
@@ -23,6 +24,7 @@ type Pager[Dto any] struct {
 }
 
 type BasePager struct {
+	Total     int `json:"total"`
 	TotalPage int `json:"totalPage"` // 总页数
 	PageSize  int `json:"pageSize"`  // 页面大小
 	PageNum   int `json:"pageNum"`   // 页号
@@ -33,7 +35,8 @@ func (p *BasePager) Offset() int {
 	return (p.PageNum - 1) * p.PageSize
 }
 
-func (p *BasePager) Total(count int64) int {
+func (p *BasePager) SetTotal(count int64) int {
+	p.Total = int(count)
 	t := math.Ceil(float64(count) / float64(p.PageSize))
 	totalPage := int(t)
 	p.TotalPage = totalPage
