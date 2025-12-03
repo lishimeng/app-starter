@@ -15,6 +15,7 @@ import (
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	shutdown "github.com/lishimeng/go-app-shutdown"
+	"github.com/redis/go-redis/v9"
 )
 
 type application struct {
@@ -77,6 +78,9 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	if h.builder.cacheEnable {
 		factory.RegisterCache(cache.New(factory.GetCtx(), h.builder.redisOpts, h.builder.cacheOpts))
+		var redisOpt = redis.Options(h.builder.redisOpts)
+		client := redis.NewClient(&redisOpt)
+		factory.RegisterRedis(client)
 	}
 
 	if h.builder.tokenValidatorEnable {

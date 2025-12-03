@@ -2,6 +2,7 @@ package factory
 
 import (
 	"context"
+
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/mqtt"
@@ -9,11 +10,13 @@ import (
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
 	proxy "github.com/lishimeng/x/container"
+	"github.com/redis/go-redis/v9"
 )
 
 const (
 	amqpKey      = "amqp_session"
 	cacheKey     = "cache_redis"
+	redisKey     = "redis_key"
 	mqttKey      = "mqtt_key"
 	webServerKey = "webserver_key"
 )
@@ -39,6 +42,26 @@ func RegisterCache(c cache.C) {
 
 func GetCache() (c cache.C) {
 	err := proxy.Get(&c, cacheKey)
+	if err != nil {
+		log.Debug(err)
+		c = nil
+	}
+	return
+}
+
+func RegisterRedis(c *redis.Client) {
+	proxy.Add(&c, redisKey)
+	go func() {
+		ctx := GetCtx()
+		select {
+		case <-ctx.Done():
+			_ = c.Close()
+		}
+	}()
+}
+
+func GetRedis() (c *redis.Client) {
+	err := proxy.Get(&c, redisKey)
 	if err != nil {
 		log.Debug(err)
 		c = nil
