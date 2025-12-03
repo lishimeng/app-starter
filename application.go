@@ -2,12 +2,14 @@ package app
 
 import (
 	"context"
+
 	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
+	"github.com/redis/go-redis/v9"
 )
 
 type Application interface {
@@ -38,5 +40,10 @@ func GetNamedOrm(aliaName string) *persistence.OrmContext {
 
 func GetCache() (c cache.C) {
 	c = factory.GetCache()
+	return
+}
+
+func RegisterRedis(c *redis.Client) {
+	c = factory.GetRedis()
 	return
 }
