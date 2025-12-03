@@ -43,7 +43,7 @@ func GetCache() (c cache.C) {
 	return
 }
 
-func RegisterRedis(c *redis.Client) {
+func GetRedis() (c *redis.Client) {
 	c = factory.GetRedis()
 	return
 }
