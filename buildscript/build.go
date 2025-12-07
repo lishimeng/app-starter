@@ -13,8 +13,8 @@ import (
 
 // runtime image config
 var (
-	NodeImageVersion    = "node:20"
-	GolangImageVersion  = "golang:1.23"
+	NodeImageVersion    = "node:24"
+	GolangImageVersion  = "golang:1.24.10"
 	RuntimeImageVersion = "lishimeng/alpine:3.17"
 	ImageSubNamespace   = "library"
 )
