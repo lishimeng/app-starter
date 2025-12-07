@@ -3,9 +3,10 @@ package buildscript
 import (
 	"bytes"
 	"fmt"
-	"github.com/lishimeng/go-log"
 	"os"
 	text "text/template"
+
+	"github.com/lishimeng/go-log"
 )
 
 // git update-index --chmod +x script.sh
@@ -74,10 +75,10 @@ func Generate(p Project, apps ...Application) (err error) {
 		return
 	}
 
-	err = createLocalBuildShell(p, apps...)
-	if err != nil {
-		return
-	}
+	//err = createLocalBuildShell(p, apps...)
+	//if err != nil {
+	//	return
+	//}
 
 	err = createDockers(p, apps...)
 	return
@@ -121,7 +122,7 @@ func createShell(pro Project, apps ...Application) (err error) {
 	if len(p.Pro.ImageRegistry) > 0 {
 		p.Pro.Namespace = fmt.Sprintf("%s/%s", p.Pro.ImageRegistry, p.Pro.Namespace)
 	}
-	scriptContent, err := rendText(p, script)
+	scriptContent, err := rendText(p, scriptV2)
 	if err != nil {
 		return
 	}
