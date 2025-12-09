@@ -252,7 +252,8 @@ main_cmd(){
   case  ${BuildMode} in
       push)
         log_debug "handle push..."
-  		  push_all "$@"
+        meta_release
+  		push_all "$@"
         ;;
       dev)
         log_debug "handle dev..."
@@ -336,6 +337,7 @@ build_all(){
 push_all(){
   log_debug "push_all..."
   common
+  meta_release
 {{- range $_, $item := .Applications }}
   push_image '{{ $item.Name }}'
 {{- end }}
