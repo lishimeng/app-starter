@@ -277,7 +277,7 @@ main(){
   handle_env
   log_debug "main..."
   log_debug "handle build mode..."
-  if [ $# -gt 1 ]; then
+  if [ $# -ge 1 ]; then
     case $1 in
     release)
       BuildMode="release"
@@ -336,7 +336,6 @@ build_all(){
 push_all(){
   log_debug "push_all..."
   common
-common
 {{- range $_, $item := .Applications }}
   push_image '{{ $item.Name }}'
 {{- end }}
