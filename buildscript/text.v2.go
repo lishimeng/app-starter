@@ -337,7 +337,6 @@ build_all(){
 push_all(){
   log_debug "push_all..."
   common
-  meta_release
 {{- range $_, $item := .Applications }}
   push_image '{{ $item.Name }}'
 {{- end }}
