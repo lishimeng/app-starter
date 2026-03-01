@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/lishimeng/app-starter/amqp"
@@ -56,6 +57,16 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		err = fmt.Errorf("application builder function nil")
 		return
 	}
+	// 读取环境变量
+	var dbLogEnabled = os.Getenv("DB_LOG_ENABLED")
+	if dbLogEnabled == "1" {
+		h.builder.dbEnable = true
+	}
+	var webLogEnabled = os.Getenv("WEB_LOG_ENABLED")
+	if webLogEnabled == "1" {
+		h.builder.webEnable = true
+	}
+
 	err = buildHandler(factory.GetCtx(), h.builder)
 	if err != nil {
 		return
