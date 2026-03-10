@@ -14,8 +14,6 @@ func (m *Manager) Run() {
 				m.registerClient(client)
 			case client := <-m.Unregister:
 				m.unregisterClient(client)
-			case message := <-m.Broadcast:
-				m.broadcast(message)
 			}
 		}
 	}()

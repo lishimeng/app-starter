@@ -5,12 +5,24 @@ import (
 	"time"
 )
 
+type MessageType int
+
+const (
+	ToClient  MessageType = 1
+	Broadcast MessageType = 2
+)
+
 type Payload struct {
-	Channel string          `json:"channel"` // 业务通道标识（如：order、notice、system）
-	Data    json.RawMessage `json:"data"`    // 业务数据（JSON格式）
-	Event   string          `json:"event"`   // SSE事件类型（可选，默认message）
-	ID      string          `json:"id"`      // 事件ID（可选）
-	Time    int64           `json:"time"`    // 事件时间戳
+	Data  json.RawMessage `json:"data"`  // 业务数据（JSON格式）
+	Event string          `json:"event"` // SSE事件类型（如：order_update、new_notification）
+	ID    string          `json:"id"`    // 事件ID（可选）
+	Time  int64           `json:"time"`  // 事件时间戳
+}
+
+type Event struct {
+	Type     MessageType // 发送类型
+	ClientId string      // 发送到指定客户端时需要提供
+	Payload  *Payload
 }
 
 func (e *Payload) Marshall() string {
@@ -39,7 +51,7 @@ func (e *Payload) Marshall() string {
 	return sseStr
 }
 
-func New(channel, eventType string, data any) (*Payload, error) {
+func New(eventType string, data any) (*Payload, error) {
 	// 序列化业务数据为JSON
 	dataJson, err := json.Marshal(data)
 	if err != nil {
@@ -47,9 +59,8 @@ func New(channel, eventType string, data any) (*Payload, error) {
 	}
 
 	return &Payload{
-		Channel: channel,
-		Data:    dataJson,
-		Event:   eventType,
-		Time:    time.Now().UnixMilli(),
+		Data:  dataJson,
+		Event: eventType,
+		Time:  time.Now().UnixMilli(),
 	}, nil
 }

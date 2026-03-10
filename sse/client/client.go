@@ -8,14 +8,16 @@ import (
 	"time"
 )
 
+// Client 表示一个SSE客户端连接
 type Client struct {
 	ctx    context.Context
 	cancel context.CancelFunc
-	mu     sync.Mutex
+	mu     sync.RWMutex
 	ID     string              // 客户端唯一标识
 	w      http.ResponseWriter // 响应写入器
 	r      *http.Request
-	closed bool // 关闭信号通道
+	closed bool            // 关闭信号
+	events map[string]bool // 订阅的事件集合
 }
 
 func New(ctx context.Context, id string, request *http.Request, writer http.ResponseWriter) *Client {
@@ -26,6 +28,7 @@ func New(ctx context.Context, id string, request *http.Request, writer http.Resp
 		ID:     id,
 		w:      writer,
 		r:      request,
+		events: make(map[string]bool),
 	}
 }
 
@@ -36,16 +39,52 @@ func (c *Client) Close() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.closed {
-		return // lock后重复检查一遍
+		return
 	}
 	c.closed = true
 	c.cancel()
 }
 
 func (c *Client) IsClosed() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.closed
+}
+
+// Subscribe 订阅指定事件
+func (c *Client) Subscribe(events ...string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.closed
+	for _, e := range events {
+		c.events[e] = true
+	}
+}
+
+// Unsubscribe 取消订阅指定事件
+func (c *Client) Unsubscribe(events ...string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for _, e := range events {
+		delete(c.events, e)
+	}
+}
+
+// IsSubscribed 检查是否订阅了指定事件
+func (c *Client) IsSubscribed(event string) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.events[event]
+}
+
+// GetEvents 获取所有订阅的事件列表
+func (c *Client) GetEvents() []string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	result := make([]string, 0, len(c.events))
+	for e := range c.events {
+		result = append(result, e)
+	}
+	return result
 }
 
 func (c *Client) Run(heartbeatInterval time.Duration) {
@@ -60,7 +99,6 @@ func (c *Client) Run(heartbeatInterval time.Duration) {
 	log.Printf("客户端 %s 启动主循环", c.ID)
 	for {
 		select {
-		// 心跳包发送逻辑
 		case <-ticker.C:
 			if err := c.sendHeartbeat(); err != nil {
 				log.Printf("客户端 %s 心跳发送失败: %v", c.ID, err)
@@ -68,12 +106,10 @@ func (c *Client) Run(heartbeatInterval time.Duration) {
 				return
 			}
 
-		// 客户端自身Context取消（主动关闭/消息发送失败）
 		case <-c.r.Context().Done():
 			log.Printf("客户端 %s 自身Context取消: %v", c.ID, c.ctx.Err())
 			return
 		case <-c.ctx.Done():
-			// 系统关闭
 			return
 		}
 	}
