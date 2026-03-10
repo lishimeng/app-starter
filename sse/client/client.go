@@ -116,7 +116,7 @@ func (c *Client) Run(heartbeatInterval time.Duration) {
 }
 
 func (c *Client) sendHeartbeat() error {
-	return c.send("ping")
+	return c.send("data: ping\n\n")
 }
 
 func (c *Client) SendMessage(msg string) error {
@@ -128,7 +128,7 @@ func (c *Client) send(msg string) error {
 		return context.Canceled
 	}
 
-	_, err := c.w.Write([]byte("data: " + msg + "\n\n"))
+	_, err := c.w.Write([]byte(msg))
 	if err != nil {
 		return err
 	}
