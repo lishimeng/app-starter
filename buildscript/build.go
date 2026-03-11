@@ -63,9 +63,8 @@ type ImageVersion struct {
 }
 
 const (
-	localBuildScriptName = "build_local.sh"
-	scriptName           = "build.sh"
-	dockerFileName       = "Dockerfile"
+	scriptName     = "build.sh"
+	dockerFileName = "Dockerfile"
 )
 
 func Generate(p Project, apps ...Application) (err error) {
@@ -75,37 +74,7 @@ func Generate(p Project, apps ...Application) (err error) {
 		return
 	}
 
-	//err = createLocalBuildShell(p, apps...)
-	//if err != nil {
-	//	return
-	//}
-
 	err = createDockers(p, apps...)
-	return
-}
-
-func createLocalBuildShell(pro Project, apps ...Application) (err error) {
-	var compiledApp []Application
-	for _, app := range apps {
-		compiledApp = append(compiledApp, *app.Build())
-	}
-	var compiledPro = *pro.Build()
-	p := Param{
-		Pro:          compiledPro,
-		Applications: compiledApp,
-	}
-	if len(p.Pro.ImageRegistry) > 0 {
-		p.Pro.Namespace = fmt.Sprintf("%s/%s", p.Pro.ImageRegistry, p.Pro.Namespace)
-	}
-	scriptContent, err := rendText(p, localBuildScript)
-	if err != nil {
-		return
-	}
-	err = os.WriteFile(localBuildScriptName, []byte(scriptContent), 0644)
-	if err != nil {
-		log.Info(err)
-		return
-	}
 	return
 }
 
@@ -122,7 +91,7 @@ func createShell(pro Project, apps ...Application) (err error) {
 	if len(p.Pro.ImageRegistry) > 0 {
 		p.Pro.Namespace = fmt.Sprintf("%s/%s", p.Pro.ImageRegistry, p.Pro.Namespace)
 	}
-	scriptContent, err := rendText(p, scriptV2)
+	scriptContent, err := rendText(p, buildShellV2Tpl)
 	if err != nil {
 		return
 	}
@@ -166,7 +135,7 @@ func createDocker(pro Project, app Application, version ImageVersion) (err error
 		p.BuildImageVersion.Golang = fmt.Sprintf("%s/%s", registry, p.BuildImageVersion.Golang)
 		p.BuildImageVersion.Runtime = fmt.Sprintf("%s/%s", registry, p.BuildImageVersion.Runtime)
 	}
-	dockerContent, err := rendText(p, dockerFile)
+	dockerContent, err := rendText(p, dockerfileTpl)
 	if err != nil {
 		return
 	}
@@ -196,9 +165,9 @@ func rendText(data interface{}, temp string) (content string, err error) {
 
 func GenerateBaseDockerfile(category ...string) (err error) {
 
-	tpl := baseDockerfileAlpine
+	tpl := baseDockerfileAlpineTpl
 	if len(category) > 0 && category[0] == "ubuntu" {
-		tpl = baseDockerfileUbuntu
+		tpl = baseDockerfileUbuntuTpl
 	}
 	dockerContent, err := rendText(nil, tpl)
 

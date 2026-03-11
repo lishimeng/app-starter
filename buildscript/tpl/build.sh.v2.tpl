@@ -1,6 +1,4 @@
-package buildscript
-
-const scriptV2 = `#!/bin/bash
+#!/bin/bash
 Namespace="{{ .Pro.Namespace }}"
 
 Base="github.com/lishimeng/app-starter/version"
@@ -343,4 +341,3 @@ push_all(){
 }
 
 main "$@"
-`
