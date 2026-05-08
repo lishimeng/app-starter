@@ -5,7 +5,7 @@ ARG VERSION
 ARG APP_PATH
 WORKDIR /ui_build
 ADD ${APP_PATH}/ui .
-RUN npm i pnpm -g && pnpm install && pnpm run build
+RUN npm i pnpm -g && pnpm install --dangerously-allow-all-builds && pnpm run build
 
 {{- end }}
 FROM {{ .BuildImageVersion.Golang }} as build
