@@ -2,8 +2,9 @@ package stream
 
 import (
 	"context"
-	"github.com/tarm/serial"
 	"time"
+
+	"github.com/tarm/serial"
 )
 
 func NewSerialSession(ctx context.Context, name string, baud int, opts ...Option) (s Session, err error) {

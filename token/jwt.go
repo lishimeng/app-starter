@@ -2,9 +2,10 @@ package token
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/kataras/jwt"
-	"time"
 )
 
 type JwtPayload struct {

@@ -3,6 +3,7 @@ package token
 import (
 	"crypto/md5"
 	"errors"
+
 	"github.com/lishimeng/x/util"
 )
 

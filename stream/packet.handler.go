@@ -1,9 +1,10 @@
 package stream
 
 import (
+	"io"
+
 	"github.com/lishimeng/go-log"
 	"github.com/lishimeng/x/util"
-	"io"
 )
 
 func (s *SessionCtx) rxLoop() {

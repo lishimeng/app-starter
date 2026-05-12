@@ -3,9 +3,10 @@ package stream
 import (
 	"bytes"
 	"context"
-	"github.com/lishimeng/x/util"
 	"testing"
 	"time"
+
+	"github.com/lishimeng/x/util"
 )
 
 func TestSplitPP(t *testing.T) {

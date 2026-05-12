@@ -1,9 +1,10 @@
 package ws
 
 import (
+	"net/http"
+
 	"github.com/gorilla/websocket"
 	"github.com/lishimeng/app-starter/server"
-	"net/http"
 )
 
 type Conn struct {

@@ -2,10 +2,11 @@ package app
 
 import (
 	"context"
-	"github.com/lishimeng/app-starter/token"
-	shutdown "github.com/lishimeng/go-app-shutdown"
 	"testing"
 	"time"
+
+	"github.com/lishimeng/app-starter/token"
+	shutdown "github.com/lishimeng/go-app-shutdown"
 )
 
 func TestTokenValidatorBuild001(t *testing.T) {

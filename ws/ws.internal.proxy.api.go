@@ -2,8 +2,9 @@ package ws
 
 import (
 	"context"
-	"github.com/lishimeng/go-log"
 	"time"
+
+	"github.com/lishimeng/go-log"
 )
 
 func apiProxyWatchDog(ctx context.Context, req chan RestJob, respCallback TxHandler) {

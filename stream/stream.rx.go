@@ -1,8 +1,9 @@
 package stream
 
 import (
-	"github.com/lishimeng/go-log"
 	"io"
+
+	"github.com/lishimeng/go-log"
 )
 
 func (s *SessionCtx) OnData(p []byte, size int, err error) {

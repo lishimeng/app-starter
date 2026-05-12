@@ -2,9 +2,10 @@ package app
 
 import (
 	"context"
-	shutdown "github.com/lishimeng/go-app-shutdown"
 	"testing"
 	"time"
+
+	shutdown "github.com/lishimeng/go-app-shutdown"
 )
 
 func TestNew(t *testing.T) {

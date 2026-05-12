@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/lishimeng/app-starter/buildscript"
 	"os"
 	"strings"
+
+	"github.com/lishimeng/app-starter/buildscript"
 )
 
 var (
