@@ -3,6 +3,8 @@ FROM {{ .BuildImageVersion.Node }} as ui
 ARG NAME
 ARG VERSION
 ARG APP_PATH
+ARG NPM_REGISTRY=https://registry.npmmirror.com
+ENV NPM_CONFIG_REGISTRY=${NPM_REGISTRY}
 WORKDIR /ui_build
 ADD ${APP_PATH}/ui .
 RUN npm i pnpm -g && pnpm install --dangerously-allow-all-builds && pnpm run build
@@ -15,7 +17,8 @@ ARG COMMIT
 ARG BUILD_TIME
 ARG APP_PATH
 ARG BASE="github.com/lishimeng/app-starter/version"
-ENV GOPROXY=https://goproxy.cn,direct
+ARG GOPROXY=https://goproxy.cn,direct
+ENV GOPROXY=${GOPROXY}
 ARG LDFLAGS=" \
 -X ${BASE}.AppName=${NAME} \
 -X ${BASE}.Version=${VERSION} \
