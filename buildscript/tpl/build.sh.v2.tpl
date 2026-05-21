@@ -2,9 +2,13 @@
 Namespace="{{ .Pro.Namespace }}"
 
 Base="github.com/lishimeng/app-starter/version"
-GOPROXY=https://goproxy.cn,direct
+GOPROXY=${GOPROXY:-https://goproxy.cn,direct}
+# 开关 -m / -g 打开时使用下列内置地址（与 Dockerfile 默认 npmmirror / 国内 Go 代理一致）
+NPM_MIRROR_REGISTRY=https://registry.npmmirror.com
+GOPROXY_CN=https://goproxy.cn,direct
 
-LOG_LEVEL=""
+USE_NPM_MIRROR=""
+USE_GOPROXY_CN=""
 CMD_MODE=""
 
 Version=''
@@ -28,7 +32,7 @@ YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # no color
 
-while getopts ":hl:d:" opt; do
+while getopts ":hl:d:mg" opt; do
   case $opt in
     l)
       #echo "set opt l ${OPTARG}"
@@ -38,8 +42,14 @@ while getopts ":hl:d:" opt; do
       #echo "set opt d ${OPTARG}"
       CMD_MODE="${OPTARG}"
       ;;
+    m)
+      USE_NPM_MIRROR=1
+      ;;
+    g)
+      USE_GOPROXY_CN=1
+      ;;
     h)
-      echo "Usage: build.sh -{opt} {opt_value} {mode:optional} {app_name:optional}"
+      echo "Usage: build.sh [-hl:dmg] {mode:optional} {app_name:optional}"
       echo ""
       echo "parameters:"
       echo "mode: dev/release/push"
@@ -48,6 +58,12 @@ while getopts ":hl:d:" opt; do
       echo "options:"
       echo "-d debug/run"
       echo "-l log level, values:error/warn/info/debug"
+      echo "-m use builtin NPM mirror (set NPM_REGISTRY to NPM_MIRROR_REGISTRY)"
+      echo "-g use builtin Go proxy CN (set GOPROXY to GOPROXY_CN)"
+      echo ""
+      echo "environment (optional):"
+      echo "  NPM_REGISTRY   镜像构建时传给 Docker；未设置则用各 Dockerfile 默认；-m 会覆盖为本仓库 NPM_MIRROR_REGISTRY"
+      echo "  GOPROXY        镜像构建时传给 Docker；-g 会覆盖为本仓库 GOPROXY_CN"
       echo ""
       exit 0
       ;;
@@ -92,6 +108,15 @@ handle_user_env(){
         CmdMode=${CmdRun}
         ;;
       esac
+  fi
+
+  if [ -n "${USE_NPM_MIRROR}" ]; then
+    NPM_REGISTRY="${NPM_MIRROR_REGISTRY}"
+    log_info "use npm mirror: ${NPM_REGISTRY}"
+  fi
+  if [ -n "${USE_GOPROXY_CN}" ]; then
+    GOPROXY="${GOPROXY_CN}"
+    log_info "use goproxy CN: ${GOPROXY}"
   fi
 }
 
@@ -172,10 +197,13 @@ print_app_info(){
   log_info "Commit:${GitCommit}"
   log_info "Build:${BuildTime}"
   log_info "Main_Path:${AppPath}"
+  log_info "GoProxy:${GOPROXY}"
   if [ "${BuildMode}" == "dev" ]; then
     log_info "Build_Os:${GOOS}"
     log_info "Build_Arch:${GOARCH}"
-    log_info "GoProxy:${GOPROXY}"
+  fi
+  if [ -n "${NPM_REGISTRY:-}" ]; then
+    log_info "NpmRegistry:${NPM_REGISTRY}"
   fi
   log_info "****************************************"
 }
@@ -201,12 +229,19 @@ build_image(){
   if [ ${CmdMode} == 0 ]; then
     exit 0
   else
+    local docker_extra=()
+    docker_extra+=(--build-arg GOPROXY="${GOPROXY}")
+    if [ -n "${NPM_REGISTRY:-}" ]; then
+      docker_extra+=(--build-arg NPM_REGISTRY="${NPM_REGISTRY}")
+    fi
     docker build -t "${Namespace}/${Name}:${Version}" \
       --build-arg NAME="${Name}" \
       --build-arg VERSION="${Version}" \
       --build-arg BUILD_TIME="${BuildTime}" \
       --build-arg COMMIT="${GitCommit}" \
-      --build-arg APP_PATH="${AppPath}" -f "./${AppPath}/Dockerfile" .
+      --build-arg APP_PATH="${AppPath}" \
+      "${docker_extra[@]}" \
+      -f "./${AppPath}/Dockerfile" .
   fi
 }
 
