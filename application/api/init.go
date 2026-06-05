@@ -2,11 +2,13 @@ package api
 
 import (
 	"context"
+
 	"github.com/kataras/iris/v12"
+
+	"net/http"
 
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
-	"net/http"
 )
 
 func Server(conf server.Config) (srv *server.Server, err error) {

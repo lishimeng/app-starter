@@ -3,10 +3,11 @@ package broker
 import (
 	"context"
 	"fmt"
-	"github.com/lishimeng/go-log"
 	"math/rand/v2"
 	"sync"
 	"time"
+
+	"github.com/lishimeng/go-log"
 )
 
 type OnDataFunc func(MessageItem)

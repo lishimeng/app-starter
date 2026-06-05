@@ -2,11 +2,12 @@ package qiyewx
 
 import (
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/x/rest"
-	"sync"
-	"time"
 )
 
 type AccessTokenHandle interface {

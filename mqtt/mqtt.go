@@ -2,10 +2,11 @@ package mqtt
 
 import (
 	"errors"
+	"time"
+
 	proxy "github.com/eclipse/paho.mqtt.golang"
 	"github.com/lishimeng/go-log"
 	"github.com/lishimeng/x/util"
-	"time"
 )
 
 var (

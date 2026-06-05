@@ -2,9 +2,10 @@ package mqtt
 
 import (
 	"context"
-	"github.com/lishimeng/go-log"
 	"testing"
 	"time"
+
+	"github.com/lishimeng/go-log"
 )
 
 func TestConn(t *testing.T) {

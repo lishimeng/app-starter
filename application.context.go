@@ -83,8 +83,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	if h.builder.cacheEnable {
 		factory.RegisterCache(cache.New(factory.GetCtx(), h.builder.redisOpts, h.builder.cacheOpts))
-		var redisOpt = redis.Options(h.builder.redisOpts)
-		client := redis.NewClient(&redisOpt)
+		client := redis.NewClient(new(redis.Options(h.builder.redisOpts)))
 		factory.RegisterRedis(client)
 	}
 

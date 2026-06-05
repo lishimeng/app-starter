@@ -2,9 +2,10 @@ package cache
 
 import (
 	"context"
+	"time"
+
 	"github.com/go-redis/cache/v9"
 	"github.com/redis/go-redis/v9"
-	"time"
 )
 
 type RedisOptions redis.Options
@@ -29,8 +30,7 @@ c := New(ctx, RedisOptions{
 	})
 */
 func New(ctx context.Context, redisOpts RedisOptions, cacheOpts Options) (c C) {
-	var options = redis.Options(redisOpts)
-	r := redis.NewClient(&options)
+	r := redis.NewClient(new(redis.Options(redisOpts)))
 
 	if cacheOpts.MaxSize <= 0 {
 		cacheOpts.MaxSize = defaultMaxSize

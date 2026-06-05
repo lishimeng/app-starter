@@ -141,7 +141,7 @@ func (h *ApplicationBuilder) EnableVueHistoryPlugin(whiteList ...string) *Applic
 				return
 			}
 			inWhiteList := false
-			for k, _ := range m {
+			for k := range m {
 				inWhiteList = strings.HasSuffix(p, k)
 				if inWhiteList {
 					break

@@ -2,10 +2,11 @@ package server
 
 import (
 	"context"
-	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/go-log"
 	"net/http"
 	"time"
+
+	"github.com/kataras/iris/v12"
+	"github.com/lishimeng/go-log"
 )
 
 const (

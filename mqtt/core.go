@@ -3,10 +3,11 @@ package mqtt
 import (
 	"context"
 	"errors"
-	proxy "github.com/eclipse/paho.mqtt.golang"
-	"github.com/lishimeng/go-log"
 	"sync"
 	"time"
+
+	proxy "github.com/eclipse/paho.mqtt.golang"
+	"github.com/lishimeng/go-log"
 )
 
 type sessionContext struct {

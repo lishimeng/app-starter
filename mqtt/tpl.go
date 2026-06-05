@@ -2,8 +2,9 @@ package mqtt
 
 import (
 	"fmt"
-	"github.com/lishimeng/x/util"
 	"strings"
+
+	"github.com/lishimeng/x/util"
 )
 
 type BuilderOption struct {

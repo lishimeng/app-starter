@@ -1,9 +1,10 @@
 package api
 
 import (
+	"strings"
+
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/go-log"
-	"strings"
 )
 
 type LogLevelReq struct {

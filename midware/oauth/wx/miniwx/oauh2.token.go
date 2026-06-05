@@ -1,8 +1,9 @@
 package miniwx
 
 import (
-	"github.com/lishimeng/app-starter/cache"
 	"sync"
+
+	"github.com/lishimeng/app-starter/cache"
 )
 
 type Oauth2Handle interface {

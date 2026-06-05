@@ -2,9 +2,10 @@ package auth
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
-	"strings"
 )
 
 const (

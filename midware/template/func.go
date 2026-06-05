@@ -2,10 +2,11 @@ package template
 
 import (
 	"fmt"
-	"github.com/kataras/iris/v12/view"
 	"html/template"
 	"regexp"
 	"strings"
+
+	"github.com/kataras/iris/v12/view"
 )
 
 func Init(engine *view.HTMLEngine) {

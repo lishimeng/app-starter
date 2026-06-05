@@ -17,8 +17,8 @@ func LoginRedirect(redirect string) func(server.Context) {
 		if ui == nil {
 			ctx.C.Redirect(redirect, 302)
 			return
-		} else {
-			ctx.C.Next()
 		}
+
+		ctx.C.Next()
 	}
 }

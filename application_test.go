@@ -37,9 +37,9 @@ func TestGetWebServer(t *testing.T) {
 				if proxy == nil {
 					t.Fatal("web server nil")
 					return
-				} else {
-					t.Logf("print web server:%s", proxy.String())
 				}
+
+				t.Logf("print web server:%s", proxy.String())
 				return
 			})
 		return nil

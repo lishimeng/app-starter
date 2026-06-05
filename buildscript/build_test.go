@@ -13,9 +13,9 @@ func TestBuildHasUi(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatal(err)
-	} else {
-		t.Log("ok")
 	}
+
+	t.Log("ok")
 }
 
 func TestBuildNoUi(t *testing.T) {
@@ -28,9 +28,9 @@ func TestBuildNoUi(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatal(err)
-	} else {
-		t.Log("ok")
 	}
+
+	t.Log("ok")
 }
 
 func TestGenBaseImage(t *testing.T) {
@@ -53,7 +53,7 @@ func TestAlias(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatal(err)
-	} else {
-		t.Log("ok")
 	}
+
+	t.Log("ok")
 }

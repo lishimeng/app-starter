@@ -2,8 +2,9 @@ package cache
 
 import (
 	"context"
-	"github.com/go-redis/cache/v9"
 	"time"
+
+	"github.com/go-redis/cache/v9"
 )
 
 type C interface {

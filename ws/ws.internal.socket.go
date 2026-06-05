@@ -152,8 +152,7 @@ func handleWsSession(ctx server.Context, topic string, logic Logic) {
 	log.Info("create WS Session: %s", sessionId)
 	ws, err := upgrade.Upgrade(ctx.C.ResponseWriter(), ctx.C.Request(), nil)
 	if err != nil {
-		var handshakeError websocket.HandshakeError
-		if !errors.As(err, &handshakeError) {
+		if _, ok := errors.AsType[websocket.HandshakeError](err); !ok {
 			log.Info(err)
 		}
 		return

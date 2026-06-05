@@ -2,9 +2,10 @@ package miniwx
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/x/rest"
-	"time"
 )
 
 type MiniAccessToken struct {
