@@ -1,21 +1,20 @@
 module github.com/lishimeng/app-starter
 
-go 1.24.10
+go 1.26
 
 require (
-	github.com/beego/beego/v2 v2.3.9
+	github.com/beego/beego/v2 v2.3.10
 	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/go-redis/cache/v9 v9.0.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/kataras/iris/v12 v12.2.11
-	github.com/kataras/jwt v0.1.15
+	github.com/kataras/jwt v0.1.17
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
-	github.com/lishimeng/x v1.3.3
-	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/redis/go-redis/v9 v9.18.0
-	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
+	github.com/lishimeng/x v1.3.5
+	github.com/rabbitmq/amqp091-go v1.11.0
+	github.com/redis/go-redis/v9 v9.20.0
 )
 
 require (
@@ -27,7 +26,6 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/flosch/pongo2/v4 v4.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
