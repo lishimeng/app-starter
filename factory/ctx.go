@@ -3,7 +3,6 @@ package factory
 import (
 	"context"
 
-	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
@@ -14,7 +13,6 @@ import (
 )
 
 const (
-	amqpKey      = "amqp_session"
 	cacheKey     = "cache_redis"
 	redisKey     = "redis_key"
 	mqttKey      = "mqtt_key"
@@ -65,19 +63,6 @@ func GetRedis() (c *redis.Client) {
 	if err != nil {
 		log.Debug(err)
 		c = nil
-	}
-	return
-}
-
-func RegisterAmqp(session rabbit.Session) {
-	proxy.Add(&session, amqpKey)
-}
-
-func GetAmqp() (session rabbit.Session) {
-	err := proxy.Get(&session, amqpKey)
-	if err != nil {
-		log.Debug(err)
-		session = nil
 	}
 	return
 }

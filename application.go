@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 
-	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/mqtt"
@@ -18,11 +17,6 @@ type Application interface {
 
 func GetWebServer() (s *server.Server) {
 	s = factory.GetWebServer()
-	return
-}
-
-func GetAmqp() (session rabbit.Session) {
-	session = factory.GetAmqp()
 	return
 }
 

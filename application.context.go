@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/beego/beego/v2/client/orm"
-	"github.com/lishimeng/app-starter/amqp"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
@@ -72,11 +71,6 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		return
 	}
 
-	// 初始化amqp连接
-	if h.builder.amqpEnable {
-		factory.RegisterAmqp(amqp.New(factory.GetCtx(), h.builder.amqpOptions, h.builder.sessionOptions...))
-	}
-
 	if h.builder.dbEnable {
 		if h.builder.dbDebug { // 检查是否需要打开debug日志
 			orm.Debug = true
@@ -100,14 +94,6 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 				auth.TokenStorage = storage
 			}
 		})
-	}
-
-	// 启动amqp业务
-	if h.builder.amqpEnable {
-		// 在线程中启动每一个handler
-		for _, h := range h.builder.amqpHandler {
-			go amqp.RegisterHandler(factory.GetAmqp(), h)
-		}
 	}
 
 	if h.builder.mqttEnable {

@@ -52,11 +52,6 @@ func TestGetWebServer(t *testing.T) {
 
 }
 
-func TestGetAmqp(t *testing.T) {
-	o := GetAmqp()
-	t.Logf("amqp is %+v", o)
-}
-
 func TestGetNamedOrm(t *testing.T) {
 	o := GetNamedOrm("default")
 	t.Logf("named orm is %+v", o)

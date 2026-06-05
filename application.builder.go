@@ -10,8 +10,6 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/app-starter/amqp"
-	"github.com/lishimeng/app-starter/amqp/rabbit"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/mqtt"
@@ -56,11 +54,6 @@ type ApplicationBuilder struct {
 
 	tokenValidatorEnable  bool
 	tokenValidatorBuilder TokenValidatorBuilder
-
-	amqpEnable     bool
-	amqpOptions    amqp.Connector
-	amqpHandler    []amqp.Handler
-	sessionOptions []rabbit.SessionOption
 
 	mqttEnable  bool
 	mqttOptions []mqtt.ClientOption
@@ -201,21 +194,6 @@ func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts
 
 func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
 	orm.Debug = true
-	return h
-}
-
-func (h *ApplicationBuilder) EnableAmqp(c amqp.Connector, options ...rabbit.SessionOption) *ApplicationBuilder {
-	h.amqpEnable = true
-	h.amqpOptions = c
-	h.sessionOptions = append(h.sessionOptions, options...)
-	return h
-}
-
-// RegisterAmqpHandlers 注册amqp handler
-//
-// 业务类任务使用延时执行策略，在连接型任务之后执行
-func (h *ApplicationBuilder) RegisterAmqpHandlers(handlers ...amqp.Handler) *ApplicationBuilder {
-	h.amqpHandler = append(h.amqpHandler, handlers...)
 	return h
 }
 
