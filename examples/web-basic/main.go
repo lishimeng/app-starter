@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/lishimeng/app-starter"
+	"github.com/lishimeng/app-starter/examples/model"
 	"github.com/lishimeng/app-starter/examples/web-basic/proc"
 	"github.com/lishimeng/app-starter/examples/web-basic/router"
+	"github.com/lishimeng/app-starter/examples/web-basic/setup"
 	"github.com/lishimeng/go-log"
 )
 
@@ -33,6 +35,7 @@ func _main() (err error) {
 	err = application.Start(func(ctx context.Context, builder *app.ApplicationBuilder) (e error) {
 
 		builder.
+			EnableDatabase(setup.PostgresConfig().Build(), new(model.BusinessConnector)).
 			SetWebLogLevel("DEBUG").
 			ComponentBefore(proc.Before).
 			ComponentAfter(proc.After).

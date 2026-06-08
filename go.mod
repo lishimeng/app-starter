@@ -10,6 +10,7 @@ require (
 	github.com/gorilla/websocket v1.5.3
 	github.com/kataras/iris/v12 v12.2.11
 	github.com/kataras/jwt v0.1.17
+	github.com/lib/pq v1.10.9
 	github.com/lishimeng/go-app-shutdown v1.0.1
 	github.com/lishimeng/go-log v1.0.0
 	github.com/lishimeng/x v1.3.5
