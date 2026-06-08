@@ -1,23 +1,81 @@
 package router
 
 import (
-	"github.com/lishimeng/app-starter"
+	"strconv"
+
+	app "github.com/lishimeng/app-starter"
 	"github.com/lishimeng/app-starter/examples/model"
+	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
 )
 
-func apiSample(ctx server.Context) {
-	var resp = make(map[string]any)
-	var err error
+type businessConnectorDto struct {
+	Id       int     `json:"id"`
+	Code     string  `json:"code"`
+	Name     string  `json:"name"`
+	ConnType string  `json:"connType"`
+	Enabled  int     `json:"enabled"`
+	Desc     *string `json:"desc,omitempty"`
+}
 
-	var list []model.BusinessConnector
-	_, err = app.GetOrm().Query(new(model.BusinessConnector)).Limit(10).All(&list)
-	if err != nil {
-		resp["err"] = err.Error()
-		ctx.Json(resp)
+func apiSample(ctx server.Context) {
+	pageNum, pageSize := 0, 0
+	if v, err := ctx.C.URLParamInt("pageNum"); err == nil && v > 0 {
+		pageNum = v
+	}
+	if v, err := ctx.C.URLParamInt("pageSize"); err == nil && v > 0 {
+		pageSize = v
+	}
+	code := ctx.C.URLParam("code")
+	name := ctx.C.URLParam("name")
+	connType := ctx.C.URLParam("connType")
+	enabledStr := ctx.C.URLParam("enabled")
+
+	pager := &app.SimplePager[model.BusinessConnector, businessConnectorDto]{
+		Pager: app.Pager[businessConnectorDto]{
+			BasePager: app.BasePager{
+				PageNum:  pageNum,
+				PageSize: pageSize,
+			},
+		},
+		OrderByExp: []string{"-id"},
+		QueryBuilder: func(tx persistence.TxContext) persistence.Query {
+			q := tx.Query(new(model.BusinessConnector))
+			if code != "" {
+				q = q.Filter("code", code)
+			}
+			if name != "" {
+				q = q.Filter("name__icontains", name)
+			}
+			if connType != "" {
+				q = q.Filter("conn_type", connType)
+			}
+			if enabledStr != "" {
+				if enabled, err := strconv.Atoi(enabledStr); err == nil {
+					q = q.Filter("enabled", enabled)
+				}
+			}
+			return q
+		},
+		Transform: func(src model.BusinessConnector, dst *businessConnectorDto) {
+			dst.Id = src.Id
+			dst.Code = src.Code
+			dst.Name = src.Name
+			dst.ConnType = src.ConnType
+			dst.Enabled = src.Enabled
+			dst.Desc = src.Desc
+		},
+	}
+
+	if err := app.QueryPage(pager); err != nil {
+		ctx.Json(app.ResponseWrapper{
+			Response: app.Response{Code: 500, Message: err.Error()},
+		})
 		return
 	}
-	resp["a"] = "b"
-	resp["list"] = list
-	ctx.Json(resp)
+
+	ctx.Json(app.ResponseWrapper{
+		Response: app.Response{Code: 0},
+		Data:     pager.Pager,
+	})
 }

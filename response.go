@@ -53,7 +53,7 @@ type SimplePager[DbModel any, Dto any] struct {
 	DataSet      []DbModel
 	Transform    func(src DbModel, dst *Dto)
 	OrderByExp   []string
-	QueryBuilder func(tx persistence.TxContext) any
+	QueryBuilder func(tx persistence.TxContext) persistence.Query
 }
 
 type PagerResponse struct {

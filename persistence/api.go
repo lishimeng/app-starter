@@ -12,8 +12,7 @@ type OpenOptions struct {
 	DBParams []any // implementation-specific pool/connection options
 }
 
-// Connector opens database sessions. Implementations live outside the public SDK surface
-// (e.g. persistence/beego, persistence/gorm).
+// Connector opens database sessions.
 type Connector interface {
 	Open(opts OpenOptions) (Session, error)
 	Migrate(alias string, models ...any) error

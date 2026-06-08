@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/beego/beego/v2/client/orm"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/midware/auth"
 	"github.com/lishimeng/app-starter/mqtt"
+	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	shutdown "github.com/lishimeng/go-app-shutdown"
@@ -72,8 +72,9 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	}
 
 	if h.builder.dbEnable {
-		if h.builder.dbDebug { // 检查是否需要打开debug日志
-			orm.Debug = true
+		if h.builder.dbDebug {
+			h.builder.dbConfig.DebugLog(true)
+			persistence.SetDebug(true)
 		}
 		err = repo.Database(h.builder.dbConfig, h.builder.dbViews, h.builder.dbModels...)
 		if err != nil {

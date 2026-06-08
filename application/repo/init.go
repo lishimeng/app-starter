@@ -1,16 +1,11 @@
 package repo
 
-import (
-	"github.com/lishimeng/app-starter/persistence"
-	_ "github.com/lishimeng/app-starter/persistence/beego"
-)
+import "github.com/lishimeng/app-starter/persistence"
 
 func Database(config persistence.BaseConfig, views []any, models ...any) (err error) {
-
-	// 此处配置默认数据库 alias=default
-	//config.RegisterModel(models...)
-	//err = persistence.InitOrm(config)
-
+	if err = persistence.Install(); err != nil {
+		return
+	}
 	if len(models) > 0 {
 		persistence.RegisterModels(models...)
 	}

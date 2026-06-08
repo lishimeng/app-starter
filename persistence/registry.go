@@ -18,8 +18,7 @@ var (
 	fallbackSessionFactory func(alias string) Session
 )
 
-// SetConnector installs the active database backend. Typically called from a backend
-// package init (e.g. persistence/beego) or by the application at startup.
+// SetConnector installs the active database connector. Called from Install().
 func SetConnector(c Connector) {
 	connectorMu.Lock()
 	defer connectorMu.Unlock()
@@ -32,14 +31,14 @@ func getConnector() Connector {
 	return connector
 }
 
-// SetConditionFactory registers how to create query conditions for the active backend.
+// SetConditionFactory registers how to create query conditions.
 func SetConditionFactory(factory func() Condition) {
 	conditionMu.Lock()
 	defer conditionMu.Unlock()
 	conditionFactory = factory
 }
 
-// NewCondition creates a backend-specific condition instance.
+// NewCondition creates a condition instance.
 func NewCondition() Condition {
 	conditionMu.RLock()
 	factory := conditionFactory
@@ -71,7 +70,6 @@ func GetSession(alias string) Session {
 }
 
 // SetFallbackSessionFactory provides sessions when no alias has been registered yet.
-// Backends typically register this during init.
 func SetFallbackSessionFactory(factory func(alias string) Session) {
 	fallbackMu.Lock()
 	defer fallbackMu.Unlock()

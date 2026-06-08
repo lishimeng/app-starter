@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-
 	"time"
 
 	"github.com/lishimeng/app-starter"
@@ -36,6 +35,7 @@ func _main() (err error) {
 
 		builder.
 			EnableDatabase(setup.PostgresConfig().Build(), new(model.BusinessConnector)).
+			EnableDatabaseLog().
 			SetWebLogLevel("DEBUG").
 			ComponentBefore(proc.Before).
 			ComponentAfter(proc.After).

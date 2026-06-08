@@ -7,12 +7,12 @@ type BusinessConnector struct {
 	app.Pk
 	app.TableChangeInfo
 
-	Code     string `orm:"column(code);unique"`
-	Name     string `orm:"column(name)"`
-	ConnType string `orm:"column(conn_type)"`
-	Config   string `orm:"column(config)"`
-	Enabled  int    `orm:"column(enabled);default(0)"`
-	Desc     string `orm:"column(desc);null"`
+	Code     string  `gorm:"column:code;uniqueIndex;not null;default:''"`
+	Name     string  `gorm:"column:name;not null;default:''"`
+	ConnType string  `gorm:"column:conn_type;not null;default:''"`
+	Config   string  `gorm:"column:config;not null"`
+	Enabled  int     `gorm:"column:enabled;not null;default:0"`
+	Desc     *string `gorm:"column:desc"`
 }
 
 func (BusinessConnector) TableName() string {

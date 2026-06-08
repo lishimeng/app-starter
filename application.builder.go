@@ -8,12 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beego/beego/v2/client/orm"
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
-	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
@@ -42,11 +41,11 @@ type ApplicationBuilder struct {
 
 	webLogLevel string
 
-	dbEnable bool
-	dbConfig persistence.BaseConfig
-	dbModels []any
-	dbViews  []any
-	dbDebug  bool
+	dbEnable      bool
+	dbConfig      persistence.BaseConfig
+	dbModels  []any
+	dbViews   []any
+	dbDebug   bool
 
 	cacheEnable bool
 	redisOpts   cache.RedisOptions
@@ -169,7 +168,6 @@ func (h *ApplicationBuilder) EnableDatabase(config persistence.BaseConfig,
 	h.dbEnable = true
 	h.dbConfig = config
 	h.dbModels = models
-	// TODO check
 	return h
 }
 
@@ -193,7 +191,7 @@ func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts
 }
 
 func (h *ApplicationBuilder) EnableOrmLog() *ApplicationBuilder {
-	orm.Debug = true
+	h.dbDebug = true
 	return h
 }
 

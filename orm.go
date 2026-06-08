@@ -4,47 +4,50 @@ import "time"
 
 type Pk struct {
 	// ID
-	Id int `orm:"pk;auto;column(id)"`
+	Id int `gorm:"primaryKey;autoIncrement;column:id"`
 }
 
-// Tenant
-// 多租户
+// Pk64 主键为 bigint / bigserial 时使用；不可与 Pk 同时使用
+type Pk64 struct {
+	Id int64 `gorm:"primaryKey;autoIncrement;column:id"`
+}
+
+// Tenant 多租户
 type Tenant struct {
-	Org int `orm:"column(org)"` // org为tenant标记
+	Org int `gorm:"column:org"` // org为tenant标记
 }
 
-// TenantPk
-// 不可与 Pk 同时使用
+// TenantPk 不可与 Pk / Pk64 同时使用
 type TenantPk struct {
 	Pk
 	Tenant
 }
 
-type OperatorInfo struct {
-	CreateOperator int `orm:"column(coperator)"`
+// TenantPk64 不可与 Pk / Pk64 同时使用
+type TenantPk64 struct {
+	Pk64
+	Tenant
 }
 
-// OperatorChangeInfo
-// 不可与 OperatorInfo 同时使用
+type OperatorInfo struct {
+	CreateOperator int `gorm:"column:coperator"`
+}
+
+// OperatorChangeInfo 不可与 OperatorInfo 同时使用
 type OperatorChangeInfo struct {
 	OperatorInfo
-	UpdateOperator int `orm:"column(moperator)"`
+	UpdateOperator int `gorm:"column:moperator"`
 }
 
-// TableChangeInfo
-// 不可与 TableInfo 同时使用
+// TableChangeInfo 不可与 TableInfo 同时使用
 type TableChangeInfo struct {
-	// 状态
-	Status int `orm:"column(status)"`
-	// 创建时间
+	Status int `gorm:"column:status;default:0"`
 	TableInfo
-	// 修改时间
-	UpdateTime time.Time `orm:"auto_now;type(datetime);column(mtime)"`
+	UpdateTime time.Time `gorm:"autoUpdateTime;column:mtime"`
 }
 
 type TableInfo struct {
-	// 创建时间
-	CreateTime time.Time `orm:"auto_now_add;type(datetime);column(ctime)"`
+	CreateTime time.Time `gorm:"autoCreateTime;column:ctime"`
 }
 
 const (

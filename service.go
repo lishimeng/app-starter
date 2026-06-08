@@ -1,9 +1,6 @@
 package app
 
-import (
-	"github.com/beego/beego/v2/client/orm"
-	"github.com/lishimeng/app-starter/persistence"
-)
+import "github.com/lishimeng/app-starter/persistence"
 
 func Query(h func(ctx persistence.OrmContext) (err error)) (err error) {
 
@@ -25,20 +22,16 @@ func QueryPage[Model any, Dto any](pager *SimplePager[Model, Dto]) (err error) {
 	if pager == nil || pager.Transform == nil || pager.QueryBuilder == nil {
 		return
 	}
-	if pager.PageNum == 0 {
+	if pager.PageNum <= 0 {
 		pager.PageNum = 1
 	}
-	if pager.PageSize == 0 {
+	if pager.PageSize <= 0 {
 		pager.PageSize = 10
 	}
 	var count int64
 	err = Transaction(func(tx persistence.TxContext) (er error) {
-		q := pager.QueryBuilder(tx)
-		if q == nil {
-			return
-		}
-		query, ok := q.(orm.QuerySeter)
-		if !ok {
+		query := pager.QueryBuilder(tx)
+		if query == nil {
 			return
 		}
 		count, er = query.Count()

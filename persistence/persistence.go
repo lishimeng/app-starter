@@ -14,38 +14,44 @@ var (
 	DriverTiDB     = Driver{"tidb"}
 )
 
+// BaseConfig 数据库连接配置，由 PostgresConfig / MysqlConfig 等 Build 生成。
 type BaseConfig struct {
-	initDb     bool
-	aliasName  string
-	driver     Driver
-	dataSource string
-	maxIdle    int
-	maxOpen    int
-	models     []interface{}
+	InitDb       bool
+	AliasName    string
+	Driver       Driver
+	DataSource   string
+	MaxIdleConns int
+	MaxOpenConns int
+	Debug        bool
+	Models       []any
 }
 
 func (b *BaseConfig) MaxIdle(n int) {
 	if n > 0 {
-		b.maxIdle = n
+		b.MaxIdleConns = n
 	}
 }
 
 func (b *BaseConfig) MaxConn(n int) {
 	if n > 0 {
-		b.maxOpen = n
+		b.MaxOpenConns = n
 	}
 }
 
-func (b *BaseConfig) RegisterModel(models ...interface{}) {
-	b.models = append(b.models, models...)
+func (b *BaseConfig) DebugLog(enable bool) {
+	b.Debug = enable
+}
+
+func (b *BaseConfig) RegisterModel(models ...any) {
+	b.Models = append(b.Models, models...)
 }
 
 func RegisterDataBase(init bool, aliasName, driverName, dataSource string, _ ...any) (err error) {
 	cfg := BaseConfig{
-		initDb:     init,
-		aliasName:  aliasName,
-		driver:     Driver{Name: driverName},
-		dataSource: dataSource,
+		InitDb:     init,
+		AliasName:  aliasName,
+		Driver:     Driver{Name: driverName},
+		DataSource: dataSource,
 	}
 	return RegisterDatabase(cfg)
 }
@@ -53,25 +59,32 @@ func RegisterDataBase(init bool, aliasName, driverName, dataSource string, _ ...
 func RegisterDatabase(config BaseConfig) (err error) {
 	c := getConnector()
 	if c == nil {
-		return fmt.Errorf("persistence: no connector registered; import a backend such as persistence/beego")
+		return fmt.Errorf("persistence: no connector registered; call Install() and register dialectors")
 	}
 
-	alias := config.aliasName
+	if config.Driver.Name == DriverPostgres.Name {
+		if err = validatePostgresDSN(config.DataSource); err != nil {
+			return
+		}
+	}
+
+	alias := config.AliasName
 	if alias == "" {
 		alias = DefaultAlias
 	}
 
-	if len(config.models) > 0 {
-		c.RegisterModels(config.models...)
+	if len(config.Models) > 0 {
+		c.RegisterModels(config.Models...)
 	}
 
 	opts := OpenOptions{
 		Alias:    alias,
-		Driver:   config.driver.Name,
-		DSN:      config.dataSource,
-		MaxIdle:  config.maxIdle,
-		MaxOpen:  config.maxOpen,
-		InitDB:   config.initDb,
+		Driver:   config.Driver.Name,
+		DSN:      config.DataSource,
+		MaxIdle:  config.MaxIdleConns,
+		MaxOpen:  config.MaxOpenConns,
+		Debug:    config.Debug || isDebugEnabled(),
+		InitDB:   config.InitDb,
 	}
 
 	session, err := c.Open(opts)
@@ -80,13 +93,13 @@ func RegisterDatabase(config BaseConfig) (err error) {
 	}
 	RegisterSession(alias, session)
 
-	if config.initDb {
-		err = c.Migrate(alias, config.models...)
+	if config.InitDb {
+		err = c.Migrate(alias, config.Models...)
 	}
 	return err
 }
 
-func RegisterModels(models ...interface{}) {
+func RegisterModels(models ...any) {
 	c := getConnector()
 	if c == nil {
 		return
