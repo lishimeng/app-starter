@@ -1,6 +1,9 @@
 package repo
 
-import "github.com/lishimeng/app-starter/persistence"
+import (
+	"github.com/lishimeng/app-starter/persistence"
+	_ "github.com/lishimeng/app-starter/persistence/beego"
+)
 
 func Database(config persistence.BaseConfig, views []any, models ...any) (err error) {
 
