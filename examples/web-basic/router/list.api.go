@@ -15,10 +15,21 @@ type businessConnectorDto struct {
 	Name     string  `json:"name"`
 	ConnType string  `json:"connType"`
 	Enabled  int     `json:"enabled"`
+	Status   int     `json:"status"`
 	Desc     *string `json:"desc,omitempty"`
 }
 
-func apiSample(ctx server.Context) {
+func toBusinessConnectorDto(src model.BusinessConnector, dst *businessConnectorDto) {
+	dst.Id = src.Id
+	dst.Code = src.Code
+	dst.Name = src.Name
+	dst.ConnType = src.ConnType
+	dst.Enabled = src.Enabled
+	dst.Status = src.Status
+	dst.Desc = src.Desc
+}
+
+func apiListSample(ctx server.Context) {
 	pageNum, pageSize := 0, 0
 	if v, err := ctx.C.URLParamInt("pageNum"); err == nil && v > 0 {
 		pageNum = v
@@ -40,30 +51,19 @@ func apiSample(ctx server.Context) {
 		},
 		OrderExp: []string{"id desc"},
 		QueryBuilder: func(tx persistence.TxContext) persistence.Query {
-			q := tx.Model(new(model.BusinessConnector))
-			if code != "" {
-				q = q.Where("code = ?", code)
-			}
-			if name != "" {
-				q = q.Where("name ILIKE ?", "%"+name+"%")
-			}
-			if connType != "" {
-				q = q.Where("conn_type = ?", connType)
-			}
+			q := tx.Model(new(model.BusinessConnector)).
+				EqualStr("code", code).
+				ILikeStr("name", name).
+				EqualStr("conn_type", connType)
 			if enabledStr != "" {
 				if enabled, err := strconv.Atoi(enabledStr); err == nil {
-					q = q.Where("enabled = ?", enabled)
+					q = q.Equal("enabled", enabled)
 				}
 			}
 			return q
 		},
 		Transform: func(src model.BusinessConnector, dst *businessConnectorDto) {
-			dst.Id = src.Id
-			dst.Code = src.Code
-			dst.Name = src.Name
-			dst.ConnType = src.ConnType
-			dst.Enabled = src.Enabled
-			dst.Desc = src.Desc
+			toBusinessConnectorDto(src, dst)
 		},
 	}
 

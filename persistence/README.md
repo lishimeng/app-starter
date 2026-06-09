@@ -145,14 +145,45 @@ persistence.RegisterDialector("postgres", func(opts persistence.OpenOptions) gor
 
 ---
 
-## 查询 API（GORM 风格）
+## 查询 API
+
+`Query` 由 `QueryCond`（条件）与 `QueryExec`（排序/分页/执行）嵌入组成，对外仍使用 `persistence.Query`。
+
+### 条件封装（QueryCond，推荐）
+
+减少手写 SQL 表达式，链式调用：
+
+| 方法 | 语义 |
+|------|------|
+| `Equal(col, val)` | `col = ?` |
+| `NotEqual(col, val)` | `col <> ?` |
+| `In(col, vals)` | `col IN ?` |
+| `Like(col, s)` | `LIKE %s%` |
+| `LLike(col, s)` | `LIKE s%`（前缀） |
+| `RLike(col, s)` | `LIKE %s`（后缀） |
+| `ILike(col, s)` | `ILIKE %s%`（PostgreSQL） |
+| `EqualStr` / `LikeStr` / `ILikeStr` 等 | 值为空时跳过条件 |
 
 ```go
 tx.Model(&model.User{}).
-    Where("status = ?", 1).
+    Equal("status", 1).
+    ILikeStr("name", keyword).
+    EqualStr("code", code).
     Order("id desc").
     Limit(10).
     Find(&list)
+```
+
+复杂条件仍可使用 `Where("a = ? AND b > ?", x, y)`。
+
+### 执行与分页（QueryExec）
+
+`Select`、`Omit`、`Order`、`Offset`、`Limit`、`Count`、`Find`、`First`、`Take`、`Update`、`Updates`。
+
+### GORM 原生
+
+```go
+tx.Model(&model.User{}).Where("status = ?", 1).Find(&list)
 ```
 
 分页查询使用 `app.SimplePager` + `app.QueryPage`。

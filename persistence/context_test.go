@@ -11,6 +11,19 @@ func (q *mockQuery) Where(query interface{}, args ...interface{}) Query {
 	return q
 }
 
+func (q *mockQuery) Equal(column string, value any) Query       { q.filters++; return q }
+func (q *mockQuery) NotEqual(column string, value any) Query    { q.filters++; return q }
+func (q *mockQuery) In(column string, values any) Query         { q.filters++; return q }
+func (q *mockQuery) Like(column string, value string) Query     { q.filters++; return q }
+func (q *mockQuery) LLike(column string, value string) Query    { q.filters++; return q }
+func (q *mockQuery) RLike(column string, value string) Query    { q.filters++; return q }
+func (q *mockQuery) ILike(column string, value string) Query    { q.filters++; return q }
+func (q *mockQuery) EqualStr(column string, value string) Query { if value != "" { q.filters++ }; return q }
+func (q *mockQuery) LikeStr(column string, value string) Query  { if value != "" { q.filters++ }; return q }
+func (q *mockQuery) LLikeStr(column string, value string) Query { if value != "" { q.filters++ }; return q }
+func (q *mockQuery) RLikeStr(column string, value string) Query { if value != "" { q.filters++ }; return q }
+func (q *mockQuery) ILikeStr(column string, value string) Query { if value != "" { q.filters++ }; return q }
+
 func (q *mockQuery) Or(query interface{}, args ...interface{}) Query     { return q }
 func (q *mockQuery) Not(query interface{}, args ...interface{}) Query    { return q }
 func (q *mockQuery) Select(query interface{}, args ...interface{}) Query { return q }

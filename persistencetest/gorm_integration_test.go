@@ -23,7 +23,7 @@ func TestGormSqliteCRUD(t *testing.T) {
 	var count int64
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
 		var err error
-		count, err = tx.Model(&TestRecord{}).Where("status = ?", 1).Count()
+		count, err = tx.Model(&TestRecord{}).Equal("status", 1).Count()
 		return err
 	}))
 	if count != 1 {
@@ -32,16 +32,36 @@ func TestGormSqliteCRUD(t *testing.T) {
 
 	var rows []TestRecord
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
-		return tx.Model(&TestRecord{}).Where("name = ?", "alpha").Find(&rows)
+		return tx.Model(&TestRecord{}).Equal("name", "alpha").Find(&rows)
 	}))
 	if len(rows) != 1 || rows[0].Name != "alpha" {
 		t.Fatalf("unexpected rows: %+v", rows)
 	}
 
-	rows[0].Status = 2
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
-		return tx.Model(&rows[0]).Select("Status").Updates(&rows[0])
+		return tx.Model(&rows[0]).Update("status", 2)
 	}))
+
+	var updated TestRecord
+	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
+		return tx.Model(&TestRecord{}).Equal("name", "alpha").First(&updated)
+	}))
+	if updated.Status != 2 {
+		t.Fatalf("status after Update: got %d want 2", updated.Status)
+	}
+
+	updated.Name = "should-not-save"
+	updated.Status = 5
+	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
+		return tx.Model(&updated).Omit("Name").Updates(&updated)
+	}))
+	var omitted TestRecord
+	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
+		return tx.Model(&TestRecord{}).Equal("name", "alpha").First(&omitted)
+	}))
+	if omitted.Name != "alpha" || omitted.Status != 5 {
+		t.Fatalf("after Omit: got %+v want name=alpha status=5", omitted)
+	}
 
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
 		return tx.Delete(&rows[0])
