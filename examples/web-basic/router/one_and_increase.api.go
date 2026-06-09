@@ -11,6 +11,7 @@ import (
 )
 
 func apiOneAndIncreaseSample(ctx server.Context) {
+	var err error
 	id, err := ctx.C.Params().GetInt("id")
 	if err != nil || id <= 0 {
 		ctx.Json(app.ResponseWrapper{
@@ -20,16 +21,19 @@ func apiOneAndIncreaseSample(ctx server.Context) {
 	}
 
 	var row model.BusinessConnector
-	err = app.Transaction(func(tx persistence.TxContext) (e error) {
+	txErr := app.Transaction(func(tx persistence.TxContext) (e error) {
 		if e = tx.Model(&model.BusinessConnector{}).Equal("id", id).First(&row); e != nil {
 			return
 		}
 		row.Status++
-		return tx.Model(&row).Update("status", row.Status)
+		if e = tx.Model(&row).Update("status", row.Status); e != nil {
+			return
+		}
+		return
 	})
-	if err != nil {
-		code, msg := 500, err.Error()
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+	if txErr != nil {
+		code, msg := 500, txErr.Error()
+		if errors.Is(txErr, gorm.ErrRecordNotFound) {
 			code, msg = 404, "not found"
 		}
 		ctx.Json(app.ResponseWrapper{

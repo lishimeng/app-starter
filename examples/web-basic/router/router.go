@@ -6,4 +6,5 @@ func Router(root server.Router) {
 
 	root.Get("/", apiListSample)
 	root.Get("/{id}", apiOneAndIncreaseSample)
+	root.Get("/{id}/fail", apiTransactionFailSample)
 }
