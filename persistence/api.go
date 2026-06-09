@@ -8,8 +8,8 @@ type OpenOptions struct {
 	Debug    bool
 	InitDB   bool
 	Driver   string
-	DSN      string
-	DBParams []any // implementation-specific pool/connection options
+	DSN        string
+	DriverOpts any // driver-specific options set by *Config.Build()
 }
 
 // Connector opens database sessions.
@@ -22,37 +22,33 @@ type Connector interface {
 // Session is the unit of work for database access, typically one per alias.
 type Session interface {
 	Transaction(fn func(Tx) error) error
-	Query(model any) Query
+	Model(value interface{}) Query
 	SetDebug(enable bool)
 	Alias() string
 }
 
 // Tx represents a transactional database session.
 type Tx interface {
-	Query(model any) Query
-	Insert(model any) error
-	Update(model any, cols ...string) error
-	Delete(model any, cols ...string) error
-	Get(model any, cols ...string) error
-	Raw(sql string, args ...any) Query
+	Model(value interface{}) Query
+	Create(value interface{}) error
+	Save(value interface{}) error
+	Delete(value interface{}, conds ...interface{}) error
+	First(dest interface{}, conds ...interface{}) error
+	Raw(sql string, values ...interface{}) Query
 }
 
-// Query is a chainable query builder used by QueryPage and business code.
+// Query is a chainable GORM-style query builder.
 type Query interface {
-	Filter(expr string, args ...any) Query
-	FilterCond(cond Condition) Query
-	OrderBy(expr ...string) Query
-	Offset(n int) Query
-	Limit(n int) Query
+	Where(query interface{}, args ...interface{}) Query
+	Or(query interface{}, args ...interface{}) Query
+	Not(query interface{}, args ...interface{}) Query
+	Select(query interface{}, args ...interface{}) Query
+	Order(value interface{}) Query
+	Offset(offset int) Query
+	Limit(limit int) Query
 	Count() (int64, error)
-	All(dest any) (int64, error)
-	One(dest any) error
-}
-
-// Condition composes query predicates.
-type Condition interface {
-	And(expr string, args ...any) Condition
-	Or(expr string, args ...any) Condition
-	AndCond(cond Condition) Condition
-	OrCond(cond Condition) Condition
+	Find(dest interface{}, conds ...interface{}) error
+	First(dest interface{}, conds ...interface{}) error
+	Take(dest interface{}, conds ...interface{}) error
+	Updates(value interface{}) error
 }

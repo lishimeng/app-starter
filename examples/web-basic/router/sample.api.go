@@ -38,21 +38,21 @@ func apiSample(ctx server.Context) {
 				PageSize: pageSize,
 			},
 		},
-		OrderByExp: []string{"-id"},
+		OrderExp: []string{"id desc"},
 		QueryBuilder: func(tx persistence.TxContext) persistence.Query {
-			q := tx.Query(new(model.BusinessConnector))
+			q := tx.Model(new(model.BusinessConnector))
 			if code != "" {
-				q = q.Filter("code", code)
+				q = q.Where("code = ?", code)
 			}
 			if name != "" {
-				q = q.Filter("name__icontains", name)
+				q = q.Where("name ILIKE ?", "%"+name+"%")
 			}
 			if connType != "" {
-				q = q.Filter("conn_type", connType)
+				q = q.Where("conn_type = ?", connType)
 			}
 			if enabledStr != "" {
 				if enabled, err := strconv.Atoi(enabledStr); err == nil {
-					q = q.Filter("enabled", enabled)
+					q = q.Where("enabled = ?", enabled)
 				}
 			}
 			return q

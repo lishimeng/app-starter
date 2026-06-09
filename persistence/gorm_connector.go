@@ -32,7 +32,7 @@ func (c *gormConnector) Open(opts OpenOptions) (Session, error) {
 		alias = DefaultAlias
 	}
 
-	dialector, err := resolveDialector(opts.Driver, opts.DSN)
+	dialector, err := resolveDialector(opts)
 	if err != nil {
 		return nil, err
 	}

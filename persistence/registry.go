@@ -11,10 +11,7 @@ var (
 	sessionMu sync.RWMutex
 	sessions  = make(map[string]Session)
 
-	conditionMu      sync.RWMutex
-	conditionFactory func() Condition
-
-	fallbackMu            sync.RWMutex
+	fallbackMu             sync.RWMutex
 	fallbackSessionFactory func(alias string) Session
 )
 
@@ -29,24 +26,6 @@ func getConnector() Connector {
 	connectorMu.RLock()
 	defer connectorMu.RUnlock()
 	return connector
-}
-
-// SetConditionFactory registers how to create query conditions.
-func SetConditionFactory(factory func() Condition) {
-	conditionMu.Lock()
-	defer conditionMu.Unlock()
-	conditionFactory = factory
-}
-
-// NewCondition creates a condition instance.
-func NewCondition() Condition {
-	conditionMu.RLock()
-	factory := conditionFactory
-	conditionMu.RUnlock()
-	if factory == nil {
-		return nil
-	}
-	return factory()
 }
 
 // RegisterSession stores a session for the given alias.

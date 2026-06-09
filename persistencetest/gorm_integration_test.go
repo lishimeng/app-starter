@@ -17,13 +17,13 @@ func TestGormSqliteCRUD(t *testing.T) {
 	}
 
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
-		return tx.Insert(&TestRecord{Name: "alpha", Status: 1})
+		return tx.Create(&TestRecord{Name: "alpha", Status: 1})
 	}))
 
 	var count int64
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
 		var err error
-		count, err = tx.Query(&TestRecord{}).Filter("status", 1).Count()
+		count, err = tx.Model(&TestRecord{}).Where("status = ?", 1).Count()
 		return err
 	}))
 	if count != 1 {
@@ -32,8 +32,7 @@ func TestGormSqliteCRUD(t *testing.T) {
 
 	var rows []TestRecord
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
-		_, err := tx.Query(&TestRecord{}).Filter("name", "alpha").All(&rows)
-		return err
+		return tx.Model(&TestRecord{}).Where("name = ?", "alpha").Find(&rows)
 	}))
 	if len(rows) != 1 || rows[0].Name != "alpha" {
 		t.Fatalf("unexpected rows: %+v", rows)
@@ -41,7 +40,7 @@ func TestGormSqliteCRUD(t *testing.T) {
 
 	rows[0].Status = 2
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
-		return tx.Update(&rows[0], "Status")
+		return tx.Model(&rows[0]).Select("Status").Updates(&rows[0])
 	}))
 
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
@@ -50,7 +49,7 @@ func TestGormSqliteCRUD(t *testing.T) {
 
 	assertNoErr(t, session.Transaction(func(tx persistence.Tx) error {
 		var err error
-		count, err = tx.Query(&TestRecord{}).Count()
+		count, err = tx.Model(&TestRecord{}).Count()
 		return err
 	}))
 	if count != 0 {

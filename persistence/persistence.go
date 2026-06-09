@@ -24,6 +24,7 @@ type BaseConfig struct {
 	MaxOpenConns int
 	Debug        bool
 	Models       []any
+	DriverOpts   any // 驱动专属选项，由对应 *Config.Build 填充
 }
 
 func (b *BaseConfig) MaxIdle(n int) {
@@ -78,13 +79,14 @@ func RegisterDatabase(config BaseConfig) (err error) {
 	}
 
 	opts := OpenOptions{
-		Alias:    alias,
-		Driver:   config.Driver.Name,
-		DSN:      config.DataSource,
-		MaxIdle:  config.MaxIdleConns,
-		MaxOpen:  config.MaxOpenConns,
-		Debug:    config.Debug || isDebugEnabled(),
-		InitDB:   config.InitDb,
+		Alias:      alias,
+		Driver:     config.Driver.Name,
+		DSN:        config.DataSource,
+		MaxIdle:    config.MaxIdleConns,
+		MaxOpen:    config.MaxOpenConns,
+		Debug:      config.Debug || isDebugEnabled(),
+		InitDB:     config.InitDb,
+		DriverOpts: config.DriverOpts,
 	}
 
 	session, err := c.Open(opts)

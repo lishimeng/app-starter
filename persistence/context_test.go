@@ -6,32 +6,36 @@ type mockQuery struct {
 	filters int
 }
 
-func (q *mockQuery) Filter(expr string, args ...any) Query {
+func (q *mockQuery) Where(query interface{}, args ...interface{}) Query {
 	q.filters++
 	return q
 }
 
-func (q *mockQuery) FilterCond(cond Condition) Query { return q }
-func (q *mockQuery) OrderBy(expr ...string) Query   { return q }
-func (q *mockQuery) Offset(n int) Query               { return q }
-func (q *mockQuery) Limit(n int) Query                { return q }
-func (q *mockQuery) Count() (int64, error)            { return 0, nil }
-func (q *mockQuery) All(dest any) (int64, error)      { return 0, nil }
-func (q *mockQuery) One(dest any) error               { return nil }
+func (q *mockQuery) Or(query interface{}, args ...interface{}) Query     { return q }
+func (q *mockQuery) Not(query interface{}, args ...interface{}) Query    { return q }
+func (q *mockQuery) Select(query interface{}, args ...interface{}) Query { return q }
+func (q *mockQuery) Order(value interface{}) Query                       { return q }
+func (q *mockQuery) Offset(offset int) Query                             { return q }
+func (q *mockQuery) Limit(limit int) Query                               { return q }
+func (q *mockQuery) Count() (int64, error)                               { return 0, nil }
+func (q *mockQuery) Find(dest interface{}, conds ...interface{}) error     { return nil }
+func (q *mockQuery) First(dest interface{}, conds ...interface{}) error  { return nil }
+func (q *mockQuery) Take(dest interface{}, conds ...interface{}) error    { return nil }
+func (q *mockQuery) Updates(value interface{}) error                     { return nil }
 
 type mockTx struct {
-	inserted bool
+	created bool
 }
 
-func (t *mockTx) Query(model any) Query { return &mockQuery{} }
-func (t *mockTx) Insert(model any) error {
-	t.inserted = true
+func (t *mockTx) Model(value interface{}) Query { return &mockQuery{} }
+func (t *mockTx) Create(value interface{}) error {
+	t.created = true
 	return nil
 }
-func (t *mockTx) Update(model any, cols ...string) error { return nil }
-func (t *mockTx) Delete(model any, cols ...string) error { return nil }
-func (t *mockTx) Get(model any, cols ...string) error    { return nil }
-func (t *mockTx) Raw(sql string, args ...any) Query      { return &mockQuery{} }
+func (t *mockTx) Save(value interface{}) error                         { return nil }
+func (t *mockTx) Delete(value interface{}, conds ...interface{}) error { return nil }
+func (t *mockTx) First(dest interface{}, conds ...interface{}) error   { return nil }
+func (t *mockTx) Raw(sql string, values ...interface{}) Query          { return &mockQuery{} }
 
 type mockSession struct {
 	debug bool
@@ -46,15 +50,15 @@ func (s *mockSession) Transaction(fn func(Tx) error) error {
 	return fn(s.tx)
 }
 
-func (s *mockSession) Query(model any) Query { return &mockQuery{} }
-func (s *mockSession) SetDebug(enable bool)  { s.debug = enable }
-func (s *mockSession) Alias() string         { return "mock" }
+func (s *mockSession) Model(value interface{}) Query { return &mockQuery{} }
+func (s *mockSession) SetDebug(enable bool)          { s.debug = enable }
+func (s *mockSession) Alias() string                 { return "mock" }
 
 func TestOrmContextFacade(t *testing.T) {
 	s := &mockSession{}
 	ctx := WrapSession(s)
 
-	if ctx.Query(struct{}{}) == nil {
+	if ctx.Model(struct{}{}) == nil {
 		t.Fatal("expected query from facade")
 	}
 
@@ -64,16 +68,16 @@ func TestOrmContextFacade(t *testing.T) {
 	}
 
 	err := ctx.Transaction(func(tx TxContext) error {
-		if tx.Query(struct{}{}) == nil {
+		if tx.Model(struct{}{}) == nil {
 			t.Fatal("expected query from tx facade")
 		}
-		return tx.Insert(struct{}{})
+		return tx.Create(struct{}{})
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s.tx == nil || !s.tx.inserted {
-		t.Fatal("expected transaction to run insert")
+	if s.tx == nil || !s.tx.created {
+		t.Fatal("expected transaction to run create")
 	}
 }
 
@@ -83,10 +87,10 @@ func TestWrapTxExposesTx(t *testing.T) {
 	if wrapped.Tx == nil {
 		t.Fatal("expected tx on context")
 	}
-	if err := wrapped.Insert(struct{}{}); err != nil {
+	if err := wrapped.Create(struct{}{}); err != nil {
 		t.Fatal(err)
 	}
-	if !tx.inserted {
-		t.Fatal("expected insert through facade")
+	if !tx.created {
+		t.Fatal("expected create through facade")
 	}
 }

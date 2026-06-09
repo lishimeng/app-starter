@@ -42,10 +42,10 @@ func QueryPage[Model any, Dto any](pager *SimplePager[Model, Dto]) (err error) {
 			return
 		}
 		pager.TotalPage = pager.SetTotal(count)
-		if len(pager.OrderByExp) > 0 {
-			query = query.OrderBy(pager.OrderByExp...)
+		for _, order := range pager.OrderExp {
+			query = query.Order(order)
 		}
-		_, er = query.Offset(pager.Offset()).Limit(pager.PageSize).All(&pager.DataSet)
+		er = query.Offset(pager.Offset()).Limit(pager.PageSize).Find(&pager.DataSet)
 
 		if er != nil {
 			return

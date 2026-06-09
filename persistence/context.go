@@ -2,13 +2,13 @@ package persistence
 
 type OrmContext struct {
 	session Session
-	// Deprecated: use facade methods (Query, Transaction). Will be removed in a future version.
+	// Deprecated: use facade methods. Exposes *gorm.DB when available.
 	Context any
 }
 
 type TxContext struct {
 	Tx Tx
-	// Deprecated: use facade methods (Query, Insert, Update, Delete, Get). Will be removed in a future version.
+	// Deprecated: use facade methods. Exposes *gorm.DB when available.
 	Context any
 }
 
@@ -29,62 +29,53 @@ func NewOrm(aliasName string) *OrmContext {
 	return &OrmContext{}
 }
 
-
-func (o *OrmContext) Query(model any) Query {
+func (o *OrmContext) Model(value interface{}) Query {
 	if o == nil || o.session == nil {
 		return nil
 	}
-	return o.session.Query(model)
+	return o.session.Model(value)
 }
 
-func (o *OrmContext) NewCondition() Condition {
-	return NewCondition()
-}
-
-func (t *TxContext) Query(model any) Query {
+func (t *TxContext) Model(value interface{}) Query {
 	if t == nil || t.Tx == nil {
 		return nil
 	}
-	return t.Tx.Query(model)
+	return t.Tx.Model(value)
 }
 
-func (t *TxContext) NewCondition() Condition {
-	return NewCondition()
-}
-
-func (t *TxContext) Insert(model any) error {
+func (t *TxContext) Create(value interface{}) error {
 	if t == nil || t.Tx == nil {
 		return nil
 	}
-	return t.Tx.Insert(model)
+	return t.Tx.Create(value)
 }
 
-func (t *TxContext) Update(model any, cols ...string) error {
+func (t *TxContext) Save(value interface{}) error {
 	if t == nil || t.Tx == nil {
 		return nil
 	}
-	return t.Tx.Update(model, cols...)
+	return t.Tx.Save(value)
 }
 
-func (t *TxContext) Delete(model any, cols ...string) error {
+func (t *TxContext) Delete(value interface{}, conds ...interface{}) error {
 	if t == nil || t.Tx == nil {
 		return nil
 	}
-	return t.Tx.Delete(model, cols...)
+	return t.Tx.Delete(value, conds...)
 }
 
-func (t *TxContext) Get(model any, cols ...string) error {
+func (t *TxContext) First(dest interface{}, conds ...interface{}) error {
 	if t == nil || t.Tx == nil {
 		return nil
 	}
-	return t.Tx.Get(model, cols...)
+	return t.Tx.First(dest, conds...)
 }
 
-func (t *TxContext) Raw(sql string, args ...any) Query {
+func (t *TxContext) Raw(sql string, values ...interface{}) Query {
 	if t == nil || t.Tx == nil {
 		return nil
 	}
-	return t.Tx.Raw(sql, args...)
+	return t.Tx.Raw(sql, values...)
 }
 
 func (o *OrmContext) SetLogEnable(enable bool) {
@@ -103,7 +94,6 @@ func (o *OrmContext) Transaction(h func(TxContext) error) (err error) {
 	})
 }
 
-// WrapSession builds an OrmContext from a Session and populates legacy Context when supported.
 func WrapSession(s Session) *OrmContext {
 	ctx := &OrmContext{session: s}
 	if exposer, ok := s.(legacyOrmExposer); ok {
@@ -112,7 +102,6 @@ func WrapSession(s Session) *OrmContext {
 	return ctx
 }
 
-// WrapTx builds a TxContext from a Tx and populates legacy Context when supported.
 func WrapTx(tx Tx) TxContext {
 	ctx := TxContext{Tx: tx}
 	if exposer, ok := tx.(legacyTxExposer); ok {

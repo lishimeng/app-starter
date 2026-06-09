@@ -7,9 +7,9 @@ import (
 	gormdb "gorm.io/gorm"
 )
 
-// DialectorOpener builds a GORM dialector from a DSN.
+// DialectorOpener builds a GORM dialector from OpenOptions.
 // Built-in drivers (postgres, mysql, sqlite) register automatically via *Config init.
-type DialectorOpener func(dsn string) gormdb.Dialector
+type DialectorOpener func(opts OpenOptions) gormdb.Dialector
 
 var (
 	dialectorMu sync.RWMutex
@@ -27,12 +27,12 @@ func RegisterDialector(driver string, opener DialectorOpener) {
 	dialectors[driver] = opener
 }
 
-func resolveDialector(driver, dsn string) (gormdb.Dialector, error) {
+func resolveDialector(opts OpenOptions) (gormdb.Dialector, error) {
 	dialectorMu.RLock()
-	opener, ok := dialectors[driver]
+	opener, ok := dialectors[opts.Driver]
 	dialectorMu.RUnlock()
 	if !ok {
-		return nil, fmt.Errorf("persistence: dialector for driver %q not registered", driver)
+		return nil, fmt.Errorf("persistence: dialector for driver %q not registered", opts.Driver)
 	}
-	return opener(dsn), nil
+	return opener(opts), nil
 }

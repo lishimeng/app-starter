@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/persistence/driver/sqlite"
 )
 
 func sqliteConfig(t *testing.T, initDb bool) persistence.BaseConfig {
 	t.Helper()
 	dsn := fmt.Sprintf("file:memdb_%s?mode=memory&cache=shared", t.Name())
-	cfg := &persistence.SqliteConfig{
+	cfg := &sqlite.Config{
 		Database:  dsn,
 		AliasName: persistence.DefaultAlias,
 		InitDb:    initDb,

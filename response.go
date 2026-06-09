@@ -52,7 +52,7 @@ type SimplePager[DbModel any, Dto any] struct {
 	Pager[Dto]
 	DataSet      []DbModel
 	Transform    func(src DbModel, dst *Dto)
-	OrderByExp   []string
+	OrderExp     []string // GORM order expressions, e.g. "id desc"
 	QueryBuilder func(tx persistence.TxContext) persistence.Query
 }
 

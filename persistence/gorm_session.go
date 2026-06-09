@@ -23,11 +23,11 @@ func (s *gormSession) Transaction(fn func(Tx) error) error {
 	})
 }
 
-func (s *gormSession) Query(model any) Query {
+func (s *gormSession) Model(value interface{}) Query {
 	if s == nil || s.db == nil {
 		return nil
 	}
-	return wrapGormQuery(s.db, model)
+	return wrapGormQuery(s.db, value)
 }
 
 func (s *gormSession) SetDebug(enable bool) {
@@ -59,58 +59,54 @@ type gormTx struct {
 	db *gormdb.DB
 }
 
-func (t *gormTx) Query(model any) Query {
+func (t *gormTx) Model(value interface{}) Query {
 	if t == nil || t.db == nil {
 		return nil
 	}
-	return wrapGormQuery(t.db, model)
+	return wrapGormQuery(t.db, value)
 }
 
-func (t *gormTx) Insert(model any) error {
+func (t *gormTx) Create(value interface{}) error {
 	if t == nil || t.db == nil {
 		return nil
 	}
-	return CheckErr(t.db.Create(model).Error)
+	return CheckErr(t.db.Create(value).Error)
 }
 
-func (t *gormTx) Update(model any, cols ...string) error {
+func (t *gormTx) Save(value interface{}) error {
+	if t == nil || t.db == nil {
+		return nil
+	}
+	return t.db.Save(value).Error
+}
+
+func (t *gormTx) Delete(value interface{}, conds ...interface{}) error {
 	if t == nil || t.db == nil {
 		return nil
 	}
 	tx := t.db
-	if len(cols) > 0 {
-		tx = tx.Select(cols)
+	if len(conds) > 0 {
+		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.Updates(model).Error
+	return tx.Delete(value).Error
 }
 
-func (t *gormTx) Delete(model any, cols ...string) error {
+func (t *gormTx) First(dest interface{}, conds ...interface{}) error {
 	if t == nil || t.db == nil {
 		return nil
 	}
 	tx := t.db
-	if len(cols) > 0 {
-		tx = tx.Select(cols)
+	if len(conds) > 0 {
+		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.Delete(model).Error
+	return tx.First(dest).Error
 }
 
-func (t *gormTx) Get(model any, cols ...string) error {
+func (t *gormTx) Raw(sql string, values ...interface{}) Query {
 	if t == nil || t.db == nil {
 		return nil
 	}
-	tx := t.db
-	if len(cols) > 0 {
-		tx = tx.Select(cols)
-	}
-	return tx.First(model).Error
-}
-
-func (t *gormTx) Raw(sql string, args ...any) Query {
-	if t == nil || t.db == nil {
-		return nil
-	}
-	return wrapGormQuery(t.db.Raw(sql, args...), nil)
+	return wrapGormQuery(t.db.Raw(sql, values...), nil)
 }
 
 func (t *gormTx) LegacyTxOrmer() any {
@@ -120,7 +116,7 @@ func (t *gormTx) LegacyTxOrmer() any {
 	return t.db
 }
 
-// SessionDB returns the underlying *gorm.DB for an OrmContext backed by GORM.
+// SessionDB returns the underlying *gorm.DB for an OrmContext.
 func SessionDB(ctx *OrmContext) (*gormdb.DB, bool) {
 	if ctx == nil {
 		return nil, false
@@ -132,7 +128,7 @@ func SessionDB(ctx *OrmContext) (*gormdb.DB, bool) {
 	return nil, false
 }
 
-// TxDB returns the underlying transactional *gorm.DB when tx is GORM-backed.
+// TxDB returns the underlying transactional *gorm.DB.
 func TxDB(ctx TxContext) (*gormdb.DB, bool) {
 	if ctx.Context != nil {
 		db, ok := ctx.Context.(*gormdb.DB)

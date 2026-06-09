@@ -2,20 +2,6 @@ package persistence
 
 import "testing"
 
-func TestInitPostgresOrm(t *testing.T) {
-
-	alias := "default"
-	c := PostgresConfig{
-		AliasName: alias,
-		InitDb:    false,
-	}
-	bc := c.Build()
-	if bc.AliasName != alias {
-		t.Fatal("alias name")
-		return
-	}
-}
-
 func TestValidatePostgresDSN(t *testing.T) {
 	err := validatePostgresDSN("user= password= dbname= host= port=5432 sslmode=disable")
 	if err == nil {
