@@ -48,13 +48,6 @@ func (s *gormSession) Alias() string {
 	return s.alias
 }
 
-func (s *gormSession) LegacyOrmer() any {
-	if s == nil {
-		return nil
-	}
-	return s.db
-}
-
 type gormTx struct {
 	db *gormdb.DB
 }
@@ -109,37 +102,26 @@ func (t *gormTx) Raw(sql string, values ...interface{}) Query {
 	return wrapGormQuery(t.db.Raw(sql, values...), nil)
 }
 
-func (t *gormTx) LegacyTxOrmer() any {
-	if t == nil {
-		return nil
-	}
-	return t.db
-}
-
 // SessionDB returns the underlying *gorm.DB for an OrmContext.
 func SessionDB(ctx *OrmContext) (*gormdb.DB, bool) {
-	if ctx == nil {
+	if ctx == nil || ctx.session == nil {
 		return nil, false
 	}
-	if ctx.Context != nil {
-		db, ok := ctx.Context.(*gormdb.DB)
-		return db, ok
+	s, ok := ctx.session.(*gormSession)
+	if !ok || s == nil || s.db == nil {
+		return nil, false
 	}
-	return nil, false
+	return s.db, true
 }
 
 // TxDB returns the underlying transactional *gorm.DB.
 func TxDB(ctx TxContext) (*gormdb.DB, bool) {
-	if ctx.Context != nil {
-		db, ok := ctx.Context.(*gormdb.DB)
-		return db, ok
+	if ctx.Tx == nil {
+		return nil, false
 	}
-	if ctx.Tx != nil {
-		wrapped, ok := ctx.Tx.(*gormTx)
-		if !ok || wrapped == nil {
-			return nil, false
-		}
-		return wrapped.db, true
+	t, ok := ctx.Tx.(*gormTx)
+	if !ok || t == nil || t.db == nil {
+		return nil, false
 	}
-	return nil, false
+	return t.db, true
 }

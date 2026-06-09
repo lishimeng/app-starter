@@ -2,14 +2,10 @@ package persistence
 
 type OrmContext struct {
 	session Session
-	// Deprecated: use facade methods. Exposes *gorm.DB when available.
-	Context any
 }
 
 type TxContext struct {
 	Tx Tx
-	// Deprecated: use facade methods. Exposes *gorm.DB when available.
-	Context any
 }
 
 func New() *OrmContext {
@@ -95,25 +91,9 @@ func (o *OrmContext) Transaction(h func(TxContext) error) (err error) {
 }
 
 func WrapSession(s Session) *OrmContext {
-	ctx := &OrmContext{session: s}
-	if exposer, ok := s.(legacyOrmExposer); ok {
-		ctx.Context = exposer.LegacyOrmer()
-	}
-	return ctx
+	return &OrmContext{session: s}
 }
 
 func WrapTx(tx Tx) TxContext {
-	ctx := TxContext{Tx: tx}
-	if exposer, ok := tx.(legacyTxExposer); ok {
-		ctx.Context = exposer.LegacyTxOrmer()
-	}
-	return ctx
-}
-
-type legacyOrmExposer interface {
-	LegacyOrmer() any
-}
-
-type legacyTxExposer interface {
-	LegacyTxOrmer() any
+	return TxContext{Tx: tx}
 }
