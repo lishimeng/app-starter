@@ -175,6 +175,31 @@ func TestSyncDB_NoAlterColumn(t *testing.T) {
 	}
 }
 
+func TestSchemaSnapshot_LoadSqlite(t *testing.T) {
+	db := openSyncDBTestDB(t)
+
+	if err := db.Exec(`CREATE TABLE snap_meta_a (id INTEGER PRIMARY KEY, name TEXT)`).Error; err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Exec(`CREATE UNIQUE INDEX idx_snap_meta_a_code ON snap_meta_a (name)`).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	snap, err := loadSchemaSnapshot(db, []string{"snap_meta_a"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !snap.HasTable("snap_meta_a") {
+		t.Fatal("expected table in snapshot")
+	}
+	if !snap.HasColumn("snap_meta_a", "name") {
+		t.Fatal("expected column in snapshot")
+	}
+	if !snap.HasIndex("snap_meta_a", "idx_snap_meta_a_code") {
+		t.Fatal("expected index in snapshot")
+	}
+}
+
 func ensureSqliteForTest(t *testing.T) {
 	t.Helper()
 	if err := Install(); err != nil {
