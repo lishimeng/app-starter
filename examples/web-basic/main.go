@@ -39,7 +39,7 @@ func _main() (err error) {
 			SetWebLogLevel("DEBUG").
 			ComponentBefore(proc.Before).
 			ComponentAfter(proc.After).
-			EnableWeb(":9527", router.Router).
+			EnableWeb(setup.WebPort(), router.Router).
 			PrintVersion()
 		return
 	}, func(s string) {

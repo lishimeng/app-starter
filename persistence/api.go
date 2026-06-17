@@ -15,7 +15,7 @@ type OpenOptions struct {
 // Connector opens database sessions.
 type Connector interface {
 	Open(opts OpenOptions) (Session, error)
-	Migrate(alias string, models ...any) error
+	Migrate(alias string, opts SyncOptions, models ...any) error
 	RegisterModels(models ...any)
 }
 

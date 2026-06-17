@@ -27,6 +27,7 @@ func (q *mockQuery) ILikeStr(column string, value string) Query { if value != ""
 func (q *mockQuery) Or(query interface{}, args ...interface{}) Query     { return q }
 func (q *mockQuery) Not(query interface{}, args ...interface{}) Query    { return q }
 func (q *mockQuery) Select(query interface{}, args ...interface{}) Query { return q }
+func (q *mockQuery) Omit(columns ...string) Query                        { return q }
 func (q *mockQuery) Order(value interface{}) Query                       { return q }
 func (q *mockQuery) Offset(offset int) Query                             { return q }
 func (q *mockQuery) Limit(limit int) Query                               { return q }
@@ -35,6 +36,7 @@ func (q *mockQuery) Find(dest interface{}, conds ...interface{}) error     { ret
 func (q *mockQuery) First(dest interface{}, conds ...interface{}) error  { return nil }
 func (q *mockQuery) Take(dest interface{}, conds ...interface{}) error    { return nil }
 func (q *mockQuery) Updates(value interface{}) error                     { return nil }
+func (q *mockQuery) Update(column string, value any) error               { return nil }
 
 type mockTx struct {
 	created bool

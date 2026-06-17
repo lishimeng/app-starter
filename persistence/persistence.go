@@ -17,6 +17,8 @@ var (
 // BaseConfig 数据库连接配置，由 PostgresConfig / MysqlConfig 等 Build 生成。
 type BaseConfig struct {
 	InitDb       bool
+	SyncForce    bool
+	SyncVerbose  bool
 	AliasName    string
 	Driver       Driver
 	DataSource   string
@@ -96,7 +98,10 @@ func RegisterDatabase(config BaseConfig) (err error) {
 	RegisterSession(alias, session)
 
 	if config.InitDb {
-		err = c.Migrate(alias, config.Models...)
+		err = c.Migrate(alias, SyncOptions{
+			Force:   config.SyncForce,
+			Verbose: config.SyncVerbose,
+		}, config.Models...)
 	}
 	return err
 }

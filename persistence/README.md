@@ -56,7 +56,9 @@ func PostgresConfig() *postgres.Config {
 
 | 字段 | 说明 |
 |------|------|
-| `InitDb` | `true` 时启动后执行 `AutoMigrate` |
+| `InitDb` | `true` 时启动后执行 **SyncDB**（轻量级建表/补列/补索引，仿 Beego `RunSyncdb`） |
+| `SyncForce` | `true` 时 SyncDB 先删表再重建（**会丢数据**，仅开发环境使用） |
+| `SyncVerbose` | `true` 时 SyncDB 打印每一步 DDL 动作 |
 | `AliasName` | 连接别名，默认 `default` |
 | `MaxIdleConns` / `MaxOpenConns` | 连接池（见下文） |
 | `Debug` | 是否打印 SQL |
@@ -124,6 +126,46 @@ mysql.Config{
 ### 其他数据库
 
 SQL Server、Oracle、ClickHouse 等可通过 `persistence.RegisterDialector` 在业务侧扩展，或新增 `persistence/driver/xxx` 子包。
+
+---
+
+## SyncDB（轻量级表结构同步）
+
+`InitDb=true` 时执行 **SyncDB**，语义对齐 Beego `orm.RunSyncdb`，**不调用** GORM `AutoMigrate`。
+
+| 操作 | SyncDB |
+|------|--------|
+| 表不存在 → 创建（含主键与索引） | 是 |
+| 表已存在 → 补缺失列 | 是 |
+| 表已存在 → 补缺失索引 | 是 |
+| `SyncForce=true` → 删表重建 | 是（有数据丢失风险） |
+| `SyncVerbose=true` → 打印 DDL 动作 | 是 |
+| 修改已有列类型/约束 | **否** |
+| 删除模型中已移除的列/索引 | **否** |
+
+手动调用（等价 Beego `RunSyncdb`）：
+
+```go
+import "github.com/lishimeng/app-starter/persistence"
+
+err := persistence.RunSyncDB(
+    persistence.DefaultAlias,
+    persistence.SyncOptions{Verbose: true},
+    &model.YourModel{},
+)
+```
+
+driver Config 示例：
+
+```go
+postgres.Config{
+    InitDb:      true,
+    SyncVerbose: true,
+    // SyncForce: true, // 仅开发：删表重建
+}.Build()
+```
+
+模型字段/索引从模型中删除后，数据库残留需**人工处理**（与 Beego 一致）。
 
 ---
 

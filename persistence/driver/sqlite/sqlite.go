@@ -15,17 +15,21 @@ func init() {
 
 // Config sqlite connection settings.
 type Config struct {
-	Database  string
-	AliasName string
-	InitDb    bool
+	Database    string
+	AliasName   string
+	InitDb      bool
+	SyncForce   bool
+	SyncVerbose bool
 }
 
 func (c *Config) Build() (b persistence.BaseConfig) {
 	b = persistence.BaseConfig{
-		DataSource: c.Database,
-		AliasName:  c.AliasName,
-		Driver:     persistence.DriverSqlite,
-		InitDb:     c.InitDb,
+		DataSource:  c.Database,
+		AliasName:   c.AliasName,
+		Driver:      persistence.DriverSqlite,
+		InitDb:      c.InitDb,
+		SyncForce:   c.SyncForce,
+		SyncVerbose: c.SyncVerbose,
 	}
 	return
 }

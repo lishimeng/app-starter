@@ -67,7 +67,7 @@ func (c *gormConnector) Open(opts OpenOptions) (Session, error) {
 	return newGormSession(alias, db), nil
 }
 
-func (c *gormConnector) Migrate(alias string, models ...any) error {
+func (c *gormConnector) Migrate(alias string, opts SyncOptions, models ...any) error {
 	if c == nil {
 		return fmt.Errorf("persistence: connector nil")
 	}
@@ -85,7 +85,7 @@ func (c *gormConnector) Migrate(alias string, models ...any) error {
 	if len(targets) == 0 {
 		return nil
 	}
-	return db.AutoMigrate(targets...)
+	return SyncDB(db, opts, targets...)
 }
 
 func (c *gormConnector) RegisterModels(models ...any) {

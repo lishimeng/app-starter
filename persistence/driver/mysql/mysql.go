@@ -50,8 +50,10 @@ func (o *OpenOpts) hasAdvanced() bool {
 
 // Config mysql connection settings.
 type Config struct {
-	InitDb    bool
-	AliasName string
+	InitDb                    bool
+	SyncForce                 bool
+	SyncVerbose               bool
+	AliasName                 string
 	UserName  string
 	Password  string
 	Host      string
@@ -86,10 +88,12 @@ func (c *Config) Build() (b persistence.BaseConfig) {
 		c.UserName, c.Password, c.Host, c.Port, c.DbName, charset, parseTime, loc)
 
 	b = persistence.BaseConfig{
-		DataSource: dataSource,
-		AliasName:  c.AliasName,
-		Driver:     persistence.DriverMysql,
-		InitDb:     c.InitDb,
+		DataSource:  dataSource,
+		AliasName:   c.AliasName,
+		Driver:      persistence.DriverMysql,
+		InitDb:      c.InitDb,
+		SyncForce:   c.SyncForce,
+		SyncVerbose: c.SyncVerbose,
 		DriverOpts: &OpenOpts{
 			DefaultStringSize:         c.DefaultStringSize,
 			DisableDatetimePrecision:  c.DisableDatetimePrecision,

@@ -32,8 +32,10 @@ type OpenOpts struct {
 
 // Config postgres connection settings.
 type Config struct {
-	InitDb         bool
-	AliasName      string
+	InitDb               bool
+	SyncForce            bool
+	SyncVerbose          bool
+	AliasName            string
 	UserName       string
 	Password       string
 	Host           string
@@ -62,10 +64,12 @@ func (c *Config) Build() (b persistence.BaseConfig) {
 		dataSource = fmt.Sprintf("%s %s", dataSource, c.AdvancedConfig)
 	}
 	b = persistence.BaseConfig{
-		DataSource: dataSource,
-		AliasName:  c.AliasName,
-		Driver:     persistence.DriverPostgres,
-		InitDb:     c.InitDb,
+		DataSource:  dataSource,
+		AliasName:   c.AliasName,
+		Driver:      persistence.DriverPostgres,
+		InitDb:      c.InitDb,
+		SyncForce:   c.SyncForce,
+		SyncVerbose: c.SyncVerbose,
 		DriverOpts: &OpenOpts{
 			PreferSimpleProtocol: c.PreferSimpleProtocol,
 		},
