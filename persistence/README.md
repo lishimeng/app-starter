@@ -215,10 +215,12 @@ tx.Model(&model.User{}).
     Equal("status", 1).
     ILikeStr("name", keyword).
     EqualStr("code", code).
-    Order("id desc").
+    Order("-Ctime").  // Beego 兼容：无前缀升序，"-" 前缀降序；字段名/列名均可
     Limit(10).
     Find(&list)
 ```
+
+`Order` 也支持 GORM 写法（`"id desc"`）及逗号分隔（`"-Ctime,id"`）。
 
 复杂条件仍可使用 `Where("a = ? AND b > ?", x, y)`。
 

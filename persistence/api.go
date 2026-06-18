@@ -256,8 +256,9 @@ type QueryExec interface {
 	Omit(columns ...string) Query
 
 	// Order 追加排序，可多次调用或传入逗号分隔表达式。
+	// Beego 兼容："id"→升序，"-Ctime"→降序；也支持 GORM 写法 "id desc"。
 	//
-	// 例：tx.Model(&User{}).Order("id desc").Order("name asc").Find(&rows)
+	// 例：tx.Model(&User{}).Order("-Ctime").Order("id").Find(&rows)
 	//
 	// SQL：
 	//

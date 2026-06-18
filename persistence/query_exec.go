@@ -18,6 +18,9 @@ func (q *gormQuery) Order(value interface{}) Query {
 	if q == nil || q.db == nil {
 		return q
 	}
+	if s, ok := value.(string); ok {
+		value = q.resolveOrder(s)
+	}
 	return &gormQuery{db: q.db.Order(value), model: q.model}
 }
 
