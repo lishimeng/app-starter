@@ -81,7 +81,7 @@ func (q *gormQuery) Update(column string, value any) error {
 	if q == nil || q.db == nil {
 		return nil
 	}
-	return q.db.Update(column, value).Error
+	return q.db.Update(q.resolveColumn(column), value).Error
 }
 
 func (q *gormQuery) Updates(value interface{}) error {

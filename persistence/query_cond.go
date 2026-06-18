@@ -23,37 +23,37 @@ func (q *gormQuery) Not(query interface{}, args ...interface{}) Query {
 
 // Equal column = ?
 func (q *gormQuery) Equal(column string, value any) Query {
-	return q.Where(column+" = ?", value)
+	return q.Where(q.resolveColumn(column)+" = ?", value)
 }
 
 // NotEqual column <> ?
 func (q *gormQuery) NotEqual(column string, value any) Query {
-	return q.Where(column+" <> ?", value)
+	return q.Where(q.resolveColumn(column)+" <> ?", value)
 }
 
 // In column IN ?
 func (q *gormQuery) In(column string, values any) Query {
-	return q.Where(column+" IN ?", values)
+	return q.Where(q.resolveColumn(column)+" IN ?", values)
 }
 
 // Like column LIKE %value%
 func (q *gormQuery) Like(column string, value string) Query {
-	return q.Where(column+" LIKE ?", "%"+value+"%")
+	return q.Where(q.resolveColumn(column)+" LIKE ?", "%"+value+"%")
 }
 
 // LLike column LIKE value%（前缀匹配）
 func (q *gormQuery) LLike(column string, value string) Query {
-	return q.Where(column+" LIKE ?", value+"%")
+	return q.Where(q.resolveColumn(column)+" LIKE ?", value+"%")
 }
 
 // RLike column LIKE %value（后缀匹配）
 func (q *gormQuery) RLike(column string, value string) Query {
-	return q.Where(column+" LIKE ?", "%"+value)
+	return q.Where(q.resolveColumn(column)+" LIKE ?", "%"+value)
 }
 
 // ILike column ILIKE %value%（不区分大小写，PostgreSQL）
 func (q *gormQuery) ILike(column string, value string) Query {
-	return q.Where(column+" ILIKE ?", "%"+value+"%")
+	return q.Where(q.resolveColumn(column)+" ILIKE ?", "%"+value+"%")
 }
 
 // EqualStr value 非空时追加 Equal。
