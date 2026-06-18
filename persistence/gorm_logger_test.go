@@ -12,7 +12,7 @@ import (
 
 func TestSlogGormLoggerTrace(t *testing.T) {
 	var buf bytes.Buffer
-	applog.Config().Output(&buf).LevelFromString("debug").Apply()
+	applog.Config().Out(&buf).LevelFromString("debug").Text().Apply()
 
 	l := newSlogGormLogger(gormlogger.Info)
 	l.Trace(nil, time.Now().Add(-5*time.Millisecond), func() (string, int64) {
@@ -20,20 +20,26 @@ func TestSlogGormLoggerTrace(t *testing.T) {
 	}, nil)
 
 	out := buf.String()
-	if strings.Contains(out, "time=") {
-		t.Fatalf("gorm sql should bypass slog text format, got: %q", out)
+	if !strings.Contains(out, "time=") {
+		t.Fatalf("gorm sql should use slog text format, got: %q", out)
+	}
+	if !strings.Contains(out, `msg="SQL executed"`) {
+		t.Fatalf("expected SQL executed message, got: %q", out)
+	}
+	if !strings.Contains(out, "module=gorm") {
+		t.Fatalf("expected module=gorm, got: %q", out)
 	}
 	if !strings.Contains(out, "SELECT 1") {
 		t.Fatalf("expected sql text, got: %q", out)
 	}
-	if !strings.Contains(out, "[rows:1]") {
-		t.Fatalf("expected rows in gorm format, got: %q", out)
+	if !strings.Contains(out, "trace.rows=1") {
+		t.Fatalf("expected rows in slog format, got: %q", out)
 	}
 }
 
 func TestSlogGormLoggerSilent(t *testing.T) {
 	var buf bytes.Buffer
-	applog.Config().Output(&buf).LevelFromString("debug").Apply()
+	applog.Config().Out(&buf).LevelFromString("debug").Apply()
 
 	l := newSlogGormLogger(gormlogger.Silent)
 	l.Trace(nil, time.Now(), func() (string, int64) {
@@ -42,6 +48,24 @@ func TestSlogGormLoggerSilent(t *testing.T) {
 
 	if buf.Len() != 0 {
 		t.Fatalf("expected no output in silent mode, got: %q", buf.String())
+	}
+}
+
+func TestSlogGormLoggerTraceWithSource(t *testing.T) {
+	var buf bytes.Buffer
+	applog.Config().Out(&buf).LevelFromString("debug").Text().Caller(true).Apply()
+
+	l := newSlogGormLogger(gormlogger.Info)
+	l.Trace(nil, time.Now().Add(-5*time.Millisecond), func() (string, int64) {
+		return "SELECT 1", 1
+	}, nil)
+
+	out := buf.String()
+	if !strings.Contains(out, "source=persistence/gorm_logger_test.go:") {
+		t.Fatalf("expected source from test file, got: %q", out)
+	}
+	if !strings.Contains(out, "module=gorm") {
+		t.Fatalf("expected module=gorm, got: %q", out)
 	}
 }
 

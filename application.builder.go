@@ -40,7 +40,6 @@ type ApplicationBuilder struct {
 	vue3Plugin       func(app *iris.Application)
 
 	webLogLevel string
-	appLogLevel string
 
 	dbEnable      bool
 	dbConfig      persistence.BaseConfig
@@ -112,12 +111,6 @@ func (h *ApplicationBuilder) ReadyHandler(handler func() int) *ApplicationBuilde
 
 func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 	h.webLogLevel = lvl
-	return h
-}
-
-// SetAppLogLevel sets application slog level (distinct from Iris HTTP access log).
-func (h *ApplicationBuilder) SetAppLogLevel(lvl string) *ApplicationBuilder {
-	h.appLogLevel = lvl
 	return h
 }
 

@@ -10,26 +10,44 @@ import (
 )
 
 var (
-	defaultHandler atomic.Value // slog.Handler
-	globalLevel    atomic.Value // slog.LevelVar
+	defaultHandler atomic.Value // handlerSlot
+	globalLevel    atomic.Value // *slog.LevelVar
+	showSource     atomic.Bool
 	outMu          sync.RWMutex
-	outWriter      io.Writer = os.Stderr
+	defaultOut     io.Writer = os.Stdout
+	outWriter      io.Writer = os.Stdout
 	rawMu          sync.Mutex
 )
+
+type handlerSlot struct {
+	h slog.Handler
+}
+
+func storeHandler(h slog.Handler) {
+	defaultHandler.Store(handlerSlot{h: h})
+}
+
+func loadHandler() slog.Handler {
+	if slot, ok := defaultHandler.Load().(handlerSlot); ok && slot.h != nil {
+		return slot.h
+	}
+	return slog.Default().Handler()
+}
 
 func init() {
 	lvl := new(slog.LevelVar)
 	lvl.Set(slog.LevelInfo)
 	globalLevel.Store(lvl)
-	outWriter = os.Stderr
-	defaultHandler.Store(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: lvl}))
+	outWriter = defaultOut
+	storeHandler(newHandler(defaultOut, lvl, false))
 }
 
 // Options builds slog handler settings (chainable).
 type Options struct {
-	level  *slog.LevelVar
-	writer io.Writer
-	json   bool
+	level      *slog.LevelVar
+	writer     io.Writer
+	json       bool
+	withCaller bool
 }
 
 // Config starts a configuration chain.
@@ -40,7 +58,7 @@ func Config() *Options {
 	}
 	return &Options{
 		level:  lvl,
-		writer: os.Stderr,
+		writer: defaultOut,
 	}
 }
 
@@ -62,7 +80,7 @@ func (c *Options) LevelFromString(s string) *Options {
 	return c
 }
 
-func (c *Options) Output(w io.Writer) *Options {
+func (c *Options) Out(w io.Writer) *Options {
 	if c != nil && w != nil {
 		c.writer = w
 	}
@@ -83,26 +101,28 @@ func (c *Options) JSON() *Options {
 	return c
 }
 
+// Caller enables source file:line on each record; entries attach source= via stack walk (default off).
+func (c *Options) Caller(enabled bool) *Options {
+	if c != nil {
+		c.withCaller = enabled
+	}
+	return c
+}
+
 // Apply installs handler as slog.Default and package default.
 func (c *Options) Apply() {
 	if c == nil {
 		return
 	}
-	opts := &slog.HandlerOptions{Level: c.level}
-	var h slog.Handler
-	if c.json {
-		h = slog.NewJSONHandler(c.writer, opts)
-	} else {
-		h = slog.NewTextHandler(c.writer, opts)
-	}
 	globalLevel.Store(c.level)
-	defaultHandler.Store(h)
+	showSource.Store(c.withCaller)
+	storeHandler(newHandler(c.writer, c.level, c.json))
 	if c.writer != nil {
 		outMu.Lock()
 		outWriter = c.writer
 		outMu.Unlock()
 	}
-	slog.SetDefault(slog.New(h))
+	slog.SetDefault(slog.New(currentHandler()))
 }
 
 // WriteRaw writes pre-formatted text directly to the configured output (no slog key=value wrapper).
@@ -112,7 +132,7 @@ func WriteRaw(msg string) {
 	w := outWriter
 	outMu.RUnlock()
 	if w == nil {
-		w = os.Stderr
+		w = defaultOut
 	}
 	rawMu.Lock()
 	defer rawMu.Unlock()
@@ -132,8 +152,9 @@ func SetLevelFromString(s string) error {
 }
 
 func currentHandler() slog.Handler {
-	if h, ok := defaultHandler.Load().(slog.Handler); ok && h != nil {
-		return h
-	}
-	return slog.Default().Handler()
+	return loadHandler()
+}
+
+func sourceEnabled() bool {
+	return showSource.Load()
 }

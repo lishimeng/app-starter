@@ -64,7 +64,7 @@ func PostgresConfig() *postgres.Config {
 | `Debug` | 是否打印 SQL（经 `log` 包 / slog 输出，`module=gorm`） |
 | `DriverOpts` | 驱动专属选项，由 `Config.Build()` 自动填充 |
 
-`Debug=true` 或 `EnableDatabaseLog()` 时，GORM SQL 经 `log.WriteRaw` 原样输出（与 GORM 默认 logger 相同的 ANSI 配色，不经 slog 转义）；业务日志仍走 slog 结构化格式。默认忽略 `record not found`，慢查询阈值 200ms。
+`Debug=true` 或 `EnableDatabaseLog()` 时，GORM SQL 经 slog 输出（`module=gorm`，`trace.*`）。`source=` 随 `log.Config().Caller(true)` 一并生效。默认忽略 `record not found`，慢查询阈值 200ms。
 
 ### Build 内置的数据库特性
 

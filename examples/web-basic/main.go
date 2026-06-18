@@ -32,6 +32,8 @@ func main() {
 }
 
 func _main() (err error) {
+	log.Config().LevelFromString("INFO").JSON().Apply()
+
 	application := app.New()
 
 	err = application.Start(func(ctx context.Context, builder *app.ApplicationBuilder) (e error) {

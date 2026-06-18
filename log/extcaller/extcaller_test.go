@@ -10,7 +10,7 @@ import (
 
 func TestAutoModuleSkipsWrapperFrames(t *testing.T) {
 	var buf bytes.Buffer
-	log.Config().Output(&buf).Text().Apply()
+	log.Config().Out(&buf).Text().Apply()
 	log.Info("from subpackage test")
 	out := buf.String()
 	if !strings.Contains(out, "module=log/extcaller") {
