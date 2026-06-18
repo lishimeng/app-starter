@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func TestConn(t *testing.T) {
@@ -29,11 +29,11 @@ func TestConn(t *testing.T) {
 	})
 
 	err = session.Subscribe(func(topic string, payload []byte) {
-		log.Debug("receive1:%s[%s]", topic, string(payload))
+		log.Debugf("receive1:%s[%s]", topic, string(payload))
 	}, qos, topic)
 
 	err = session.Subscribe(func(topic string, payload []byte) {
-		log.Debug("receive2:%s[%s]", topic, string(payload))
+		log.Debugf("receive2:%s[%s]", topic, string(payload))
 	}, qos, topic+"2")
 
 	if err != nil {
@@ -49,11 +49,11 @@ func TestConn(t *testing.T) {
 				log.Info("publish a message")
 				err = session.Publish(topic, qos, false, []byte("test mqtt lib"))
 				if err != nil {
-					log.Debug(err)
+					log.Debugf("%v", err)
 				}
 				err = session.Publish(topic+"2", qos, false, []byte("test mqtt lib222"))
 				if err != nil {
-					log.Debug(err)
+					log.Debugf("%v", err)
 				}
 			}
 		}

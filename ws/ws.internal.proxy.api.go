@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func apiProxyWatchDog(ctx context.Context, req chan RestJob, respCallback TxHandler) {
@@ -26,7 +26,7 @@ func apiProxyWatchDog(ctx context.Context, req chan RestJob, respCallback TxHand
 func apiProxyLoop(ctx context.Context, req chan RestJob, respCallback TxHandler) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Info(err)
+			log.Infof("%v", err)
 			return
 		}
 	}()
@@ -48,7 +48,7 @@ func apiProxyHandler(req RestJob, respCallback TxHandler) {
 	var resp = make(map[string]any)
 	err := req.Fetch(&resp)
 	if err != nil {
-		log.Info(err)
+		log.Infof("%v", err)
 	}
 	respCallback(req.Api, "api", resp) // TODO
 	return

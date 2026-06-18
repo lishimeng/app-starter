@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kataras/iris/v12"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 const (
@@ -111,7 +111,7 @@ func (s *Server) Start(ctx context.Context) error {
 		_ = monitorServer.ListenAndServe()
 	}()
 
-	log.Info("web server listen %s", s.config.Listen)
+	log.Infof("web server listen %s", s.config.Listen)
 	return srv.ListenAndServe()
 }
 

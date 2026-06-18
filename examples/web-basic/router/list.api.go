@@ -5,6 +5,7 @@ import (
 
 	app "github.com/lishimeng/app-starter"
 	"github.com/lishimeng/app-starter/examples/model"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
 )
@@ -37,6 +38,7 @@ func apiListSample(ctx server.Context) {
 	if v, err := ctx.C.URLParamInt("pageSize"); err == nil && v > 0 {
 		pageSize = v
 	}
+	log.Info("query", "pageNum", pageNum, "pageSize", pageSize)
 	code := ctx.C.URLParam("code")
 	name := ctx.C.URLParam("name")
 	connType := ctx.C.URLParam("connType")

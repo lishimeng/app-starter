@@ -7,7 +7,7 @@ import (
 	"time"
 
 	proxy "github.com/eclipse/paho.mqtt.golang"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 type sessionContext struct {

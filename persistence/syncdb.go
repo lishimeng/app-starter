@@ -2,8 +2,8 @@ package persistence
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/lishimeng/app-starter/log"
 	gormdb "gorm.io/gorm"
 )
 
@@ -15,7 +15,7 @@ type SyncOptions struct {
 
 func syncLog(opts SyncOptions, format string, args ...any) {
 	if opts.Verbose {
-		log.Printf("syncdb: "+format, args...)
+		log.For("syncdb").Infof(format, args...)
 	}
 }
 

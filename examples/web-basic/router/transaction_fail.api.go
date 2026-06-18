@@ -4,8 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	app "github.com/lishimeng/app-starter"
+	"github.com/lishimeng/app-starter"
 	"github.com/lishimeng/app-starter/examples/model"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
 	"gorm.io/gorm"
@@ -64,6 +65,8 @@ func apiTransactionFailSample(ctx server.Context) {
 		})
 		return
 	}
+	log.With("err", txErr).Error("transaction fail")
+	log.Errorf("%v", txErr)
 
 	var after model.BusinessConnector
 	if err = app.Query(func(o persistence.OrmContext) error {

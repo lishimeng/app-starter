@@ -9,6 +9,7 @@ import (
 	"github.com/lishimeng/app-starter/application/repo"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/factory"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/midware/auth"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
@@ -56,6 +57,16 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		err = fmt.Errorf("application builder function nil")
 		return
 	}
+
+	appLogLevel := h.builder.appLogLevel
+	if appLogLevel == "" {
+		appLogLevel = os.Getenv("LOG_LEVEL")
+	}
+	if appLogLevel == "" {
+		appLogLevel = "INFO"
+	}
+	log.Config().LevelFromString(appLogLevel).Text().Apply()
+
 	// 读取环境变量
 	var dbLogEnabled = os.Getenv("DB_LOG_ENABLED")
 	if dbLogEnabled == "1" {

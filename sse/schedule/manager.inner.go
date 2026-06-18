@@ -3,14 +3,14 @@ package schedule
 import (
 	"github.com/lishimeng/app-starter/sse/client"
 	"github.com/lishimeng/app-starter/sse/event"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func (m *Manager) registerClient(c *client.Client) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.Clients[c.ID] = c
-	log.Info("客户端 %s 已连接，当前在线数: %d", c.ID, len(m.Clients))
+	log.Infof("客户端 %s 已连接，当前在线数: %d", c.ID, len(m.Clients))
 }
 
 func (m *Manager) unregisterClient(c *client.Client) {
@@ -18,7 +18,7 @@ func (m *Manager) unregisterClient(c *client.Client) {
 	defer m.mu.Unlock()
 	if _, ok := m.Clients[c.ID]; ok {
 		delete(m.Clients, c.ID)
-		log.Info("客户端 %s 已断开，当前在线数: %d", c.ID, len(m.Clients))
+		log.Infof("客户端 %s 已断开，当前在线数: %d", c.ID, len(m.Clients))
 	}
 }
 
@@ -45,13 +45,13 @@ func (m *Manager) sendToClient(clientId string, payload *event.Payload) error {
 
 	defer func() {
 		if err := recover(); err != nil {
-			log.Info(err)
+			log.Infof("%v", err)
 		}
 	}()
 
 	err := c.SendMessage(message)
 	if err != nil {
-		log.Info(err)
+		log.Infof("%v", err)
 	}
 	return nil
 }
@@ -76,12 +76,12 @@ func (m *Manager) broadcast(payload *event.Payload) error {
 		func(client *client.Client) {
 			defer func() {
 				if err := recover(); err != nil {
-					log.Info(err)
+					log.Infof("%v", err)
 				}
 			}()
 			err := client.SendMessage(message)
 			if err != nil {
-				log.Info(err)
+				log.Infof("%v", err)
 			}
 		}(c)
 	}

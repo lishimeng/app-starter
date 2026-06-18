@@ -5,7 +5,7 @@ import (
 
 	"github.com/lishimeng/app-starter/midware/auth/cookie"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 const (
@@ -34,7 +34,7 @@ func GetAuth(ctx server.Context) (auth string, ok bool) {
 		return
 	}
 	if !strings.HasPrefix(header, Realm) {
-		log.Debug("unsupported realm:%s", header)
+		log.Debugf("unsupported realm:%s", header)
 		ok = false
 		return
 	}

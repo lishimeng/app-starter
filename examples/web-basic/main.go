@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/lishimeng/app-starter"
@@ -10,22 +9,26 @@ import (
 	"github.com/lishimeng/app-starter/examples/web-basic/proc"
 	"github.com/lishimeng/app-starter/examples/web-basic/router"
 	"github.com/lishimeng/app-starter/examples/web-basic/setup"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func main() {
 
 	defer func() {
+		time.Sleep(time.Millisecond * 200)
+	}()
+
+	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println(err)
+			log.Errorf("%v", err)
 		}
 	}()
 
 	err := _main()
 	if err != nil {
-		fmt.Println(err)
+		log.Errorf("%v", err)
 	}
-	time.Sleep(time.Millisecond * 200)
+
 }
 
 func _main() (err error) {
@@ -33,6 +36,7 @@ func _main() (err error) {
 
 	err = application.Start(func(ctx context.Context, builder *app.ApplicationBuilder) (e error) {
 
+		log.Info("application start")
 		builder.
 			EnableDatabase(setup.PostgresConfig().Build(), new(model.BusinessConnector)).
 			EnableDatabaseLog().

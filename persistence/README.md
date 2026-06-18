@@ -61,8 +61,10 @@ func PostgresConfig() *postgres.Config {
 | `SyncVerbose` | `true` 时 SyncDB 打印每一步 DDL 动作 |
 | `AliasName` | 连接别名，默认 `default` |
 | `MaxIdleConns` / `MaxOpenConns` | 连接池（见下文） |
-| `Debug` | 是否打印 SQL |
+| `Debug` | 是否打印 SQL（经 `log` 包 / slog 输出，`module=gorm`） |
 | `DriverOpts` | 驱动专属选项，由 `Config.Build()` 自动填充 |
+
+`Debug=true` 或 `EnableDatabaseLog()` 时，GORM SQL 经 `log.WriteRaw` 原样输出（与 GORM 默认 logger 相同的 ANSI 配色，不经 slog 转义）；业务日志仍走 slog 结构化格式。默认忽略 `record not found`，慢查询阈值 200ms。
 
 ### Build 内置的数据库特性
 

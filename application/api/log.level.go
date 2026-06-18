@@ -1,10 +1,8 @@
 package api
 
 import (
-	"strings"
-
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
 )
 
 type LogLevelReq struct {
@@ -27,23 +25,18 @@ func changeLogLevel(ctx server.Context) {
 		ctx.Json(resp)
 		return
 	}
-	var lvl log.Level
-	if strings.HasPrefix(req.Level, "INFO") {
-		lvl = log.INFO
-	} else if strings.HasPrefix(req.Level, "FINE") {
-		lvl = log.FINE
-	} else if strings.HasPrefix(req.Level, "DEBUG") {
-		lvl = log.DEBUG
-	} else if strings.HasPrefix(req.Level, "ERROR") {
-		lvl = log.ERROR
-	} else {
+	if req.Level == "" {
 		resp.Code = 200
 		resp.Message = "unknown level"
 		ctx.Json(resp)
 		return
 	}
-
-	log.SetLevelAll(lvl)
+	if err = log.SetLevelFromString(req.Level); err != nil {
+		resp.Code = 200
+		resp.Message = "unknown level"
+		ctx.Json(resp)
+		return
+	}
 
 	resp.Code = 200
 	ctx.Json(resp)

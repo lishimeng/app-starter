@@ -2,10 +2,11 @@ package client
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/lishimeng/app-starter/log"
 )
 
 // Client 表示一个SSE客户端连接
@@ -89,25 +90,25 @@ func (c *Client) GetEvents() []string {
 
 func (c *Client) Run(heartbeatInterval time.Duration) {
 	if c.IsClosed() {
-		log.Printf("客户端 %s 已关闭，跳过主循环", c.ID)
+		log.Infof("客户端 %s 已关闭，跳过主循环", c.ID)
 		return
 	}
 
 	ticker := time.NewTicker(heartbeatInterval)
 	defer ticker.Stop()
 
-	log.Printf("客户端 %s 启动主循环", c.ID)
+	log.Infof("客户端 %s 启动主循环", c.ID)
 	for {
 		select {
 		case <-ticker.C:
 			if err := c.sendHeartbeat(); err != nil {
-				log.Printf("客户端 %s 心跳发送失败: %v", c.ID, err)
+				log.Infof("客户端 %s 心跳发送失败: %v", c.ID, err)
 				c.Close()
 				return
 			}
 
 		case <-c.r.Context().Done():
-			log.Printf("客户端 %s 自身Context取消: %v", c.ID, c.ctx.Err())
+			log.Infof("客户端 %s 自身Context取消: %v", c.ID, c.ctx.Err())
 			return
 		case <-c.ctx.Done():
 			return

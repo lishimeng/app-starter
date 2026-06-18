@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	gormdb "gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type gormConnector struct {
@@ -37,13 +36,10 @@ func (c *gormConnector) Open(opts OpenOptions) (Session, error) {
 		return nil, err
 	}
 
-	logLevel := logger.Silent
-	if opts.Debug || c.isDebug() {
-		logLevel = logger.Info
-	}
+	logLevel := gormLogLevel(opts.Debug || c.isDebug())
 
 	db, err := gormdb.Open(dialector, &gormdb.Config{
-		Logger: logger.Default.LogMode(logLevel),
+		Logger: newSlogGormLogger(logLevel),
 	})
 	if err != nil {
 		return nil, err
@@ -124,12 +120,9 @@ func (c *gormConnector) setGlobalDebug(enable bool) {
 	}
 	c.mu.Unlock()
 
-	lvl := logger.Silent
-	if enable {
-		lvl = logger.Info
-	}
+	lvl := gormLogLevel(enable)
 	for _, db := range dbs {
-		db.Logger = db.Logger.LogMode(lvl)
+		db.Logger = newSlogGormLogger(lvl)
 	}
 }
 

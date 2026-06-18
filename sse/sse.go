@@ -8,7 +8,7 @@ import (
 
 	"github.com/lishimeng/app-starter/sse/client"
 	"github.com/lishimeng/app-starter/sse/schedule"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func NewManager(ctx context.Context) *schedule.Manager {
@@ -29,12 +29,12 @@ func WebHandler(manager *schedule.Manager, w http.ResponseWriter, r *http.Reques
 
 	if len(events) > 0 {
 		c.Subscribe(events...)
-		log.Info("客户端 %s 订阅events: %v", clientID, events)
+		log.Infof("客户端 %s 订阅events: %v", clientID, events)
 	}
 
 	manager.Register <- c
 	defer func() {
-		log.Info("客户端 %s handler退出，执行反注册", clientID)
+		log.Infof("客户端 %s handler退出，执行反注册", clientID)
 		manager.Unregister <- c
 	}()
 

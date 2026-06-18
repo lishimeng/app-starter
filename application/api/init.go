@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func Server(conf server.Config) (srv *server.Server, err error) {
@@ -51,7 +51,7 @@ func Start(ctx context.Context, srv *server.Server) (err error) {
 
 		e := srv.Start(ctx)
 		if e != nil {
-			log.Info(e)
+			log.Infof("%v", e)
 		}
 		log.Info("stop web server")
 	}()

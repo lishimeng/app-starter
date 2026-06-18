@@ -5,7 +5,7 @@ import (
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 func JwtTokenVerify(ctx server.Context) {
@@ -22,13 +22,13 @@ func JwtTokenVerify(ctx server.Context) {
 	uid := ""
 	err = factory.GetCache().Get(authCtx, &uid)
 	if err != nil {
-		log.Info(err)
+		log.Infof("%v", err)
 		resp.Valid = false
 		ctx.Json(resp)
 		return
 	}
 
-	log.Info("%s", uid)
+	log.Infof("%s", uid)
 	resp.Valid = true
 	ctx.Json(resp)
 }

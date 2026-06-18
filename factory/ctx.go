@@ -7,7 +7,7 @@ import (
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 	proxy "github.com/lishimeng/x/container"
 	"github.com/redis/go-redis/v9"
 )
@@ -41,7 +41,7 @@ func RegisterCache(c cache.C) {
 func GetCache() (c cache.C) {
 	err := proxy.Get(&c, cacheKey)
 	if err != nil {
-		log.Debug(err)
+		log.Debugf("%v", err)
 		c = nil
 	}
 	return
@@ -61,7 +61,7 @@ func RegisterRedis(c *redis.Client) {
 func GetRedis() (c *redis.Client) {
 	err := proxy.Get(&c, redisKey)
 	if err != nil {
-		log.Debug(err)
+		log.Debugf("%v", err)
 		c = nil
 	}
 	return
@@ -73,7 +73,7 @@ func RegisterMqtt(session mqtt.Session) {
 func GetMqtt() (session mqtt.Session) {
 	err := proxy.Get(&session, mqttKey)
 	if err != nil {
-		log.Debug(err)
+		log.Debugf("%v", err)
 		session = nil
 	}
 	return
@@ -86,7 +86,7 @@ func GetWebServer() (s *server.Server) {
 	var svr server.Server
 	err := proxy.Get(&svr, webServerKey)
 	if err != nil {
-		log.Debug(err)
+		log.Debugf("%v", err)
 		s = nil
 	} else {
 		s = &svr

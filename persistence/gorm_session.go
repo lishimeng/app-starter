@@ -2,7 +2,6 @@ package persistence
 
 import (
 	gormdb "gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type gormSession struct {
@@ -34,11 +33,7 @@ func (s *gormSession) SetDebug(enable bool) {
 	if s == nil || s.db == nil {
 		return
 	}
-	lvl := logger.Silent
-	if enable {
-		lvl = logger.Info
-	}
-	s.db.Logger = s.db.Logger.LogMode(lvl)
+	s.db.Logger = newSlogGormLogger(gormLogLevel(enable))
 }
 
 func (s *gormSession) Alias() string {

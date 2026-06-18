@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/lishimeng/app-starter/broker"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 type Downstream struct {
@@ -40,13 +40,13 @@ func handler(ctx context.Context, topic string, ws *websocket.Conn, logic Logic)
 			Payload:  payload,
 		}
 		if e := txEncoder.Encode(obj); e != nil {
-			log.Info(e)
+			log.Infof("%v", e)
 		} else {
 			content := txBuf.String()
 			txBuf.Reset()
 			msg, e := websocket.NewPreparedMessage(websocket.TextMessage, []byte(content))
 			if e != nil {
-				log.Info(e)
+				log.Infof("%v", e)
 				return
 			}
 			txQueue <- msg
@@ -87,7 +87,7 @@ func handler(ctx context.Context, topic string, ws *websocket.Conn, logic Logic)
 			case <-time.After(time.Second * 3):
 				msg, e := websocket.NewPreparedMessage(websocket.PingMessage, nil)
 				if e != nil {
-					log.Info(e)
+					log.Infof("%v", e)
 					return
 				}
 				txQueue <- msg
@@ -106,8 +106,8 @@ func handler(ctx context.Context, topic string, ws *websocket.Conn, logic Logic)
 		var req RestJob
 		err := json.Unmarshal(m, &req)
 		if err != nil {
-			log.Info(err)
-			log.Info(string(m))
+			log.Infof("%v", err)
+			log.Info("ws message", "raw", string(m))
 			return
 		}
 		apiReq <- req
@@ -121,7 +121,7 @@ func handler(ctx context.Context, topic string, ws *websocket.Conn, logic Logic)
 			default:
 				messageType, payload, err := ws.ReadMessage()
 				if err != nil {
-					log.Info(err)
+					log.Infof("%v", err)
 					exit()
 					return
 				}
@@ -149,17 +149,17 @@ func handler(ctx context.Context, topic string, ws *websocket.Conn, logic Logic)
 
 func handleWsSession(ctx server.Context, topic string, logic Logic) {
 	sessionId := strings.ReplaceAll(uuid.New().String(), "-", "")
-	log.Info("create WS Session: %s", sessionId)
+	log.Infof("create WS Session: %s", sessionId)
 	ws, err := upgrade.Upgrade(ctx.C.ResponseWriter(), ctx.C.Request(), nil)
 	if err != nil {
 		if _, ok := errors.AsType[websocket.HandshakeError](err); !ok {
-			log.Info(err)
+			log.Infof("%v", err)
 		}
 		return
 	}
 	wait, cancel := context.WithCancel(context.Background())
 	ws.SetCloseHandler(func(code int, text string) error {
-		log.Info("WS Session close: %s", sessionId)
+		log.Info("WS Session close", "sessionId", sessionId)
 		cancel()
 		return nil
 	})
@@ -174,7 +174,7 @@ func handleWsSession(ctx server.Context, topic string, logic Logic) {
 func _writeMsg(conn *websocket.Conn, m *websocket.PreparedMessage) {
 	defer func() {
 		if e := recover(); e != nil {
-			log.Info(e)
+			log.Infof("%v", e)
 		}
 	}()
 	_ = conn.WritePreparedMessage(m)

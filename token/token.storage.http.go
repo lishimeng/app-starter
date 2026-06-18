@@ -3,7 +3,7 @@ package token
 import (
 	"github.com/kataras/jwt"
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/x/rest"
 )
 
@@ -59,12 +59,12 @@ func (hs *httpStorage) verify(key string) (err error) {
 	header, value := bearer.BuildAuth(key)
 	code, err := rest.New().GetJson(hs.connector.Server, nil, &resp, rest.Header{Name: header, Value: value})
 	if err != nil {
-		log.Info(err)
+		log.Infof("%v", err)
 		err = ErrInvalid
 		return
 	}
 	if code != 200 {
-		log.Debug("http status code:%d", code)
+		log.Debugf("http status code:%d", code)
 		err = ErrInvalid
 		return
 	}

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 type OnDataFunc func(MessageItem)
@@ -81,7 +81,7 @@ func (c *Client) transmission() {
 func (c *Client) _transmissionLoop() {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info(r)
+			log.Infof("%v", r)
 		}
 	}()
 	for {
@@ -100,7 +100,7 @@ func (c *Client) _transmissionLoop() {
 func (c *Client) broadcast(item MessageItem) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info(r)
+			log.Infof("%v", r)
 		}
 	}()
 
@@ -116,7 +116,7 @@ func (c *Client) broadcast(item MessageItem) {
 func (c *Client) broadcastTo(sendTo OnDataFunc, item MessageItem) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info(r)
+			log.Infof("%v", r)
 		}
 	}()
 	sendTo(item)
@@ -126,7 +126,7 @@ func (c *Client) Publish(topic string, data any) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			log.Info(r)
+			log.Infof("%v", r)
 		}
 	}()
 	ctx, cancel := context.WithTimeout(c.ctx, time.Second)

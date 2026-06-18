@@ -6,7 +6,7 @@ import (
 	"os"
 	text "text/template"
 
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 // git update-index --chmod +x script.sh
@@ -97,7 +97,7 @@ func createShell(pro Project, apps ...Application) (err error) {
 	}
 	err = os.WriteFile(scriptName, []byte(scriptContent), 0644)
 	if err != nil {
-		log.Info(err)
+		log.Infof("%v", err)
 		return
 	}
 	return

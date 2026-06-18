@@ -5,7 +5,7 @@ import (
 	"time"
 
 	proxy "github.com/eclipse/paho.mqtt.golang"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/x/util"
 )
 
@@ -36,7 +36,7 @@ var WithAuth = func(username, password string) ClientOption {
 var WithRandomClientId = func() ClientOption {
 	return func(options *proxy.ClientOptions) *proxy.ClientOptions {
 		options = options.SetClientID(util.UUIDString())
-		log.Debug("ClientId:%s", options.ClientID)
+		log.Debugf("ClientId:%s", options.ClientID)
 		return options
 	}
 }

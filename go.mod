@@ -11,7 +11,6 @@ require (
 	github.com/kataras/iris/v12 v12.2.11
 	github.com/kataras/jwt v0.1.17
 	github.com/lishimeng/go-app-shutdown v1.0.1
-	github.com/lishimeng/go-log v1.0.0
 	github.com/lishimeng/x v1.3.5
 	github.com/redis/go-redis/v9 v9.20.0
 	gorm.io/driver/mysql v1.6.0
@@ -55,7 +54,6 @@ require (
 	github.com/kataras/sitemap v0.0.6 // indirect
 	github.com/kataras/tunnel v0.0.4 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
-	github.com/lishimeng/log4go v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailgun/raymond/v2 v2.0.48 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -78,7 +76,6 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tdewolff/minify/v2 v2.20.19 // indirect
 	github.com/tdewolff/parse/v2 v2.7.12 // indirect
-	github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/go-tinylfu v0.2.2 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect

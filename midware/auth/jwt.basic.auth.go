@@ -3,7 +3,7 @@ package auth
 import (
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 // JwtBasic 预处理jwt,解析后存入 UserInfoKey 和相应header
@@ -26,8 +26,7 @@ func JwtBasic() func(server.Context) {
 
 		p, err := TokenStorage.Verify(h)
 		if err != nil {
-			log.Debug("can't verify token")
-			log.Debug(err)
+			log.Debug("can't verify token", "err", err)
 			ctx.C.Next()
 			return
 		}

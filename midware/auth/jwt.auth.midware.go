@@ -4,7 +4,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/go-log"
+	"github.com/lishimeng/app-starter/log"
 )
 
 // SimpleJwtAuth 简单验证器
@@ -29,8 +29,7 @@ func SimpleJwtAuth(ctx server.Context) {
 
 	p, err := TokenStorage.Verify(h)
 	if err != nil {
-		log.Debug("can't verify token")
-		log.Debug(err)
+		log.Debug("can't verify token", "err", err)
 		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
 		return
 	}
