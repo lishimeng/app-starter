@@ -1,4 +1,4 @@
-package factory
+﻿package factory
 
 import (
 	"context"
@@ -6,17 +6,17 @@ import (
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/redis"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/log"
 	proxy "github.com/lishimeng/x/container"
-	"github.com/redis/go-redis/v9"
 )
 
 const (
-	cacheKey         = "cache_redis"
-	redisSessionKey  = "redis_session"
-	mqttKey          = "mqtt_key"
-	webServerKey     = "webserver_key"
+	cacheKey     = "cache_redis"
+	redisKey     = "redis_client"
+	mqttKey      = "mqtt_key"
+	webServerKey = "webserver_key"
 )
 
 var globalContext context.Context
@@ -43,14 +43,13 @@ func GetCache() (c cache.C) {
 	return
 }
 
-// RegisterRedis registers a RedisSession built from client; closes client on app ctx done.
-func RegisterRedis(client *redis.Client) {
+// RegisterRedis creates and registers a shared redis.Client; closes on app ctx done.
+func RegisterRedis(opts redis.Options) {
+	client := redis.NewClient(opts)
 	if client == nil {
 		return
 	}
-	session := cache.NewRedisSession(client)
-	proxy.Add(&session, redisSessionKey)
-	cache.SetRedisSessionResolver(GetRedisSession)
+	proxy.Add(&client, redisKey)
 	go func() {
 		ctx := GetCtx()
 		select {
@@ -60,11 +59,11 @@ func RegisterRedis(client *redis.Client) {
 	}()
 }
 
-func GetRedisSession() (s cache.RedisSession) {
-	err := proxy.Get(&s, redisSessionKey)
+func GetRedisClient() (c *redis.Client) {
+	err := proxy.Get(&c, redisKey)
 	if err != nil {
 		log.Debugf("%v", err)
-		s = nil
+		c = nil
 	}
 	return
 }

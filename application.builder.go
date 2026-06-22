@@ -11,12 +11,13 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
-	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/mqtt"
+	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/redis"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
-	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/x/etc"
 )
 
@@ -41,14 +42,15 @@ type ApplicationBuilder struct {
 
 	webLogLevel string
 
-	dbEnable      bool
-	dbConfig      persistence.BaseConfig
-	dbModels  []any
-	dbViews   []any
-	dbDebug   bool
+	dbEnable bool
+	dbConfig persistence.BaseConfig
+	dbModels []any
+	dbViews  []any
+	dbDebug  bool
 
+	redisEnable  bool
+	redisOpts   redis.Options
 	cacheEnable bool
-	redisOpts   cache.RedisOptions
 	cacheOpts   cache.Options
 
 	tokenValidatorEnable  bool
@@ -121,7 +123,7 @@ func (h *ApplicationBuilder) EnableStaticWeb(assetFile func() http.FileSystem) *
 }
 
 /*
-EnableVueHistoryPlugin 页面路径使用index.html替换
+EnableVueHistoryPlugin 椤甸潰璺緞浣跨敤index.html鏇挎崲
 */
 func (h *ApplicationBuilder) EnableVueHistoryPlugin(whiteList ...string) *ApplicationBuilder {
 
@@ -176,16 +178,20 @@ func (h *ApplicationBuilder) EnableDatabaseView(views ...interface{}) *Applicati
 	return h
 }
 
-// EnableDatabaseLog 打开orm log输出
+// EnableDatabaseLog 鎵撳紑orm log杈撳嚭
 func (h *ApplicationBuilder) EnableDatabaseLog() *ApplicationBuilder {
 	h.dbDebug = true
 	return h
 }
 
-func (h *ApplicationBuilder) EnableCache(redisOpts cache.RedisOptions, cacheOpts cache.Options) *ApplicationBuilder {
+func (h *ApplicationBuilder) EnableRedis(opts redis.Options) *ApplicationBuilder {
+	h.redisEnable = true
+	h.redisOpts = opts
+	return h
+}
 
+func (h *ApplicationBuilder) EnableCache(cacheOpts cache.Options) *ApplicationBuilder {
 	h.cacheEnable = true
-	h.redisOpts = redisOpts
 	h.cacheOpts = cacheOpts
 	return h
 }
@@ -204,7 +210,7 @@ func (h *ApplicationBuilder) EnableMqtt(options ...mqtt.ClientOption) *Applicati
 	return h
 }
 
-// EnableTokenValidator 验证Token，使用RedisTokenValidator前需要enableCache
+// EnableTokenValidator 楠岃瘉Token锛屼娇鐢≧edisTokenValidator鍓嶉渶瑕乪nableCache
 func (h *ApplicationBuilder) EnableTokenValidator(builder TokenValidatorBuilder) *ApplicationBuilder {
 	h.tokenValidatorEnable = true
 	h.tokenValidatorBuilder = builder

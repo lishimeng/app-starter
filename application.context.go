@@ -15,7 +15,6 @@ import (
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	shutdown "github.com/lishimeng/go-app-shutdown"
-	"github.com/redis/go-redis/v9"
 )
 
 type application struct {
@@ -57,7 +56,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		return
 	}
 
-	// 读取环境变量
+	// 璇诲彇鐜鍙橀噺
 	var dbLogEnabled = os.Getenv("DB_LOG_ENABLED")
 	if dbLogEnabled == "1" {
 		h.builder.dbEnable = true
@@ -83,10 +82,16 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		}
 	}
 
+	if h.builder.redisEnable {
+		factory.RegisterRedis(h.builder.redisOpts)
+	}
+
 	if h.builder.cacheEnable {
-		factory.RegisterCache(cache.New(factory.GetCtx(), h.builder.redisOpts, h.builder.cacheOpts))
-		client := redis.NewClient(new(redis.Options(h.builder.redisOpts)))
-		factory.RegisterRedis(client)
+		if !h.builder.redisEnable || factory.GetRedisClient() == nil {
+			err = fmt.Errorf("EnableCache requires EnableRedis")
+			return
+		}
+		factory.RegisterCache(cache.New(factory.GetCtx(), factory.GetRedisClient(), h.builder.cacheOpts))
 	}
 
 	if h.builder.tokenValidatorEnable {
@@ -160,3 +165,4 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	return
 }
+

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/persistence"
 )
 
@@ -17,14 +16,6 @@ func Query(h func(ctx persistence.OrmContext) (err error)) (err error) {
 
 func Transaction(h func(ctx persistence.TxContext) error) (err error) {
 	err = GetOrm().Transaction(h)
-	return
-}
-
-func Redis(h func(ctx cache.RedisContext) error) (err error) {
-	if h == nil {
-		return
-	}
-	err = h(*GetRedis())
 	return
 }
 
@@ -73,3 +64,4 @@ func QueryPage[Model any, Dto any](pager *SimplePager[Model, Dto]) (err error) {
 	})
 	return
 }
+

@@ -1,4 +1,4 @@
-package app
+﻿package app
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
+	"github.com/lishimeng/app-starter/redis"
 	"github.com/lishimeng/app-starter/server"
 )
 
@@ -36,6 +37,6 @@ func GetCache() (c cache.C) {
 	return
 }
 
-func GetRedis() *cache.RedisContext {
-	return cache.NewRedis()
+func GetRedisClient() *redis.Client {
+	return factory.GetRedisClient()
 }

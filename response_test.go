@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 )
 
@@ -17,7 +16,7 @@ func TestResponse001(t *testing.T) {
 		t.Fatal(err)
 		return
 	}
-	fmt.Printf(string(bs))
+	t.Log(string(bs))
 }
 
 func TestResponse002(t *testing.T) {
@@ -31,7 +30,7 @@ func TestResponse002(t *testing.T) {
 		t.Fatal(err)
 		return
 	}
-	fmt.Printf(string(bs))
+	t.Log(string(bs))
 }
 
 func TestResponse003(t *testing.T) {
@@ -43,5 +42,5 @@ func TestResponse003(t *testing.T) {
 		t.Fatal(err)
 		return
 	}
-	fmt.Printf(string(bs))
+	t.Log(string(bs))
 }
