@@ -58,14 +58,14 @@ func (t *gormTx) Create(value interface{}) error {
 	if t == nil || t.db == nil {
 		return nil
 	}
-	return CheckErr(t.db.Create(value).Error)
+	return NormalizeErr(CheckErr(t.db.Create(value).Error))
 }
 
 func (t *gormTx) Save(value interface{}) error {
 	if t == nil || t.db == nil {
 		return nil
 	}
-	return t.db.Save(value).Error
+	return NormalizeErr(t.db.Save(value).Error)
 }
 
 func (t *gormTx) Delete(value interface{}, conds ...interface{}) error {
@@ -76,7 +76,7 @@ func (t *gormTx) Delete(value interface{}, conds ...interface{}) error {
 	if len(conds) > 0 {
 		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.Delete(value).Error
+	return NormalizeErr(tx.Delete(value).Error)
 }
 
 func (t *gormTx) First(dest interface{}, conds ...interface{}) error {
@@ -87,7 +87,7 @@ func (t *gormTx) First(dest interface{}, conds ...interface{}) error {
 	if len(conds) > 0 {
 		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.First(dest).Error
+	return NormalizeErr(tx.First(dest).Error)
 }
 
 func (t *gormTx) Raw(sql string, values ...interface{}) Query {

@@ -1,13 +1,10 @@
 package router
 
 import (
-	"errors"
-
 	app "github.com/lishimeng/app-starter"
 	"github.com/lishimeng/app-starter/examples/model"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
-	"gorm.io/gorm"
 )
 
 func apiOneAndIncreaseSample(ctx server.Context) {
@@ -33,7 +30,7 @@ func apiOneAndIncreaseSample(ctx server.Context) {
 	})
 	if txErr != nil {
 		code, msg := 500, txErr.Error()
-		if errors.Is(txErr, gorm.ErrRecordNotFound) {
+		if persistence.IsNotFound(txErr) {
 			code, msg = 404, "not found"
 		}
 		ctx.Json(app.ResponseWrapper{

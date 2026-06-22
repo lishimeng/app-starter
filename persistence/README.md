@@ -238,6 +238,23 @@ tx.Model(&model.User{}).Where("status = ?", 1).Find(&list)
 
 ---
 
+## 错误处理
+
+持久层在边界将 GORM 错误归一化，业务**不要** `import "gorm.io/gorm"` 判断 `ErrRecordNotFound`：
+
+```go
+if persistence.IsNotFound(err) {
+    // 404
+}
+if persistence.IsDuplicate(err) {
+    // 唯一约束冲突
+}
+```
+
+`First` / `Take` / `Find` 等无匹配时返回 `persistence.IsNotFound(err) == true` 的错误。
+
+---
+
 ## 参考链接
 
 - [GORM - 连接到数据库](https://gorm.io/zh_CN/docs/connecting_to_the_database.html)

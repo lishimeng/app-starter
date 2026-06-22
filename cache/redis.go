@@ -32,12 +32,12 @@ func (c *redisCache) GetProxy() *cache.Cache {
 err = c.Get(key, &obj)
 */
 func (c *redisCache) Get(key string, value interface{}) (err error) {
-	err = c.proxy.Get(c.ctx, key, value)
+	err = NormalizeErr(c.proxy.Get(c.ctx, key, value))
 	return
 }
 
 func (c *redisCache) GetSkipLocal(key string, value interface{}) (err error) {
-	err = c.proxy.GetSkippingLocalCache(c.ctx, key, value)
+	err = NormalizeErr(c.proxy.GetSkippingLocalCache(c.ctx, key, value))
 	return
 }
 
@@ -70,12 +70,12 @@ func (c *redisCache) SetTTL(key string, value interface{}, ttl time.Duration) (e
 	if ttl > 0 {
 		item.TTL = ttl
 	}
-	err = c.proxy.Set(&item)
+	err = NormalizeErr(c.proxy.Set(&item))
 	return
 }
 
 // Del 删除, 慎用
 func (c *redisCache) Del(key string) (err error) {
-	err = c.proxy.Delete(c.ctx, key)
+	err = NormalizeErr(c.proxy.Delete(c.ctx, key))
 	return
 }

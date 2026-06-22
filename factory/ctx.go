@@ -13,17 +13,13 @@ import (
 )
 
 const (
-	cacheKey     = "cache_redis"
-	redisKey     = "redis_key"
-	mqttKey      = "mqtt_key"
-	webServerKey = "webserver_key"
+	cacheKey         = "cache_redis"
+	redisSessionKey  = "redis_session"
+	mqttKey          = "mqtt_key"
+	webServerKey     = "webserver_key"
 )
 
 var globalContext context.Context
-
-//var appCache cache.C
-
-//var amqpSession rabbit.Session
 
 func RegisterCtx(ctx context.Context) {
 	globalContext = ctx
@@ -47,22 +43,28 @@ func GetCache() (c cache.C) {
 	return
 }
 
-func RegisterRedis(c *redis.Client) {
-	proxy.Add(&c, redisKey)
+// RegisterRedis registers a RedisSession built from client; closes client on app ctx done.
+func RegisterRedis(client *redis.Client) {
+	if client == nil {
+		return
+	}
+	session := cache.NewRedisSession(client)
+	proxy.Add(&session, redisSessionKey)
+	cache.SetRedisSessionResolver(GetRedisSession)
 	go func() {
 		ctx := GetCtx()
 		select {
 		case <-ctx.Done():
-			_ = c.Close()
+			_ = client.Close()
 		}
 	}()
 }
 
-func GetRedis() (c *redis.Client) {
-	err := proxy.Get(&c, redisKey)
+func GetRedisSession() (s cache.RedisSession) {
+	err := proxy.Get(&s, redisSessionKey)
 	if err != nil {
 		log.Debugf("%v", err)
-		c = nil
+		s = nil
 	}
 	return
 }

@@ -43,7 +43,7 @@ func (q *gormQuery) Count() (int64, error) {
 		return 0, nil
 	}
 	var count int64
-	err := q.db.Count(&count).Error
+	err := NormalizeErr(q.db.Count(&count).Error)
 	return count, err
 }
 
@@ -55,7 +55,7 @@ func (q *gormQuery) Find(dest interface{}, conds ...interface{}) error {
 	if len(conds) > 0 {
 		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.Find(dest).Error
+	return NormalizeErr(tx.Find(dest).Error)
 }
 
 func (q *gormQuery) First(dest interface{}, conds ...interface{}) error {
@@ -66,7 +66,7 @@ func (q *gormQuery) First(dest interface{}, conds ...interface{}) error {
 	if len(conds) > 0 {
 		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.First(dest).Error
+	return NormalizeErr(tx.First(dest).Error)
 }
 
 func (q *gormQuery) Take(dest interface{}, conds ...interface{}) error {
@@ -77,19 +77,19 @@ func (q *gormQuery) Take(dest interface{}, conds ...interface{}) error {
 	if len(conds) > 0 {
 		tx = tx.Where(conds[0], conds[1:]...)
 	}
-	return tx.Take(dest).Error
+	return NormalizeErr(tx.Take(dest).Error)
 }
 
 func (q *gormQuery) Update(column string, value any) error {
 	if q == nil || q.db == nil {
 		return nil
 	}
-	return q.db.Update(q.resolveColumn(column), value).Error
+	return NormalizeErr(q.db.Update(q.resolveColumn(column), value).Error)
 }
 
 func (q *gormQuery) Updates(value interface{}) error {
 	if q == nil || q.db == nil {
 		return nil
 	}
-	return q.db.Updates(value).Error
+	return NormalizeErr(q.db.Updates(value).Error)
 }

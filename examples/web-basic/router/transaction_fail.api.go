@@ -1,15 +1,13 @@
 package router
 
 import (
-	"errors"
 	"fmt"
 
-	"github.com/lishimeng/app-starter"
+	app "github.com/lishimeng/app-starter"
 	"github.com/lishimeng/app-starter/examples/model"
 	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/persistence"
 	"github.com/lishimeng/app-starter/server"
-	"gorm.io/gorm"
 )
 
 type transactionFailDto struct {
@@ -36,7 +34,7 @@ func apiTransactionFailSample(ctx server.Context) {
 		return o.Model(&model.BusinessConnector{}).Equal("id", id).First(&before)
 	}); err != nil {
 		code, msg := 500, err.Error()
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if persistence.IsNotFound(err) {
 			code, msg = 404, "not found"
 		}
 		ctx.Json(app.ResponseWrapper{
