@@ -240,18 +240,49 @@ tx.Model(&model.User{}).Where("status = ?", 1).Find(&list)
 
 ## 错误处理
 
-持久层在边界将 GORM 错误归一化，业务**不要** `import "gorm.io/gorm"` 判断 `ErrRecordNotFound`：
+### 两条路径，不要混用判断函数
+
+| 路径 | 你拿到的 `err` | 该怎么判断 |
+|------|----------------|------------|
+| **框架 API**（`Session` / `Query` / `Tx`） | 已在边界 `NormalizeErr`，为 `persistence.ErrNotFound` | `persistence.IsNotFound(err)` |
+| **直接用 GORM**（`*gorm.DB` 等，未走本包封装） | 原始 `gorm.ErrRecordNotFound` | `persistence.IsGormRecordNotFound(err)` |
+
+框架 API 在 `gorm_session.go`、`query_exec.go` 出口统一调用 `NormalizeErr`：**不会**把 `gorm.ErrRecordNotFound` 原样抛给业务。
+
+`persistence.ErrNotFound` 是包内归一化哨兵（`errors.New("persistence: not found")`），供 `NormalizeErr` 返回、`IsNotFound` 比较。业务**不必**也**不应**手写 `errors.Is(err, persistence.ErrNotFound)`，统一走下方工具函数。
+
+### 工具函数（`persistence/errors.go`）
+
+| 函数 | 只适用于 |
+|------|----------|
+| `IsNotFound(err)` | 框架 API 返回的 err（已归一化） |
+| `IsGormRecordNotFound(err)` | 直接 GORM 返回的原始 err |
+| `IsNotFoundAny(err)` | 来源不确定、或需同时兼容两种 err 时 |
+| `IsDuplicate(err)` | 任意来源的唯一约束类错误（字符串启发式） |
+
+### 示例
+
+**走框架（推荐）：**
 
 ```go
+err := session.First(&row)
 if persistence.IsNotFound(err) {
-    // 404
-}
-if persistence.IsDuplicate(err) {
-    // 唯一约束冲突
+    // 记录不存在
 }
 ```
 
-`First` / `Take` / `Find` 等无匹配时返回 `persistence.IsNotFound(err) == true` 的错误。
+**直接用 GORM（少数场景）：**
+
+```go
+err := db.First(&row).Error
+if persistence.IsGormRecordNotFound(err) {
+    // 记录不存在
+}
+```
+
+业务**不要** `import "gorm.io/gorm"` 判断 `ErrRecordNotFound`；走框架用 `IsNotFound`，直连 GORM 用 `IsGormRecordNotFound`。
+
+`First` / `Take` / `Find` 等经框架封装后，无匹配时 `persistence.IsNotFound(err)` 为 `true`。
 
 ---
 
