@@ -234,14 +234,19 @@ build_image(){
     if [ -n "${NPM_REGISTRY:-}" ]; then
       docker_extra+=(--build-arg NPM_REGISTRY="${NPM_REGISTRY}")
     fi
-    docker build -t "${Namespace}/${Name}:${Version}" \
+    log_info "docker build start: ${Name}"
+    if ! docker build -t "${Namespace}/${Name}:${Version}" \
       --build-arg NAME="${Name}" \
       --build-arg VERSION="${Version}" \
       --build-arg BUILD_TIME="${BuildTime}" \
       --build-arg COMMIT="${GitCommit}" \
       --build-arg APP_PATH="${AppPath}" \
       "${docker_extra[@]}" \
-      -f "./${AppPath}/Dockerfile" .
+      -f "./${AppPath}/Dockerfile" .; then
+      log_error "docker build failed: ${Name}"
+      exit 1
+    fi
+    log_info "docker build ok: ${Name}"
   fi
 }
 

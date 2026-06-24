@@ -6,10 +6,11 @@ ARG APP_PATH
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 WORKDIR /ui_build
 ADD ${APP_PATH}/ui .
+SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 RUN npm install -g pnpm --registry="${NPM_REGISTRY}" \
     && pnpm config set registry "${NPM_REGISTRY}" \
-    && pnpm install --dangerously-allow-all-builds \
-    && pnpm run build
+    && pnpm install --dangerously-allow-all-builds
+RUN pnpm run build
 
 {{- end }}
 FROM {{ .BuildImageVersion.Golang }} as build
