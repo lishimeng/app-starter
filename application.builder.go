@@ -4,9 +4,6 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"path"
-	"strings"
-	"time"
 
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
@@ -35,9 +32,6 @@ type ApplicationBuilder struct {
 	assetNames      func() []string
 	webStaticHome   string
 	assetFile       func() http.FileSystem
-
-	vue3PluginEnable bool
-	vue3Plugin       func(*server.Server)
 
 	webLogLevel string
 
@@ -135,49 +129,6 @@ func (h *ApplicationBuilder) pprofListenAddr() string {
 func (h *ApplicationBuilder) EnableStaticWeb(assetFile func() http.FileSystem) *ApplicationBuilder {
 	h.webStaticEnable = true
 	h.assetFile = assetFile
-	return h
-}
-
-/*
-EnableVueHistoryPlugin 椤甸潰璺緞浣跨敤index.html鏇挎崲
-*/
-func (h *ApplicationBuilder) EnableVueHistoryPlugin(whiteList ...string) *ApplicationBuilder {
-
-	h.vue3PluginEnable = true
-	const indexPage = "index.html"
-	var handler = func(srv *server.Server) {
-		var m = map[string]byte{}
-		for _, f := range whiteList {
-			m[f] = 1
-		}
-		srv.SetNoRoute(func(ctx server.Context) {
-			p := ctx.Path()
-			ext := path.Ext(p)
-			if len(ext) > 0 {
-				ctx.Status(http.StatusNotFound)
-				return
-			}
-			inWhiteList := false
-			for k := range m {
-				inWhiteList = strings.HasSuffix(p, k)
-				if inWhiteList {
-					break
-				}
-			}
-			if inWhiteList {
-				ctx.Status(http.StatusNotFound)
-				return
-			}
-			index, err := h.assetFile().Open(indexPage)
-			if err != nil {
-				ctx.Status(http.StatusNotFound)
-				return
-			}
-			defer index.Close()
-			http.ServeContent(ctx.ResponseWriter(), ctx.Request(), indexPage, time.Now(), index)
-		})
-	}
-	h.vue3Plugin = handler
 	return h
 }
 

@@ -129,27 +129,21 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 			return
 		}
 		factory.RegisterWebServer(*srv)
-		if h.builder.webStaticEnable {
-			err = api.EnableStatic(srv,
-				h.builder.assetFile)
-			if err != nil {
-				return
-			}
-		}
-		if h.builder.vue3PluginEnable {
-			err = api.EnableVue3Plugin(srv, h.builder.vue3Plugin)
-			if err != nil {
-				return
-			}
-		}
 
-	if h.builder.pprofListenAddr() != "" {
+		if h.builder.pprofListenAddr() != "" {
 			srv.EnableMetrics()
 		}
 
+		// Gin: register specific routes before catch-alls (StaticFS).
 		err = api.EnableComponents(srv, h.builder.webComponents...)
 		if err != nil {
 			return
+		}
+		if h.builder.webStaticEnable {
+			err = api.EnableStatic(srv, h.builder.assetFile)
+			if err != nil {
+				return
+			}
 		}
 
 		err = api.Start(factory.GetCtx(), srv)
