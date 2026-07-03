@@ -1,10 +1,9 @@
 package auth
 
 import (
-	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
-	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/log"
+	"github.com/lishimeng/app-starter/server"
 )
 
 // SimpleJwtAuth 简单验证器
@@ -13,30 +12,32 @@ import (
 //
 // 需要启动token验证器
 func SimpleJwtAuth(ctx server.Context) {
-
-	var err error
 	h, ok := bearer.GetAuth(ctx)
 	if !ok {
-		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
+		unauthorized(ctx)
 		return
 	}
 
 	if TokenStorage == nil {
 		log.Debug("token storage nil")
-		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
+		unauthorized(ctx)
 		return
 	}
 
 	p, err := TokenStorage.Verify(h)
 	if err != nil {
 		log.Debug("can't verify token", "err", err)
-		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
+		unauthorized(ctx)
 		return
 	}
 
-	ctx.C.Values().Set(UserInfoKey, p)
+	ctx.Set(UserInfoKey, p)
 
-	r := ctx.C.Request()
+	r := ctx.Request()
+	if r == nil {
+		unauthorized(ctx)
+		return
+	}
 
 	if len(p.Uid) > 0 {
 		r.Header.Set(UidKey, p.Uid)
@@ -53,5 +54,5 @@ func SimpleJwtAuth(ctx server.Context) {
 	if len(p.Scope) > 0 {
 		r.Header.Set(ScopeKey, p.Scope)
 	}
-	ctx.C.Next()
+	ctx.Next()
 }

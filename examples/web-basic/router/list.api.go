@@ -32,17 +32,17 @@ func toBusinessConnectorDto(src model.BusinessConnector, dst *businessConnectorD
 
 func apiListSample(ctx server.Context) {
 	pageNum, pageSize := 0, 0
-	if v, err := ctx.C.URLParamInt("pageNum"); err == nil && v > 0 {
+	if v, err := ctx.QueryInt("pageNum"); err == nil && v > 0 {
 		pageNum = v
 	}
-	if v, err := ctx.C.URLParamInt("pageSize"); err == nil && v > 0 {
+	if v, err := ctx.QueryInt("pageSize"); err == nil && v > 0 {
 		pageSize = v
 	}
 	log.Info("query", "pageNum", pageNum, "pageSize", pageSize)
-	code := ctx.C.URLParam("code")
-	name := ctx.C.URLParam("name")
-	connType := ctx.C.URLParam("connType")
-	enabledStr := ctx.C.URLParam("enabled")
+	code := ctx.Query("code")
+	name := ctx.Query("name")
+	connType := ctx.Query("connType")
+	enabledStr := ctx.Query("enabled")
 
 	pager := &app.SimplePager[model.BusinessConnector, businessConnectorDto]{
 		Pager: app.Pager[businessConnectorDto]{

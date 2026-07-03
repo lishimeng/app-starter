@@ -8,10 +8,15 @@ import (
 	shutdown "github.com/lishimeng/go-app-shutdown"
 )
 
+func exitAfterStart() {
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		shutdown.Exit("test done")
+	}()
+}
+
 func TestNew(t *testing.T) {
-	go time.AfterFunc(time.Second*20, func() {
-		shutdown.Exit("time to shutdown")
-	})
+	exitAfterStart()
 	var a = New()
 	e := a.Start(func(ctx context.Context, builder *ApplicationBuilder) error {
 		builder.EnableWeb(":8111")
@@ -22,24 +27,20 @@ func TestNew(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-
 }
 
 func TestGetWebServer(t *testing.T) {
-	go time.AfterFunc(time.Second*20, func() {
-		shutdown.Exit("time to shutdown")
-	})
+	exitAfterStart()
 	var a = New()
 	e := a.Start(func(ctx context.Context, builder *ApplicationBuilder) error {
 		builder.EnableWeb(":8111").
 			ComponentAfter(func(ctx context.Context) (err error) {
-				proxy := GetWebServer().GetApplication()
-				if proxy == nil {
+				engine := GetWebServer().GetEngine()
+				if engine == nil {
 					t.Fatal("web server nil")
 					return
 				}
-
-				t.Logf("print web server:%s", proxy.String())
+				t.Logf("web server engine ready")
 				return
 			})
 		return nil
@@ -49,7 +50,6 @@ func TestGetWebServer(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-
 }
 
 func TestGetNamedOrm(t *testing.T) {

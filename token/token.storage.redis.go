@@ -1,7 +1,6 @@
 package token
 
 import (
-	"github.com/kataras/jwt"
 	"github.com/lishimeng/app-starter/cache"
 )
 
@@ -17,7 +16,7 @@ func NewRedisStorage(c cache.C) (s Storage) {
 }
 
 func (rs *redisStorage) Verify(key string) (p JwtPayload, err error) {
-	ut, err := jwt.Decode([]byte(key)) // 校验格式
+	ut, err := Decode([]byte(key)) // 校验格式
 	if err != nil {
 		return
 	}

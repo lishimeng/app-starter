@@ -61,6 +61,10 @@ func (session *sessionContext) OnConnect(handler func()) {
 	session.onConnect = handler
 }
 
+func (session *sessionContext) Connected() bool {
+	return session.conn != nil && session.conn.IsConnected()
+}
+
 func (session *sessionContext) ensureConnected() error {
 	if !session.conn.IsConnected() {
 		session.locker.Lock()

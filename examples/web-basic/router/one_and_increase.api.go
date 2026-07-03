@@ -9,7 +9,7 @@ import (
 
 func apiOneAndIncreaseSample(ctx server.Context) {
 	var err error
-	id, err := ctx.C.Params().GetInt("id")
+	id, err := ctx.ParamInt("id")
 	if err != nil || id <= 0 {
 		ctx.Json(app.ResponseWrapper{
 			Response: app.Response{Code: 400, Message: "invalid id"},

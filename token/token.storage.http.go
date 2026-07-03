@@ -1,7 +1,6 @@
 package token
 
 import (
-	"github.com/kataras/jwt"
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
 	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/x/rest"
@@ -41,7 +40,7 @@ type HttpTokenResp struct {
 }
 
 func (hs *httpStorage) Verify(key string) (p JwtPayload, err error) {
-	ut, err := jwt.Decode([]byte(key))
+	ut, err := Decode([]byte(key))
 	if err != nil {
 		return
 	}

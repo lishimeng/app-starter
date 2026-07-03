@@ -1,11 +1,12 @@
 package token
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/kataras/jwt"
 )
 
 type JwtPayload struct {
@@ -18,60 +19,90 @@ type JwtPayload struct {
 
 func (jp *JwtPayload) WithClient(clientType ClientTye) *JwtPayload {
 	switch clientType {
-	case App:
-	case Pad:
-	case PC:
-	case WeChat:
-	default:
-		return jp
+	case App, Pad, PC, WeChat:
+		jp.Client = string(clientType)
 	}
-	jp.Client = string(clientType)
 	return jp
 }
 
+type jwtClaims struct {
+	JwtPayload
+	jwt.RegisteredClaims
+}
+
+// VerifiedToken holds cryptographically verified JWT claims.
+type VerifiedToken struct {
+	claims jwtClaims
+}
+
+func (vt *VerifiedToken) Claims(v interface{}) error {
+	p, ok := v.(*JwtPayload)
+	if !ok {
+		return fmt.Errorf("token: expected *JwtPayload")
+	}
+	*p = vt.claims.JwtPayload
+	return nil
+}
+
+// UnverifiedToken holds parsed JWT claims without signature verification.
+type UnverifiedToken struct {
+	claims jwtClaims
+}
+
+func (ut *UnverifiedToken) Claims(v interface{}) error {
+	p, ok := v.(*JwtPayload)
+	if !ok {
+		return fmt.Errorf("token: expected *JwtPayload")
+	}
+	*p = ut.claims.JwtPayload
+	return nil
+}
+
+// Decode parses a JWT without verifying its signature.
+func Decode(t []byte) (*UnverifiedToken, error) {
+	var c jwtClaims
+	_, _, err := jwt.NewParser(jwt.WithoutClaimsValidation()).ParseUnverified(string(t), &c)
+	if err != nil {
+		return nil, err
+	}
+	return &UnverifiedToken{claims: c}, nil
+}
+
 type JwtProvider struct {
-	alg         jwt.Alg
-	signKey     jwt.PrivateKey
-	verifyKey   jwt.PublicKey
-	issuer      string
-	defaultTTL  time.Duration
-	checkIssuer bool
+	signingMethod jwt.SigningMethod
+	signKey       interface{}
+	verifyKey     interface{}
+	issuer        string
+	defaultTTL    time.Duration
+	checkIssuer   bool
 }
 
 type JwtBuildOption func(provider *JwtProvider)
 
-// HS256：bit 长度要>=256，即字节长度>=32
-// HS384：bit 长度要>=384，即字节长度>=48
-// HS512：bit 长度要>=512，即字节长度>=64
-var jwtAllAlg = []jwt.Alg{
-	jwt.NONE,
-	jwt.HS256,
-	jwt.HS384,
-	jwt.HS512,
-	jwt.RS256,
-	jwt.RS384,
-	jwt.RS512,
-	jwt.PS256,
-	jwt.PS384,
-	jwt.PS512,
-	jwt.ES256,
-	jwt.ES384,
-	jwt.ES512,
-	jwt.EdDSA,
+var jwtAllAlg = map[string]jwt.SigningMethod{
+	"HS256": jwt.SigningMethodHS256,
+	"HS384": jwt.SigningMethodHS384,
+	"HS512": jwt.SigningMethodHS512,
+	"RS256": jwt.SigningMethodRS256,
+	"RS384": jwt.SigningMethodRS384,
+	"RS512": jwt.SigningMethodRS512,
+	"PS256": jwt.SigningMethodPS256,
+	"PS384": jwt.SigningMethodPS384,
+	"PS512": jwt.SigningMethodPS512,
+	"ES256": jwt.SigningMethodES256,
+	"ES384": jwt.SigningMethodES384,
+	"ES512": jwt.SigningMethodES512,
 }
 
 var WithAlg = func(alg string) JwtBuildOption {
 	return func(provider *JwtProvider) {
-		for _, a := range jwtAllAlg {
-			if a.Name() == alg {
-				provider.alg = a
-				break
-			}
+		if m, ok := jwtAllAlg[alg]; ok {
+			provider.signingMethod = m
 		}
 	}
 }
 
-// WithIssuer 设置issuer, 如不设置,将不能创建jwt, 校验的时候不会检查issuer是否相同
+// WithIssuer sets issuer; verification checks issuer when set.
 var WithIssuer = func(issuer string) JwtBuildOption {
 	return func(provider *JwtProvider) {
 		provider.issuer = issuer
@@ -79,7 +110,7 @@ var WithIssuer = func(issuer string) JwtBuildOption {
 	}
 }
 
-// WithKey 设置秘钥
+// WithKey sets signing and verification keys.
 var WithKey = func(signKey interface{}, verifyKey interface{}) JwtBuildOption {
 	return func(provider *JwtProvider) {
 		provider.signKey = signKey
@@ -87,7 +118,7 @@ var WithKey = func(signKey interface{}, verifyKey interface{}) JwtBuildOption {
 	}
 }
 
-// WithDefaultTTL 设置ttl
+// WithDefaultTTL sets the default token TTL.
 var WithDefaultTTL = func(ttl time.Duration) JwtBuildOption {
 	return func(provider *JwtProvider) {
 		provider.defaultTTL = ttl
@@ -95,54 +126,65 @@ var WithDefaultTTL = func(ttl time.Duration) JwtBuildOption {
 }
 
 func NewJwtProvider(options ...JwtBuildOption) (jp *JwtProvider) {
-	jp = &JwtProvider{}
+	jp = &JwtProvider{
+		signingMethod: jwt.SigningMethodHS256,
+		defaultTTL:    time.Hour,
+	}
 	for _, opt := range options {
 		opt(jp)
 	}
-	if jp.defaultTTL == 0 {
-		jp.defaultTTL = time.Hour
-	}
 	return
 }
 
-func (jp *JwtProvider) Verify(t []byte) (verifiedToken *jwt.VerifiedToken, err error) {
-	var validators []jwt.TokenValidator
-	if jp.checkIssuer {
-		validators = append(validators, jwt.Plain, jwt.Expected{Issuer: jp.issuer})
+func (jp *JwtProvider) Verify(t []byte) (verifiedToken *VerifiedToken, err error) {
+	if jp.verifyKey == nil || jp.signingMethod == nil {
+		return nil, errors.New("token: verify not configured")
 	}
-	verifiedToken, err = jwt.Verify(jp.alg, jp.verifyKey, t, validators...)
-	return
+	var c jwtClaims
+	opts := []jwt.ParserOption{}
+	if jp.checkIssuer {
+		opts = append(opts, jwt.WithIssuer(jp.issuer))
+	}
+	_, err = jwt.ParseWithClaims(string(t), &c, func(token *jwt.Token) (interface{}, error) {
+		if token.Method == nil || token.Method.Alg() != jp.signingMethod.Alg() {
+			return nil, fmt.Errorf("token: unexpected signing method")
+		}
+		return jp.verifyKey, nil
+	}, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &VerifiedToken{claims: c}, nil
 }
 
 func (jp *JwtProvider) Gen(p JwtPayload) (t []byte, err error) {
-	id := uuid.New().String()
-	sub := fmt.Sprintf("%s_%s_%s", p.Dept, p.Client, p.Uid)
-	standardClaims := jwt.Claims{
-		NotBefore: time.Now().Unix(),
-		ID:        id,
-		Issuer:    jp.issuer,
-		Subject:   sub,
-		Audience:  []string{p.Client},
-	}
-	t, err = jwt.Sign(jwt.HS256, jp.signKey, p, standardClaims, jwt.MaxAge(jp.defaultTTL))
-	return
+	return jp.GenWithTTL(p, jp.defaultTTL)
 }
 
 func (jp *JwtProvider) GenWithTTL(p JwtPayload, ttl time.Duration) (t []byte, err error) {
-	id := uuid.New().String()
-	sub := fmt.Sprintf("%s_%s_%s", p.Dept, p.Client, p.Uid)
-	standardClaims := jwt.Claims{
-		NotBefore: time.Now().Unix(),
-		ID:        id,
-		Issuer:    jp.issuer,
-		Subject:   sub,
-		Audience:  []string{p.Client},
+	if jp.signKey == nil || jp.signingMethod == nil {
+		return nil, errors.New("token: signing not configured")
 	}
-	t, err = jwt.Sign(jwt.HS256, jp.signKey, p, standardClaims, jwt.MaxAge(ttl))
-	return
+	now := time.Now()
+	c := jwtClaims{
+		JwtPayload: p,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        uuid.New().String(),
+			Issuer:    jp.issuer,
+			Subject:   fmt.Sprintf("%s_%s_%s", p.Dept, p.Client, p.Uid),
+			Audience:  jwt.ClaimStrings{p.Client},
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),
+			IssuedAt:  jwt.NewNumericDate(now),
+		},
+	}
+	s, err := jwt.NewWithClaims(jp.signingMethod, c).SignedString(jp.signKey)
+	if err != nil {
+		return nil, err
+	}
+	return []byte(s), nil
 }
 
-func (jp *JwtProvider) Decode(t []byte) (ut *jwt.UnverifiedToken, err error) {
-	ut, err = jwt.Decode(t)
-	return
+func (jp *JwtProvider) Decode(t []byte) (ut *UnverifiedToken, err error) {
+	return Decode(t)
 }

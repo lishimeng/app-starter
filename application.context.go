@@ -143,16 +143,25 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 			}
 		}
 
+	if h.builder.pprofListenAddr() != "" {
+			srv.EnableMetrics()
+		}
+
 		err = api.EnableComponents(srv, h.builder.webComponents...)
 		if err != nil {
 			return
 		}
 
-		err = api.EnableMonitors(srv)
+		err = api.Start(factory.GetCtx(), srv)
 		if err != nil {
 			return
 		}
-		err = api.Start(factory.GetCtx(), srv)
+	}
+
+	if listen := h.builder.pprofListenAddr(); listen != "" {
+		err = api.StartPprof(factory.GetCtx(), server.PprofConfig{
+			Listen: listen,
+		})
 		if err != nil {
 			return
 		}

@@ -150,7 +150,7 @@ func handler(ctx context.Context, topic string, ws *websocket.Conn, logic Logic)
 func handleWsSession(ctx server.Context, topic string, logic Logic) {
 	sessionId := strings.ReplaceAll(uuid.New().String(), "-", "")
 	log.Infof("create WS Session: %s", sessionId)
-	ws, err := upgrade.Upgrade(ctx.C.ResponseWriter(), ctx.C.Request(), nil)
+	ws, err := upgrade.Upgrade(ctx.ResponseWriter(), ctx.Request(), nil)
 	if err != nil {
 		if _, ok := errors.AsType[websocket.HandshakeError](err); !ok {
 			log.Infof("%v", err)

@@ -23,6 +23,7 @@ ARG BASE="github.com/lishimeng/app-starter/version"
 ARG GOPROXY=https://goproxy.cn,direct
 ENV GOPROXY=${GOPROXY}
 ARG LDFLAGS=" \
+-s -w \
 -X ${BASE}.AppName=${NAME} \
 -X ${BASE}.Version=${VERSION} \
 -X ${BASE}.Commit=${COMMIT} \

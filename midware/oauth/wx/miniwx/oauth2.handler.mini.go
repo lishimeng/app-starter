@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/x/rest"
+	"net/http"
 )
 
 type MiniAccessToken struct {
@@ -78,7 +78,7 @@ func GetTokenFromServer(url string, respPtr interface{}) (err error) {
 		return
 	}
 
-	if code != iris.StatusOK {
+	if code != http.StatusOK {
 		err = fmt.Errorf("http code: %d", code)
 		return
 	}

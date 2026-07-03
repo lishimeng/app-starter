@@ -5,15 +5,15 @@ import (
 	"html/template"
 	"regexp"
 	"strings"
-
-	"github.com/kataras/iris/v12/view"
 )
 
-func Init(engine *view.HTMLEngine) {
-	engine.AddFunc("indent", Indent)
-	engine.AddFunc("nindent", NIndent)
-	engine.AddFunc("mod", Mod)
-	engine.AddFunc("nmod", NMod)
+func RegisterFuncs(tmpl *template.Template) {
+	tmpl.Funcs(template.FuncMap{
+		"indent":  Indent,
+		"nindent": NIndent,
+		"mod":     Mod,
+		"nmod":    NMod,
+	})
 }
 
 func Indent(n int, html template.HTML) template.HTML {

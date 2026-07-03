@@ -1,16 +1,17 @@
 package api
 
 import (
-	"github.com/kataras/iris/v12"
+	"net/http"
+
 	"github.com/lishimeng/app-starter/server"
 )
 
 var ReadinessHandler func() int
 
 func Ready(ctx server.Context) {
-	if LivenessHandler != nil {
-		ctx.C.StatusCode(ReadinessHandler())
+	if ReadinessHandler != nil {
+		ctx.Status(ReadinessHandler())
 	} else {
-		ctx.C.StatusCode(iris.StatusOK)
+		ctx.Status(http.StatusOK)
 	}
 }

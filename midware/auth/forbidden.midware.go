@@ -1,7 +1,8 @@
 package auth
 
 import (
-	"github.com/kataras/iris/v12"
+	"net/http"
+
 	"github.com/lishimeng/app-starter/server"
 )
 
@@ -19,7 +20,6 @@ type ForbiddenOption struct {
 }
 
 var WithJsonResp = func() func(ForbiddenOption) ForbiddenOption {
-
 	return func(opt ForbiddenOption) ForbiddenOption {
 		opt.Type = JsonForbiddenResponse
 		return opt
@@ -43,8 +43,6 @@ var WithHtmlResp = func(redirect string) func(ForbiddenOption) ForbiddenOption {
 }
 
 // Forbidden401Handler 401处理器
-//
-// 判定为401时返回消息
 func Forbidden401Handler(option ...func(ForbiddenOption) ForbiddenOption) func(server.Context) {
 	var opt ForbiddenOption
 	for _, f := range option {
@@ -55,35 +53,31 @@ func Forbidden401Handler(option ...func(ForbiddenOption) ForbiddenOption) func(s
 			responseForbidden(ctx, opt)
 			return
 		}
-		ctx.C.Next()
+		ctx.Next()
 	}
 }
 
 func responseForbidden(ctx server.Context, opt ForbiddenOption) {
 	switch opt.Type {
-	case HtmlForbiddenResponse: // 返回401页面
-		ctx.C.Redirect(opt.Redirect401Page)
-	case JsonForbiddenResponse: // 返回json
-		errorWith(ctx, iris.StatusUnauthorized, ErrNotAllowed)
-	default: // 返回http 401状态值
-		ctx.C.StatusCode(iris.StatusUnauthorized)
+	case HtmlForbiddenResponse:
+		ctx.Redirect(opt.Redirect401Page, http.StatusFound)
+	case JsonForbiddenResponse:
+		unauthorized(ctx)
+	default:
+		ctx.Status(http.StatusUnauthorized)
 	}
 }
 
 func checkForbidden(ctx server.Context, opt ForbiddenOption) (pass bool) {
 	pass = true
-	// 检查不通过的情况
-	// ui为空
-	if ctx.C.Values().Get(UserInfoKey) == nil {
+	if _, ok := ctx.Get(UserInfoKey); !ok {
 		pass = false
 		return
 	}
-	// scope检查
-	grantedScope := ctx.C.GetHeader(ScopeKey)
+	grantedScope := ctx.GetHeader(ScopeKey)
 	if len(opt.Scope) > 0 {
 		pass = checkScope(grantedScope, opt.Scope)
 	}
-
 	return
 }
 

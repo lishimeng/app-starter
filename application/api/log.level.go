@@ -18,7 +18,7 @@ func changeLogLevel(ctx server.Context) {
 	var err error
 	var req LogLevelReq
 	var resp Resp
-	err = ctx.C.ReadJSON(&req)
+	err = ctx.BindJSON(&req)
 	if err != nil {
 		resp.Code = 500
 		resp.Message = err.Error()

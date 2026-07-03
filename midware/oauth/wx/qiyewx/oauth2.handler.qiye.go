@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/x/rest"
+	"net/http"
 )
 
 type AccessTokenHandle interface {
@@ -100,7 +100,7 @@ func GetTokenFromServer(url string) (resAccessToken ResAccessToken, err error) {
 		return
 	}
 
-	if code != iris.StatusOK {
+	if code != http.StatusOK {
 		err = fmt.Errorf("http code: %d", code)
 		return
 	}

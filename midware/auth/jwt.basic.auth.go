@@ -2,8 +2,8 @@ package auth
 
 import (
 	"github.com/lishimeng/app-starter/midware/auth/bearer"
-	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/log"
+	"github.com/lishimeng/app-starter/server"
 )
 
 // JwtBasic 预处理jwt,解析后存入 UserInfoKey 和相应header
@@ -11,29 +11,32 @@ import (
 // 需要启动token验证器
 func JwtBasic() func(server.Context) {
 	return func(ctx server.Context) {
-		var err error
 		h, ok := bearer.GetAuth(ctx)
 		if !ok {
-			ctx.C.Next()
+			ctx.Next()
 			return
 		}
 
 		if TokenStorage == nil {
 			log.Debug("token storage nil")
-			ctx.C.Next()
+			ctx.Next()
 			return
 		}
 
 		p, err := TokenStorage.Verify(h)
 		if err != nil {
 			log.Debug("can't verify token", "err", err)
-			ctx.C.Next()
+			ctx.Next()
 			return
 		}
 
-		ctx.C.Values().Set(UserInfoKey, p)
+		ctx.Set(UserInfoKey, p)
 
-		r := ctx.C.Request()
+		r := ctx.Request()
+		if r == nil {
+			ctx.Next()
+			return
+		}
 
 		if len(p.Uid) > 0 {
 			r.Header.Set(UidKey, p.Uid)
@@ -50,6 +53,6 @@ func JwtBasic() func(server.Context) {
 		if len(p.Scope) > 0 {
 			r.Header.Set(ScopeKey, p.Scope)
 		}
-		ctx.C.Next()
+		ctx.Next()
 	}
 }

@@ -27,7 +27,7 @@ func GetAuth(ctx server.Context) (auth string, ok bool) {
 		ok = false
 		return
 	}
-	header := ctx.C.GetHeader(AuthHeader)
+	header := ctx.GetHeader(AuthHeader)
 	if len(header) <= 0 {
 		log.Debug("no auth")
 		ok = false

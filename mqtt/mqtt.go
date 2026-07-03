@@ -19,6 +19,8 @@ type Session interface {
 	Subscribe(handler func(topic string, payload []byte), qos byte, topic string) error
 	Unsubscribe(topics ...string)
 	OnConnect(cb func())
+	// Connected reports whether the client has an active broker connection.
+	Connected() bool
 }
 
 type ClientOption func(*proxy.ClientOptions) *proxy.ClientOptions

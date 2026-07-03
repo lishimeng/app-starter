@@ -9,6 +9,6 @@ func Router(root server.Router) {
 
 	log.Info("init router...")
 	root.Get("/", apiListSample)
-	root.Get("/{id}", apiOneAndIncreaseSample)
-	root.Get("/{id}/fail", apiTransactionFailSample)
+	root.Get("/:id", apiOneAndIncreaseSample)
+	root.Get("/:id/fail", apiTransactionFailSample)
 }

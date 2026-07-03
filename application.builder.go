@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kataras/iris/v12"
 	"github.com/lishimeng/app-starter/application/api"
 	"github.com/lishimeng/app-starter/cache"
 	"github.com/lishimeng/app-starter/log"
@@ -38,9 +37,12 @@ type ApplicationBuilder struct {
 	assetFile       func() http.FileSystem
 
 	vue3PluginEnable bool
-	vue3Plugin       func(app *iris.Application)
+	vue3Plugin       func(*server.Server)
 
 	webLogLevel string
+
+	pprofListen         string
+	pprofListenOverride bool
 
 	dbEnable bool
 	dbConfig persistence.BaseConfig
@@ -116,6 +118,20 @@ func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 	return h
 }
 
+// SetPprofListen overrides the default pprof listen address (DefaultPprofListen, :6060).
+func (h *ApplicationBuilder) SetPprofListen(listen string) *ApplicationBuilder {
+	h.pprofListen = listen
+	h.pprofListenOverride = true
+	return h
+}
+
+func (h *ApplicationBuilder) pprofListenAddr() string {
+	if h.pprofListenOverride {
+		return h.pprofListen
+	}
+	return server.DefaultPprofListen
+}
+
 func (h *ApplicationBuilder) EnableStaticWeb(assetFile func() http.FileSystem) *ApplicationBuilder {
 	h.webStaticEnable = true
 	h.assetFile = assetFile
@@ -129,16 +145,16 @@ func (h *ApplicationBuilder) EnableVueHistoryPlugin(whiteList ...string) *Applic
 
 	h.vue3PluginEnable = true
 	const indexPage = "index.html"
-	var handler = func(app *iris.Application) {
+	var handler = func(srv *server.Server) {
 		var m = map[string]byte{}
 		for _, f := range whiteList {
 			m[f] = 1
 		}
-		app.OnErrorCode(iris.StatusNotFound, func(ctx iris.Context) {
+		srv.SetNoRoute(func(ctx server.Context) {
 			p := ctx.Path()
 			ext := path.Ext(p)
 			if len(ext) > 0 {
-				ctx.Next()
+				ctx.Status(http.StatusNotFound)
 				return
 			}
 			inWhiteList := false
@@ -149,15 +165,16 @@ func (h *ApplicationBuilder) EnableVueHistoryPlugin(whiteList ...string) *Applic
 				}
 			}
 			if inWhiteList {
-				ctx.Next()
+				ctx.Status(http.StatusNotFound)
 				return
 			}
 			index, err := h.assetFile().Open(indexPage)
 			if err != nil {
-				ctx.Next()
+				ctx.Status(http.StatusNotFound)
 				return
 			}
-			ctx.ServeContent(index, indexPage, time.Now())
+			defer index.Close()
+			http.ServeContent(ctx.ResponseWriter(), ctx.Request(), indexPage, time.Now(), index)
 		})
 	}
 	h.vue3Plugin = handler
