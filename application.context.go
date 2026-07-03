@@ -134,7 +134,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 			srv.EnableMetrics()
 		}
 
-		// Gin: register specific routes before catch-alls (StaticFS).
+		// API/monitor routes first; static files via NoRoute (Gin rejects StaticFS("/") with /api).
 		err = api.EnableComponents(srv, h.builder.webComponents...)
 		if err != nil {
 			return

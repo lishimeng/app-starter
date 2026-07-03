@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: system-ui, sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    color: #004d40;
+}
+
+main {
+    max-width: 40rem;
+    margin: 4rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 77, 64, 0.12);
+}
+
+h1 {
+    margin-top: 0;
+}
+
+.hint code {
+    background: #e0f2f1;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+}
+
+#status.ok {
+    color: #1b5e20;
+    font-weight: 600;
+}

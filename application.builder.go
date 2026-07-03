@@ -2,6 +2,9 @@ package app
 
 import (
 	"context"
+	"embed"
+	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 
@@ -19,6 +22,33 @@ import (
 
 type TokenValidatorInjectFunc func(storage token.Storage)
 type TokenValidatorBuilder func(injectFunc TokenValidatorInjectFunc)
+
+// WithEmbed adapts embed.FS to EnableStaticWeb (files at FS root → URL /, /css/..., etc.).
+func WithEmbed(fs embed.FS) func() http.FileSystem {
+	return WithEmbedRoot(fs, ".")
+}
+
+// WithEmbedRoot serves a subdirectory inside fsys at web root.
+// Use when embedding with //go:embed all:static and paths are static/index.html, etc.
+func WithEmbedRoot(fsys fs.FS, root string) func() http.FileSystem {
+	if root == "" || root == "." {
+		return func() http.FileSystem { return http.FS(fsys) }
+	}
+	sub, err := fs.Sub(fsys, root)
+	if err != nil {
+		panic(fmt.Sprintf("app.WithEmbedRoot(%q): %v", root, err))
+	}
+	return func() http.FileSystem { return http.FS(sub) }
+}
+
+// EnableEmbedStaticWeb is shorthand for EnableStaticWeb(WithEmbedRoot(fs, root...)).
+func (h *ApplicationBuilder) EnableEmbedStaticWeb(fsys fs.FS, root ...string) *ApplicationBuilder {
+	dir := "."
+	if len(root) > 0 && root[0] != "" {
+		dir = root[0]
+	}
+	return h.EnableStaticWeb(WithEmbedRoot(fsys, dir))
+}
 
 type ApplicationBuilder struct {
 	webEnable     bool
@@ -44,7 +74,7 @@ type ApplicationBuilder struct {
 	dbViews  []any
 	dbDebug  bool
 
-	redisEnable  bool
+	redisEnable bool
 	redisOpts   redis.Options
 	cacheEnable bool
 	cacheOpts   cache.Options

@@ -8,7 +8,8 @@ import (
 func Router(root server.Router) {
 
 	log.Info("init router...")
-	root.Get("/", apiListSample)
-	root.Get("/:id", apiOneAndIncreaseSample)
-	root.Get("/:id/fail", apiTransactionFailSample)
+	api := root.Path("/api")
+	api.Get("/", apiListSample)
+	api.Get("/:id", apiOneAndIncreaseSample)
+	api.Get("/:id/fail", apiTransactionFailSample)
 }

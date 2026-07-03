@@ -23,7 +23,8 @@ func EnableComponents(srv *server.Server, components ...server.Component) (err e
 }
 
 func EnableStatic(srv *server.Server, assetFile func() http.FileSystem) (err error) {
-	srv.StaticFS("/", assetFile())
+	// Gin cannot register StaticFS("/") when /api, /m, etc. exist on the same engine.
+	srv.SetNoRoute(server.FileServerNoRoute(assetFile()))
 	return
 }
 
