@@ -6,6 +6,7 @@ import (
 
 	"github.com/lishimeng/app-starter"
 	"github.com/lishimeng/app-starter/examples/model"
+	"github.com/lishimeng/app-starter/examples/web-basic/admin"
 	"github.com/lishimeng/app-starter/examples/web-basic/proc"
 	"github.com/lishimeng/app-starter/examples/web-basic/router"
 	"github.com/lishimeng/app-starter/examples/web-basic/setup"
@@ -44,6 +45,7 @@ func _main() (err error) {
 			EnableDatabase(setup.PostgresConfig().Build(), new(model.BusinessConnector)).
 			EnableDatabaseLog().
 			EnableStaticWeb(app.WithEmbed(static.Static)).
+			EnableAdminRoutes(admin.Register).
 			SetWebLogLevel("DEBUG").
 			ComponentBefore(proc.Before).
 			ComponentAfter(proc.After).

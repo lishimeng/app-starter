@@ -67,6 +67,7 @@ type ApplicationBuilder struct {
 
 	pprofListen         string
 	pprofListenOverride bool
+	adminSetup          server.AdminSetup
 
 	dbEnable bool
 	dbConfig persistence.BaseConfig
@@ -146,6 +147,14 @@ func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 func (h *ApplicationBuilder) SetPprofListen(listen string) *ApplicationBuilder {
 	h.pprofListen = listen
 	h.pprofListenOverride = true
+	return h
+}
+
+// EnableAdminRoutes registers custom routes on the admin listener (default :6060).
+// Framework routes (/pprof, /metrics, POST /cl) are registered first; setup runs after.
+// setup receives server.Router so business code does not import gin.
+func (h *ApplicationBuilder) EnableAdminRoutes(setup server.AdminSetup) *ApplicationBuilder {
+	h.adminSetup = setup
 	return h
 }
 

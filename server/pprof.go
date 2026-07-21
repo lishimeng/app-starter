@@ -18,12 +18,16 @@ const DefaultPprofPath = "/pprof"
 // DefaultAdminLogLevelPath is the admin listener path for runtime log level changes.
 const DefaultAdminLogLevelPath = "/cl"
 
+// AdminSetup registers custom routes on the admin HTTP listener (:6060).
+// Same signature as Component so business code uses server.Router, not gin.
+type AdminSetup func(Router)
+
 // PprofConfig configures the admin HTTP listener (pprof, metrics, and admin API).
 type PprofConfig struct {
 	Listen      string // e.g. DefaultPprofListen; empty disables the listener
 	Path        string // pprof prefix, default DefaultPprofPath
 	MetricsPath string // default DefaultMetricsPath
-	Setup       func(*gin.Engine)
+	Setup       AdminSetup
 }
 
 // StartPprof listens on cfg.Listen and serves pprof and /metrics.
@@ -47,7 +51,7 @@ func StartPprof(ctx context.Context, cfg PprofConfig) error {
 	pprof.Register(engine.Group(""), pprofPath)
 	engine.GET(metricsPath, gin.WrapH(MetricsHandler()))
 	if cfg.Setup != nil {
-		cfg.Setup(engine)
+		cfg.Setup(NewRouter(engine))
 	}
 
 	srv := &http.Server{

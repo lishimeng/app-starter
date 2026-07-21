@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/server"
 )
@@ -41,7 +40,9 @@ func Start(ctx context.Context, srv *server.Server) (err error) {
 }
 
 func StartPprof(ctx context.Context, cfg server.PprofConfig) (err error) {
-	cfg.Setup = registerAdminRoutes
+	// Do not discard business Setup: wrap so framework /cl is registered first,
+	// then the caller's AdminSetup (from ApplicationBuilder.EnableAdminRoutes).
+	cfg.Setup = composeAdminSetup(cfg.Setup)
 	go func() {
 		log.Info("start admin server")
 		e := server.StartPprof(ctx, cfg)
@@ -53,6 +54,16 @@ func StartPprof(ctx context.Context, cfg server.PprofConfig) (err error) {
 	return nil
 }
 
-func registerAdminRoutes(e *gin.Engine) {
-	e.POST(server.DefaultAdminLogLevelPath, server.GinHandler(changeLogLevel))
+// composeAdminSetup keeps framework admin APIs and appends business routes after them.
+func composeAdminSetup(user server.AdminSetup) server.AdminSetup {
+	return func(r server.Router) {
+		registerAdminRoutes(r)
+		if user != nil {
+			user(r)
+		}
+	}
+}
+
+func registerAdminRoutes(r server.Router) {
+	r.Post(server.DefaultAdminLogLevelPath, changeLogLevel)
 }

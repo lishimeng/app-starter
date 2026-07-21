@@ -13,12 +13,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TestStartPprofDisabled(t *testing.T) {
-	err := StartPprof(context.Background(), PprofConfig{})
-	if err != nil {
-		t.Fatal(err)
+func TestStartPprofSetup(t *testing.T) {
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+	pprof.Register(engine.Group(""), DefaultPprofPath)
+	engine.GET(DefaultMetricsPath, gin.WrapH(MetricsHandler()))
+	called := false
+	setup := AdminSetup(func(r Router) {
+		called = true
+		r.Get("/ping", func(ctx Context) {
+			_, _ = ctx.Write([]byte("pong"))
+		})
+	})
+	setup(NewRouter(engine))
+	if !called {
+		t.Fatal("Setup not called")
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
+	w := httptest.NewRecorder()
+	engine.ServeHTTP(w, req)
+	if w.Code != http.StatusOK || w.Body.String() != "pong" {
+		t.Fatalf("GET /ping = %d %q", w.Code, w.Body.String())
 	}
 }
+
 
 func TestAdminRoutes(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
