@@ -30,6 +30,8 @@ func New(config Config) *Server {
 		config: config,
 		engine: gin.New(),
 	}
+	// Match by path without trailing slash (rewrite /api/ → /api, no 301).
+	s.engine.RedirectTrailingSlash = false
 	s.engine.Use(gin.Recovery())
 	return s
 }
@@ -88,7 +90,7 @@ func (s *Server) RegisterComponents(components ...Component) *Server {
 func (s *Server) Start(ctx context.Context) error {
 	srv := &http.Server{
 		Addr:    s.config.Listen,
-		Handler: s.engine,
+		Handler: stripTrailingSlash(s.engine),
 	}
 	return serveHTTP(ctx, srv, "web server")
 }

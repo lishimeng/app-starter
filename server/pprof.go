@@ -53,6 +53,7 @@ func StartPprof(ctx context.Context, cfg PprofConfig) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	engine := gin.New()
+	engine.RedirectTrailingSlash = false
 	engine.Use(gin.Recovery())
 	pprof.Register(engine.Group(""), pprofPath)
 	engine.GET(metricsPath, gin.WrapH(MetricsHandler()))
@@ -62,7 +63,7 @@ func StartPprof(ctx context.Context, cfg PprofConfig) error {
 
 	srv := &http.Server{
 		Addr:    cfg.Listen,
-		Handler: engine,
+		Handler: stripTrailingSlash(engine),
 	}
 	return serveHTTP(ctx, srv, "admin server")
 }

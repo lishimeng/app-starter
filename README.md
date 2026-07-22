@@ -58,6 +58,18 @@ POST http://localhost:6060/cl   {"level":"debug"}
 
 完整示例见 [`examples/web-basic`](examples/web-basic)（含 `admin.Register` 与测试）。
 
+### URL 尾斜杠
+
+业务 Web 与 admin（`:6060`）在进入路由前都会去掉路径末尾的 `/`（根路径 `/` 除外），类似 nginx rewrite，**不发 301**：
+
+```text
+/api/   →  /api
+/demo/ping/  →  /demo/ping
+/       →  /（不变）
+```
+
+请把路由注册成不带尾斜杠的形式（如 `GET /api`、`GET /demo/ping`）。
+
 Delete tag
 ---
 
