@@ -155,6 +155,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	if listen := h.builder.pprofListenAddr(); listen != "" {
 		err = api.StartPprof(factory.GetCtx(), server.PprofConfig{
 			Listen: listen,
+			LogLvl: h.builder.webLogLevel,
 			Setup:  h.builder.adminSetup,
 		})
 		if err != nil {

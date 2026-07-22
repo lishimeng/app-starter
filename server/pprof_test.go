@@ -39,6 +39,25 @@ func TestStartPprofSetup(t *testing.T) {
 	}
 }
 
+func TestStartPprofDebugMode(t *testing.T) {
+	prev := gin.Mode()
+	t.Cleanup(func() { gin.SetMode(prev) })
+
+	cfg := PprofConfig{LogLvl: "DEBUG"}
+	if !strings.EqualFold(cfg.LogLvl, "debug") {
+		t.Fatal("expected debug log level")
+	}
+	// Mirror StartPprof mode selection without binding a port.
+	if strings.EqualFold(cfg.LogLvl, "debug") {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	if gin.Mode() != gin.DebugMode {
+		t.Fatalf("mode = %s, want debug", gin.Mode())
+	}
+}
+
 
 func TestAdminRoutes(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)

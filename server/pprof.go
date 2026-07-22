@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,7 @@ type PprofConfig struct {
 	Listen      string // e.g. DefaultPprofListen; empty disables the listener
 	Path        string // pprof prefix, default DefaultPprofPath
 	MetricsPath string // default DefaultMetricsPath
+	LogLvl      string // "debug" enables Gin route listing (same as web LogLvl)
 	Setup       AdminSetup
 }
 
@@ -45,7 +47,11 @@ func StartPprof(ctx context.Context, cfg PprofConfig) error {
 		metricsPath = DefaultMetricsPath
 	}
 
-	gin.SetMode(gin.ReleaseMode)
+	if strings.EqualFold(cfg.LogLvl, "debug") {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 	pprof.Register(engine.Group(""), pprofPath)
