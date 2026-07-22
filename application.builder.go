@@ -67,6 +67,7 @@ type ApplicationBuilder struct {
 
 	pprofListen         string
 	pprofListenOverride bool
+	adminDisabled       bool
 	adminSetup          server.AdminSetup
 	stripTrailingSlash  bool
 
@@ -151,10 +152,24 @@ func (h *ApplicationBuilder) EnableStripTrailingSlash() *ApplicationBuilder {
 	return h
 }
 
-// SetPprofListen overrides the default pprof listen address (DefaultPprofListen, :6060).
+// SetPprofListen sets the admin listen address.
+// Empty listen uses server.DefaultPprofListen (":6060").
+// To disable the admin listener, call DisableAdmin.
 func (h *ApplicationBuilder) SetPprofListen(listen string) *ApplicationBuilder {
+	if listen == "" {
+		listen = server.DefaultPprofListen
+	}
 	h.pprofListen = listen
 	h.pprofListenOverride = true
+	h.adminDisabled = false
+	return h
+}
+
+// DisableAdmin disables the admin HTTP listener (pprof / metrics / admin routes).
+func (h *ApplicationBuilder) DisableAdmin() *ApplicationBuilder {
+	h.pprofListen = ""
+	h.pprofListenOverride = true
+	h.adminDisabled = true
 	return h
 }
 
@@ -167,6 +182,9 @@ func (h *ApplicationBuilder) EnableAdminRoutes(setup server.AdminSetup) *Applica
 }
 
 func (h *ApplicationBuilder) pprofListenAddr() string {
+	if h.adminDisabled {
+		return ""
+	}
 	if h.pprofListenOverride {
 		return h.pprofListen
 	}
