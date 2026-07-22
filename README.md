@@ -17,9 +17,12 @@
 | `POST /cl` | 运行时改日志级别，body 示例：`{"level":"debug"}` |
 
 关闭 admin：`builder.DisableAdmin()`  
-改监听地址：`builder.SetAdminListen(":7070")`  
+重新开启：`builder.EnableAdmin()`  
+改监听地址：`builder.SetAdminListen(":7070")`（只改地址，不改变 enable）  
 `SetAdminListen("")` 等同于默认常量 `:6060`  
 `SetWebLogLevel("DEBUG")` 时，admin 启动也会打印 Gin 路由列表（与业务 Web 一致）。
+
+`New()` 默认 `adminEnable=true`；`SetAdminListen` / `EnableAdminRoutes` 仅在 enable 时生效（同 `dbEnable` 与 `dbDebug`）。
 
 ### 注册业务 Admin API
 

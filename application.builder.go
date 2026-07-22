@@ -65,11 +65,10 @@ type ApplicationBuilder struct {
 
 	webLogLevel string
 
-	adminListen         string
-	adminListenOverride bool
-	adminDisabled       bool
-	adminSetup          server.AdminSetup
-	stripTrailingSlash  bool
+	adminEnable bool
+	adminListen string
+	adminSetup  server.AdminSetup
+	stripTrailingSlash bool
 
 	dbEnable bool
 	dbConfig persistence.BaseConfig
@@ -152,40 +151,43 @@ func (h *ApplicationBuilder) EnableStripTrailingSlash() *ApplicationBuilder {
 	return h
 }
 
-// SetAdminListen sets the admin listen address.
+// EnableAdmin enables the admin HTTP listener (default listen :6060).
+// On by default when created via New(); call after DisableAdmin to turn it back on.
+func (h *ApplicationBuilder) EnableAdmin() *ApplicationBuilder {
+	h.adminEnable = true
+	return h
+}
+
+// SetAdminListen sets the admin listen address only (does not enable/disable).
 // Empty listen uses server.DefaultAdminListen (":6060").
-// To disable the admin listener, call DisableAdmin.
+// Effective only when adminEnable is true (same pattern as dbDebug under dbEnable).
 func (h *ApplicationBuilder) SetAdminListen(listen string) *ApplicationBuilder {
 	if listen == "" {
 		listen = server.DefaultAdminListen
 	}
 	h.adminListen = listen
-	h.adminListenOverride = true
-	h.adminDisabled = false
 	return h
 }
 
 // DisableAdmin disables the admin HTTP listener (pprof / metrics / admin routes).
 func (h *ApplicationBuilder) DisableAdmin() *ApplicationBuilder {
-	h.adminListen = ""
-	h.adminListenOverride = true
-	h.adminDisabled = true
+	h.adminEnable = false
 	return h
 }
 
-// EnableAdminRoutes registers custom routes on the admin listener (default :6060).
-// Framework routes (/pprof, /metrics, POST /cl) are registered first; setup runs after.
-// setup receives server.Router so business code does not import gin.
+// EnableAdminRoutes registers custom routes on the admin listener.
+// Effective only when admin is enabled. Framework routes (/pprof, /metrics, POST /cl)
+// are registered first; setup runs after. setup uses server.Router (not gin).
 func (h *ApplicationBuilder) EnableAdminRoutes(setup server.AdminSetup) *ApplicationBuilder {
 	h.adminSetup = setup
 	return h
 }
 
 func (h *ApplicationBuilder) adminListenAddr() string {
-	if h.adminDisabled {
+	if !h.adminEnable {
 		return ""
 	}
-	if h.adminListenOverride {
+	if h.adminListen != "" {
 		return h.adminListen
 	}
 	return server.DefaultAdminListen

@@ -23,7 +23,9 @@ type application struct {
 
 func New() (instance Application) {
 	factory.RegisterCtx(shutdown.Context())
-	builder := &ApplicationBuilder{}
+	builder := &ApplicationBuilder{
+		adminEnable: true, // admin on by default (DisableAdmin to turn off)
+	}
 	ins := &application{builder: builder}
 	instance = ins
 	return
