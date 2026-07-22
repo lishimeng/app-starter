@@ -10,8 +10,8 @@ import (
 	"github.com/lishimeng/app-starter/log"
 )
 
-// DefaultPprofListen is the default admin listen address (pprof + metrics).
-const DefaultPprofListen = ":6060"
+// DefaultAdminListen is the default admin listen address (pprof + metrics + admin API).
+const DefaultAdminListen = ":6060"
 
 // DefaultPprofPath is the URL prefix for pprof routes on the admin listener.
 const DefaultPprofPath = "/pprof"
@@ -23,9 +23,9 @@ const DefaultAdminLogLevelPath = "/cl"
 // Same signature as Component so business code uses server.Router, not gin.
 type AdminSetup func(Router)
 
-// PprofConfig configures the admin HTTP listener (pprof, metrics, and admin API).
-type PprofConfig struct {
-	Listen             string // e.g. DefaultPprofListen; empty disables the listener
+// AdminConfig configures the admin HTTP listener (pprof, metrics, and admin API).
+type AdminConfig struct {
+	Listen             string // e.g. DefaultAdminListen; empty disables the listener
 	Path               string // pprof prefix, default DefaultPprofPath
 	MetricsPath        string // default DefaultMetricsPath
 	LogLvl             string // "debug" enables Gin route listing (same as web LogLvl)
@@ -33,9 +33,9 @@ type PprofConfig struct {
 	Setup              AdminSetup
 }
 
-// StartPprof listens on cfg.Listen and serves pprof and /metrics.
+// StartAdmin listens on cfg.Listen and serves pprof, /metrics, and admin routes.
 // Returns immediately with nil when Listen is empty.
-func StartPprof(ctx context.Context, cfg PprofConfig) error {
+func StartAdmin(ctx context.Context, cfg AdminConfig) error {
 	if cfg.Listen == "" {
 		return nil
 	}

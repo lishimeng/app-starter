@@ -131,7 +131,7 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		}
 		factory.RegisterWebServer(*srv)
 
-		if h.builder.pprofListenAddr() != "" {
+		if h.builder.adminListenAddr() != "" {
 			srv.EnableMetrics()
 		}
 
@@ -153,8 +153,8 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		}
 	}
 
-	if listen := h.builder.pprofListenAddr(); listen != "" {
-		err = api.StartPprof(factory.GetCtx(), server.PprofConfig{
+	if listen := h.builder.adminListenAddr(); listen != "" {
+		err = api.StartAdmin(factory.GetCtx(), server.AdminConfig{
 			Listen:             listen,
 			LogLvl:             h.builder.webLogLevel,
 			StripTrailingSlash: h.builder.stripTrailingSlash,

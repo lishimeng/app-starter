@@ -94,7 +94,7 @@ func TestAdminRoutesWithApp(t *testing.T) {
 
 	err := app.New().Start(func(ctx context.Context, builder *app.ApplicationBuilder) error {
 		builder.
-			SetPprofListen(adminAddr).
+			SetAdminListen(adminAddr).
 			EnableAdminRoutes(admin.Register).
 			EnableWeb(webAddr)
 		return nil

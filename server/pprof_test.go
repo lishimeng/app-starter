@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TestStartPprofSetup(t *testing.T) {
+func TestStartAdminSetup(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(gin.Recovery())
@@ -39,15 +39,15 @@ func TestStartPprofSetup(t *testing.T) {
 	}
 }
 
-func TestStartPprofDebugMode(t *testing.T) {
+func TestStartAdminDebugMode(t *testing.T) {
 	prev := gin.Mode()
 	t.Cleanup(func() { gin.SetMode(prev) })
 
-	cfg := PprofConfig{LogLvl: "DEBUG"}
+	cfg := AdminConfig{LogLvl: "DEBUG"}
 	if !strings.EqualFold(cfg.LogLvl, "debug") {
 		t.Fatal("expected debug log level")
 	}
-	// Mirror StartPprof mode selection without binding a port.
+	// Mirror StartAdmin mode selection without binding a port.
 	if strings.EqualFold(cfg.LogLvl, "debug") {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -55,6 +55,13 @@ func TestStartPprofDebugMode(t *testing.T) {
 	}
 	if gin.Mode() != gin.DebugMode {
 		t.Fatalf("mode = %s, want debug", gin.Mode())
+	}
+}
+
+func TestStartAdminDisabled(t *testing.T) {
+	err := StartAdmin(context.Background(), AdminConfig{})
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

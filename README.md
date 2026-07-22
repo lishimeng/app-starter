@@ -17,8 +17,8 @@
 | `POST /cl` | 运行时改日志级别，body 示例：`{"level":"debug"}` |
 
 关闭 admin：`builder.DisableAdmin()`  
-改监听地址：`builder.SetPprofListen(":7070")`  
-`SetPprofListen("")` 等同于默认常量 `:6060`  
+改监听地址：`builder.SetAdminListen(":7070")`  
+`SetAdminListen("")` 等同于默认常量 `:6060`  
 `SetWebLogLevel("DEBUG")` 时，admin 启动也会打印 Gin 路由列表（与业务 Web 一致）。
 
 ### 注册业务 Admin API

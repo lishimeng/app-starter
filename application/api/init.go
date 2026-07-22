@@ -39,13 +39,13 @@ func Start(ctx context.Context, srv *server.Server) (err error) {
 	return nil
 }
 
-func StartPprof(ctx context.Context, cfg server.PprofConfig) (err error) {
+func StartAdmin(ctx context.Context, cfg server.AdminConfig) (err error) {
 	// Do not discard business Setup: wrap so framework /cl is registered first,
 	// then the caller's AdminSetup (from ApplicationBuilder.EnableAdminRoutes).
 	cfg.Setup = composeAdminSetup(cfg.Setup)
 	go func() {
 		log.Info("start admin server")
-		e := server.StartPprof(ctx, cfg)
+		e := server.StartAdmin(ctx, cfg)
 		if e != nil && e != http.ErrServerClosed {
 			log.Infof("%v", e)
 		}
