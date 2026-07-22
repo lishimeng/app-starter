@@ -11,8 +11,9 @@ import (
 type Component func(root Router)
 
 type Config struct {
-	Listen string
-	LogLvl string
+	Listen             string
+	LogLvl             string
+	StripTrailingSlash bool // rewrite /api/ → /api before routing (no 301)
 }
 
 type Server struct {
@@ -30,8 +31,9 @@ func New(config Config) *Server {
 		config: config,
 		engine: gin.New(),
 	}
-	// Match by path without trailing slash (rewrite /api/ → /api, no 301).
-	s.engine.RedirectTrailingSlash = false
+	if config.StripTrailingSlash {
+		s.engine.RedirectTrailingSlash = false
+	}
 	s.engine.Use(gin.Recovery())
 	return s
 }
@@ -88,9 +90,13 @@ func (s *Server) RegisterComponents(components ...Component) *Server {
 }
 
 func (s *Server) Start(ctx context.Context) error {
+	handler := http.Handler(s.engine)
+	if s.config.StripTrailingSlash {
+		handler = stripTrailingSlash(handler)
+	}
 	srv := &http.Server{
 		Addr:    s.config.Listen,
-		Handler: stripTrailingSlash(s.engine),
+		Handler: handler,
 	}
 	return serveHTTP(ctx, srv, "web server")
 }

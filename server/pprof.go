@@ -25,11 +25,12 @@ type AdminSetup func(Router)
 
 // PprofConfig configures the admin HTTP listener (pprof, metrics, and admin API).
 type PprofConfig struct {
-	Listen      string // e.g. DefaultPprofListen; empty disables the listener
-	Path        string // pprof prefix, default DefaultPprofPath
-	MetricsPath string // default DefaultMetricsPath
-	LogLvl      string // "debug" enables Gin route listing (same as web LogLvl)
-	Setup       AdminSetup
+	Listen             string // e.g. DefaultPprofListen; empty disables the listener
+	Path               string // pprof prefix, default DefaultPprofPath
+	MetricsPath        string // default DefaultMetricsPath
+	LogLvl             string // "debug" enables Gin route listing (same as web LogLvl)
+	StripTrailingSlash bool   // rewrite /demo/ping/ → /demo/ping before routing (no 301)
+	Setup              AdminSetup
 }
 
 // StartPprof listens on cfg.Listen and serves pprof and /metrics.
@@ -53,7 +54,9 @@ func StartPprof(ctx context.Context, cfg PprofConfig) error {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	engine := gin.New()
-	engine.RedirectTrailingSlash = false
+	if cfg.StripTrailingSlash {
+		engine.RedirectTrailingSlash = false
+	}
 	engine.Use(gin.Recovery())
 	pprof.Register(engine.Group(""), pprofPath)
 	engine.GET(metricsPath, gin.WrapH(MetricsHandler()))
@@ -61,9 +64,13 @@ func StartPprof(ctx context.Context, cfg PprofConfig) error {
 		cfg.Setup(NewRouter(engine))
 	}
 
+	handler := http.Handler(engine)
+	if cfg.StripTrailingSlash {
+		handler = stripTrailingSlash(handler)
+	}
 	srv := &http.Server{
 		Addr:    cfg.Listen,
-		Handler: stripTrailingSlash(engine),
+		Handler: handler,
 	}
 	return serveHTTP(ctx, srv, "admin server")
 }

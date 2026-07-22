@@ -68,6 +68,7 @@ type ApplicationBuilder struct {
 	pprofListen         string
 	pprofListenOverride bool
 	adminSetup          server.AdminSetup
+	stripTrailingSlash  bool
 
 	dbEnable bool
 	dbConfig persistence.BaseConfig
@@ -140,6 +141,13 @@ func (h *ApplicationBuilder) ReadyHandler(handler func() int) *ApplicationBuilde
 
 func (h *ApplicationBuilder) SetWebLogLevel(lvl string) *ApplicationBuilder {
 	h.webLogLevel = lvl
+	return h
+}
+
+// EnableStripTrailingSlash rewrites paths like /api/ → /api on web and admin
+// before routing (nginx-style, no 301). Off by default.
+func (h *ApplicationBuilder) EnableStripTrailingSlash() *ApplicationBuilder {
+	h.stripTrailingSlash = true
 	return h
 }
 

@@ -119,7 +119,8 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 	if h.builder.webEnable {
 		var srv *server.Server
 		conf := server.Config{
-			Listen: h.builder.webListen,
+			Listen:             h.builder.webListen,
+			StripTrailingSlash: h.builder.stripTrailingSlash,
 		}
 		if len(h.builder.webLogLevel) > 0 {
 			conf.LogLvl = h.builder.webLogLevel
@@ -154,9 +155,10 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 
 	if listen := h.builder.pprofListenAddr(); listen != "" {
 		err = api.StartPprof(factory.GetCtx(), server.PprofConfig{
-			Listen: listen,
-			LogLvl: h.builder.webLogLevel,
-			Setup:  h.builder.adminSetup,
+			Listen:             listen,
+			LogLvl:             h.builder.webLogLevel,
+			StripTrailingSlash: h.builder.stripTrailingSlash,
+			Setup:              h.builder.adminSetup,
 		})
 		if err != nil {
 			return

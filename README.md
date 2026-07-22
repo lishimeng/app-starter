@@ -60,15 +60,19 @@ POST http://localhost:6060/cl   {"level":"debug"}
 
 ### URL 尾斜杠
 
-业务 Web 与 admin（`:6060`）在进入路由前都会去掉路径末尾的 `/`（根路径 `/` 除外），类似 nginx rewrite，**不发 301**：
+默认关闭。调用 `EnableStripTrailingSlash()` 后，业务 Web 与 admin 在进入路由前会去掉路径末尾的 `/`（根路径 `/` 除外），类似 nginx rewrite，**不发 301**：
 
-```text
-/api/   →  /api
-/demo/ping/  →  /demo/ping
-/       →  /（不变）
+```go
+builder.EnableStripTrailingSlash()
 ```
 
-请把路由注册成不带尾斜杠的形式（如 `GET /api`、`GET /demo/ping`）。
+```text
+/api/        →  /api
+/demo/ping/  →  /demo/ping
+/            →  /（不变）
+```
+
+开启后请把路由注册成不带尾斜杠的形式（如 `GET /api`、`GET /demo/ping`）。关闭时沿用 Gin 默认的尾斜杠重定向（`RedirectTrailingSlash`）。
 
 Delete tag
 ---

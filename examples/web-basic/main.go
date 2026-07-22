@@ -46,6 +46,7 @@ func _main() (err error) {
 			EnableDatabaseLog().
 			EnableStaticWeb(app.WithEmbed(static.Static)).
 			EnableAdminRoutes(admin.Register).
+			EnableStripTrailingSlash().
 			SetWebLogLevel("DEBUG").
 			ComponentBefore(proc.Before).
 			ComponentAfter(proc.After).
