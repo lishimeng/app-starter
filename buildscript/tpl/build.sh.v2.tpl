@@ -234,6 +234,9 @@ build_image(){
     if [ -n "${NPM_REGISTRY:-}" ]; then
       docker_extra+=(--build-arg NPM_REGISTRY="${NPM_REGISTRY}")
     fi
+    # 关闭 BuildKit 默认 provenance/SBOM：阿里云等旧仓库会拒收
+    # application/vnd.oci.empty.v1+json（unknown manifest class）
+    docker_extra+=(--provenance=false --sbom=false)
     log_info "docker build start: ${Name}"
     if ! docker build -t "${Namespace}/${Name}:${Version}" \
       --build-arg NAME="${Name}" \
