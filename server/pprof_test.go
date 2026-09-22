@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/lishimeng/app-starter/server/pprof"
 )
 
 func TestStartAdminSetup(t *testing.T) {
@@ -18,7 +18,7 @@ func TestStartAdminSetup(t *testing.T) {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 	pprof.Register(engine.Group(""), DefaultPprofPath)
-	engine.GET(DefaultMetricsPath, gin.WrapH(MetricsHandler()))
+	engine.GET(DefaultMetricsPath, handleMetrics)
 	called := false
 	setup := AdminSetup(func(r Router) {
 		called = true
@@ -65,12 +65,11 @@ func TestStartAdminDisabled(t *testing.T) {
 	}
 }
 
-
 func TestAdminRoutes(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	pprof.Register(engine.Group(""), DefaultPprofPath)
-	engine.GET(DefaultMetricsPath, gin.WrapH(MetricsHandler()))
+	engine.GET(DefaultMetricsPath, handleMetrics)
 
 	req := httptest.NewRequest(http.MethodGet, DefaultPprofPath+"/", nil)
 	w := httptest.NewRecorder()

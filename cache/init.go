@@ -5,7 +5,7 @@ import (
 	"time"
 
 	gocache "github.com/go-redis/cache/v9"
-	starterredis "github.com/lishimeng/app-starter/redis"
+	starterredis "github.com/lishimeng/x/redis"
 )
 
 type Options struct {

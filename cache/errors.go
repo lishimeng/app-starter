@@ -3,7 +3,7 @@
 import (
 	"errors"
 
-	starterredis "github.com/lishimeng/app-starter/redis"
+	starterredis "github.com/lishimeng/x/redis"
 )
 
 var errNotFound = errors.New("cache: not found")

@@ -13,11 +13,11 @@ import (
 	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
-	"github.com/lishimeng/app-starter/redis"
 	"github.com/lishimeng/app-starter/server"
 	"github.com/lishimeng/app-starter/token"
 	"github.com/lishimeng/app-starter/version"
 	"github.com/lishimeng/x/etc"
+	"github.com/lishimeng/x/redis"
 )
 
 type TokenValidatorInjectFunc func(storage token.Storage)
@@ -65,9 +65,9 @@ type ApplicationBuilder struct {
 
 	webLogLevel string
 
-	adminEnable bool
-	adminListen string
-	adminSetup  server.AdminSetup
+	adminEnable        bool
+	adminListen        string
+	adminSetup         server.AdminSetup
 	stripTrailingSlash bool
 
 	dbEnable bool
@@ -245,7 +245,7 @@ func (h *ApplicationBuilder) EnableMqtt(options ...mqtt.ClientOption) *Applicati
 	return h
 }
 
-// EnableTokenValidator 楠岃瘉Token锛屼娇鐢≧edisTokenValidator鍓嶉渶瑕乪nableCache
+// EnableTokenValidator token验证器
 func (h *ApplicationBuilder) EnableTokenValidator(builder TokenValidatorBuilder) *ApplicationBuilder {
 	h.tokenValidatorEnable = true
 	h.tokenValidatorBuilder = builder

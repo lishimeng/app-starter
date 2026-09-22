@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/lishimeng/app-starter/log"
+	"github.com/lishimeng/app-starter/server/pprof"
 )
 
 // DefaultAdminListen is the default admin listen address (pprof + metrics + admin API).
@@ -59,7 +59,7 @@ func StartAdmin(ctx context.Context, cfg AdminConfig) error {
 	}
 	engine.Use(gin.Recovery())
 	pprof.Register(engine.Group(""), pprofPath)
-	engine.GET(metricsPath, gin.WrapH(MetricsHandler()))
+	engine.GET(metricsPath, handleMetrics)
 	if cfg.Setup != nil {
 		cfg.Setup(NewRouter(engine))
 	}

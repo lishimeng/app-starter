@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/lishimeng/app-starter/cache"
+	"github.com/lishimeng/app-starter/log"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
-	"github.com/lishimeng/app-starter/redis"
 	"github.com/lishimeng/app-starter/server"
-	"github.com/lishimeng/app-starter/log"
 	proxy "github.com/lishimeng/x/container"
+	"github.com/lishimeng/x/redis"
 )
 
 const (

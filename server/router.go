@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/lishimeng/app-starter/server/pprof"
 )
 
 type Handler func(ctx Context)
@@ -31,32 +31,38 @@ func (r *router) Path(prefix string) Router {
 	return &router{g: r.g.Group(prefix)}
 }
 
+func (r *router) add(path string, handlers []Handler, register func(...gin.HandlerFunc)) {
+	withRouteHandlerName(handlers, func() {
+		register(wrapGinHandlers(handlers...)...)
+	})
+}
+
 func (r *router) Get(path string, handlers ...Handler) {
-	r.g.GET(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.GET(path, hs...) })
 }
 
 func (r *router) Post(path string, handlers ...Handler) {
-	r.g.POST(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.POST(path, hs...) })
 }
 
 func (r *router) Put(path string, handlers ...Handler) {
-	r.g.PUT(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.PUT(path, hs...) })
 }
 
 func (r *router) Delete(path string, handlers ...Handler) {
-	r.g.DELETE(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.DELETE(path, hs...) })
 }
 
 func (r *router) Patch(path string, handlers ...Handler) {
-	r.g.PATCH(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.PATCH(path, hs...) })
 }
 
 func (r *router) Options(path string, handlers ...Handler) {
-	r.g.OPTIONS(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.OPTIONS(path, hs...) })
 }
 
 func (r *router) Any(path string, handlers ...Handler) {
-	r.g.Any(path, wrapGinHandlers(handlers...)...)
+	r.add(path, handlers, func(hs ...gin.HandlerFunc) { r.g.Any(path, hs...) })
 }
 
 func (r *router) MountPprof(relativePath string) {

@@ -7,8 +7,8 @@ import (
 	"github.com/lishimeng/app-starter/factory"
 	"github.com/lishimeng/app-starter/mqtt"
 	"github.com/lishimeng/app-starter/persistence"
-	"github.com/lishimeng/app-starter/redis"
 	"github.com/lishimeng/app-starter/server"
+	"github.com/redis/go-redis/v9"
 )
 
 type Application interface {

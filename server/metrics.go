@@ -72,3 +72,7 @@ func MetricsHandler() http.Handler {
 	initMetrics()
 	return promhttp.HandlerFor(metricsReg, promhttp.HandlerOpts{})
 }
+
+func handleMetrics(c *gin.Context) {
+	MetricsHandler().ServeHTTP(c.Writer, c.Request)
+}
