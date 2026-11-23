@@ -62,6 +62,22 @@ POST http://localhost:6060/cl   {"level":"debug"}
 
 完整示例见 [`examples/web-basic`](examples/web-basic)（含 `admin.Register` 与测试）。
 
+### Web 全局中间件
+
+通过 `EnableWebMiddleware` 注册（`server.Handler`，不要直接 `gin.Use`）。  
+启动顺序：`Recovery` → **业务全局中间件** → Metrics（若开启 admin）→ 路由 / 静态。
+
+```go
+builder.
+    EnableWebMiddleware(func(ctx server.Context) {
+        ctx.SetHeader("X-Request-Id", "...")
+        ctx.Next() // 必须继续后续中间件/路由
+    }).
+    EnableWeb(":9527", router.Router)
+```
+
+可多次调用，按调用顺序追加。
+
 ### URL 尾斜杠
 
 默认关闭。调用 `EnableStripTrailingSlash()` 后，业务 Web 与 admin 在进入路由前会去掉路径末尾的 `/`（根路径 `/` 除外），类似 nginx rewrite，**不发 301**：

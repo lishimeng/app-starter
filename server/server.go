@@ -47,6 +47,15 @@ func (s *Server) RegisterComponent(component Component) *Server {
 	return s
 }
 
+// Use registers global HTTP middleware. Call before RegisterComponents / route setup.
+func (s *Server) Use(handlers ...Handler) *Server {
+	if len(handlers) == 0 {
+		return s
+	}
+	s.engine.Use(wrapGinHandlers(handlers...)...)
+	return s
+}
+
 func (s *Server) AdvancedConfig(handler func(*gin.Engine)) *Server {
 	if handler != nil {
 		handler(s.engine)

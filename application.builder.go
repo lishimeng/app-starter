@@ -51,9 +51,10 @@ func (h *ApplicationBuilder) EnableEmbedStaticWeb(fsys fs.FS, root ...string) *A
 }
 
 type ApplicationBuilder struct {
-	webEnable     bool
-	webListen     string
-	webComponents []server.Component
+	webEnable      bool
+	webListen      string
+	webComponents  []server.Component
+	webMiddlewares []server.Handler
 
 	webStaticEnable bool
 	vdir            string
@@ -117,6 +118,15 @@ func (h *ApplicationBuilder) EnableWeb(listen string, components ...server.Compo
 		h.webComponents = append(h.webComponents, components...)
 	}
 	// TODO check
+	return h
+}
+
+// EnableWebMiddleware registers global HTTP middleware on the main web server.
+// Applied after Recovery and before metrics/routes. Handlers should call ctx.Next().
+func (h *ApplicationBuilder) EnableWebMiddleware(handlers ...server.Handler) *ApplicationBuilder {
+	if len(handlers) > 0 {
+		h.webMiddlewares = append(h.webMiddlewares, handlers...)
+	}
 	return h
 }
 

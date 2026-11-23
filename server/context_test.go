@@ -66,6 +66,36 @@ func TestContextMiddlewareSetGet(t *testing.T) {
 	}
 }
 
+func TestServerUseGlobalMiddleware(t *testing.T) {
+	srv := New(Config{Listen: ":0"})
+	var order []string
+	srv.Use(func(ctx Context) {
+		order = append(order, "mw")
+		ctx.SetHeader("X-Global", "1")
+		ctx.Next()
+	})
+	srv.RegisterComponent(func(root Router) {
+		root.Get("/ping", func(ctx Context) {
+			order = append(order, "handler")
+			ctx.Json(map[string]string{"ok": "true"})
+		})
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/ping", nil)
+	w := httptest.NewRecorder()
+	srv.GetEngine().ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", w.Code)
+	}
+	if w.Header().Get("X-Global") != "1" {
+		t.Fatal("missing X-Global from global middleware")
+	}
+	if len(order) != 2 || order[0] != "mw" || order[1] != "handler" {
+		t.Fatalf("order = %v, want [mw handler]", order)
+	}
+}
+
 func TestContextBindJSON(t *testing.T) {
 	srv := New(Config{Listen: ":0"})
 	srv.RegisterComponent(func(root Router) {

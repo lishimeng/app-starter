@@ -133,6 +133,10 @@ func (h *application) _start(buildHandler func(ctx context.Context, builder *App
 		}
 		factory.RegisterWebServer(*srv)
 
+		// Global middleware must be registered before routes.
+		if len(h.builder.webMiddlewares) > 0 {
+			srv.Use(h.builder.webMiddlewares...)
+		}
 		if h.builder.adminListenAddr() != "" {
 			srv.EnableMetrics()
 		}
